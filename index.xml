@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Rasta Mouse</title>
-    <link>http://localhost/</link>
+    <link>http://rastamouse.me/</link>
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="http://localhost/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>

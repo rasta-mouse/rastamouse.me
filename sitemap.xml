@@ -2,22 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://localhost/archives/</loc>
+    <loc>http://rastamouse.me/archives/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://localhost/categories/</loc>
+    <loc>http://rastamouse.me/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://localhost/</loc>
+    <loc>http://rastamouse.me/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://localhost/tags/</loc>
+    <loc>http://rastamouse.me/tags/</loc>
     <priority>0</priority>
   </url>
   
