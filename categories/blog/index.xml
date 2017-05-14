@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Rasta Mouse</title>
-    <link>http://rastamouse.me/</link>
-    <description>Recent content on Rasta Mouse</description>
+    <title>Blog on Rasta Mouse</title>
+    <link>http://rastamouse.me/categories/blog/</link>
+    <description>Recent content in Blog on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 13 May 2017 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://rastamouse.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>

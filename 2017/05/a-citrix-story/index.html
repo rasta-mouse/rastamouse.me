@@ -1,0 +1,874 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.20.1">
+    <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
+    <title>A Citrix Story</title>
+    <meta name="author" content="Rasta Mouse">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="http://rastamouse.me/favicon.png">
+    
+
+    
+    <meta name="description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
+
+">
+    <meta property="og:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
+
+">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="A Citrix Story">
+    <meta property="og:url" content="/2017/05/a-citrix-story/">
+    <meta property="og:site_name" content="Rasta Mouse">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rasta Mouse">
+    <meta name="twitter:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
+
+">
+    
+      <meta name="twitter:creator" content="@_RastaMouse">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=640">
+    
+
+    
+      <meta property="og:image" content="http://rastamouse.me/images/citrix/citrix-icon.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" />
+    
+    
+    <link rel="stylesheet" href="http://rastamouse.me/css/style-u6mk0ojoywresbx8iepslrmmhl4stuhrsxuwhkpwrkrx7mryjcaimasnk4pi.min.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="http://rastamouse.me/">Rasta Mouse</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="http://rastamouse.me/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="http://rastamouse.me/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Rasta Mouse</h4>
+        
+          <h5 class="sidebar-profile-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="http://rastamouse.me/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="http://rastamouse.me/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="http://rastamouse.me/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="http://rastamouse.me/#about">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="http://rastamouse.me/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://twitter.com/_RastaMouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+      
+      <span class="sidebar-button-desc">Twitter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://keybase.io/rasta_mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-lock"></i>
+      
+      <span class="sidebar-button-desc">Keybase</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastalabs.net" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-shield"></i>
+      
+      <span class="sidebar-button-desc">RastaLabs</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/rasta-mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="http://rastamouse.me/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      A Citrix Story
+    </h1>
+  
+  <div class="postShorten-meta post-meta">
+  
+    <time itemprop="datePublished" datetime="2017-05-13T00:00:00Z">
+      
+  
+  
+  
+  
+    13 May 2017
+  
+
+    </time>
+  
+  
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="http://rastamouse.me/categories/blog">blog</a>
+    
+  
+
+
+</div>
+
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p>I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.</p>
+
+<p></p>
+
+<h2 id="background">Background</h2>
+
+<p>The purpose of the system was to provide staff a means of accessing internal resources via a BYOD model.  They would login to a publically available Citrix Access Gateway and receive a virtual desktop instance of Windows 7.</p>
+
+<p>The scope was limited to the VDI&rsquo;s so I wasn&rsquo;t to attack other elements of the domain, which made lateral movement a pain in particular.  This post is an outline of how, after initial local privilege escalation, I was able to leverage Kerberos Silver Tickets as a means of maintaining elevated persistence and lateral movement capability.</p>
+
+<p>This was a partial white-box review, so I did have some valid credentials to log in with.  So we&rsquo;ll kick this off with a Cobalt Strike foothold.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/1-vdi4_nlove.PNG" />
+    
+    
+</figure>
+
+
+<h2 id="persistence">Persistence</h2>
+
+<p>I have a session as <code>nlove</code>, and I&rsquo;d like to keep it that way.  One tricky aspect to VDI is that each time a user logs on, they get assigned a fresh desktop from the master image.  This means that once a user logs off a virtual desktop, any changes they may&rsquo;ve made are lost.  Provisions must be made for users&rsquo; files etc, but like regular domain roaming profiles, there are some elements that get left behind.</p>
+
+<p>In this case, it turns out practically everything that occurs within userland persist across different VDI sessions, including HKCU.  So I setup a really simple level of persistence in <code>HKCU\Software\Microsoft\Windows\CurrentVersion\Run</code>.</p>
+
+<p>This persistence method also helps us with our lateral movement problem - more on that later.</p>
+
+<h2 id="priv-esc">Priv Esc</h2>
+
+<p>This turned out to be relatively simple.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/2-vdi4_localadmins.PNG" />
+    
+    
+</figure>
+
+
+<p>One of the system administrators must&rsquo;ve put <code>bob</code> in at some point for testing or during early development, but it was a pretty big derp as it has no password.  The only difficultly I had was spawning a new session via Beacon.  The built-in parser won&rsquo;t handle a blank password and writing a custom aggressor script to run <code>bspawnas</code> didn&rsquo;t work either.  I tried a few others like <code>runas</code>, but I eventually resigned myself to elevating in the actual virtual desktop.  So I just uploaded a stageless PowerShell SMB payload and ran it manually.</p>
+
+<p>
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/3-vdi4_bob.PNG" />
+    
+    
+</figure>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/4-vdi4_smbbeacon.PNG" />
+    
+    
+</figure>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/5-vdi4_bobbeacon.PNG" />
+    
+    
+</figure>
+</p>
+
+<p>If any readers have a solution to this - please let me know!</p>
+
+<p>Now that we have admin access over the desktop, we can carry out the classic act of dumping all the password hashes.  The accounts we&rsquo;re interested in are <code>CitrixAdmin</code> and <code>VDI-004$</code>.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/6-vdi4_creds.PNG" />
+    
+    
+</figure>
+
+
+<p>The Cobalt Strike credential parser doesn&rsquo;t grab machine hashes by default.  <a href="https://github.com/bluscreenofjeff/AggressorScripts/blob/master/silver-tickets.cna">Silver Ticket Monitor</a> is an aggressor extension built by <a href="https://twitter.com/bluscreenofjeff">Jeff Dimmock</a>, which enables machine hash tracking and provides a new GUI popup for crafting Silver Tickets.</p>
+
+<h2 id="lateral-movement">Lateral Movement</h2>
+
+<p>Even though I have the credentials for 2 local admin accounts (the built-in Administrator account is disabled), they can&rsquo;t be used to move laterally across the other VDIs.  Non-RID 500 accounts cannot (by default) authenticate as administrators across a network, even if the credentials are identical across computers.  <a href="https://twitter.com/harmj0y">Will Schroeder</a> <a href="http://www.harmj0y.net/blog/redteaming/pass-the-hash-is-dead-long-live-localaccounttokenfilterpolicy/">blogged</a> about this a while ago.</p>
+
+<h2 id="the-desktop-shuffle">The Desktop Shuffle</h2>
+
+<p>This is where things start getting at least a little more interesting.</p>
+
+<p>Let&rsquo;s say <code>nlove</code> logs off for the day and we lose our Beacons.  Next morning he logs on and gets a fresh virtual desktop.  Because his user profile follows him from desktop to desktop, our registry persistence calls back and we get a new session.  This time on <code>VDI-001</code>.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/7-vdi1_nlove.PNG" />
+    
+    
+</figure>
+
+
+<p>We can elevate using the <code>CitrixAdmin</code> account, because the password is the same across all systems.  Here, we do a <code>spawnas</code> and <code>bypassuac</code>.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/8-vdi1_elevate.PNG" />
+    
+    
+</figure>
+
+
+<p>We can now dump the machine hash for <code>VDI-001</code>.  The next trick, is moving laterally back to <code>VDI-004</code>, which we can do using its machine hash that we obtained previously.  Using Jeff&rsquo;s extension:</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/9-silver_ticket.PNG" />
+    
+    
+</figure>
+
+
+<p>The domain SID can be obtained via <code>shell whoami /all</code>; and the actual <code>mimiktaz</code> command to forge the Silver Ticket is <code>mimikatz kerberos::golden /user:CitrixAdmin /domain:wild-west.local /sid:S-1-5-21-4247185703-3639085842-2880657779 /target:VDI-004.wild-west.local /rc4:ea0830b4abd1f2c976bb443f64f8186d /service:cifs /ptt</code></p>
+
+<p>Once the ticket has been injected into our current session, we can simply do a <code>psexec_psh</code> (or whatever method you prefer) to take <code>VDI-004</code>.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/10-vdi1_4.PNG" />
+    
+    
+</figure>
+
+
+<p>Now we have control over 2 VDIs.</p>
+
+<p>If we take a look at <code>VDI-004</code> we can see that it&rsquo;s been assigned to another user, <code>rparker</code>.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/11-vdi4_netlogons.PNG" />
+    
+    
+</figure>
+
+
+<p>We can obviously steal his password, inject a new Beacon into one of his processes and setup the same userland persistance as with <code>nlove</code>.</p>
+
+<p>
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/12-vdi4_creds.PNG" />
+    
+    
+</figure>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/13-vdi1_4.PNG" />
+    
+    
+</figure>
+</p>
+
+<h3 id="rince-and-repeat">Rince and Repeat</h3>
+
+<p>Let&rsquo;s say another day goes by, <code>nlove</code> and <code>rparker</code> have logged back in and are assigned <code>VDI-005</code> and <code>VDI-003</code> respectively.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/14-vdi3_5.PNG" />
+    
+    
+</figure>
+
+
+<p>We elevate on both desktops.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/15-vdi3_5_elevated.PNG" />
+    
+    
+</figure>
+
+
+<p>Dump the hashes.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/16-vdi1345_creds.PNG" />
+    
+    
+</figure>
+
+
+<p>And Pass the Ticket to take <code>VDI-001</code> and <code>VDI-004</code> again.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/17-moar_vdi.PNG" />
+    
+    
+</figure>
+
+
+<p>We now discover a new user on <code>VDI-004</code> - <code>jhardin</code>.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/18-vdi4_jhardin.PNG" />
+    
+    
+</figure>
+
+
+<p>Follow the same process of persisting as <code>jhardin</code> and spreading to more desktops.</p>
+
+
+<figure >
+    
+        <img src="http://rastamouse.me/images/citrix/19-final.PNG" />
+    
+    
+</figure>
+
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There are obviously better and more elegent methods of moving laterally across machines.  Given the limitation of the scope, this seemed to be the best available option.  By default, computer hashes are automatically rotated every 30 days, so it would be a lot of work to maintain access across a large number of desktops.  As long as there is sufficient overlap between the computer and <code>CitrixAdmin</code> account passwords being changed, you could likely persist in this manner for a long time.</p>
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="http://rastamouse.me/tags/citrix/">citrix</a>
+
+  <a class="tag tag--primary tag--small" href="http://rastamouse.me/tags/cobalt-strike/">cobalt strike</a>
+
+  <a class="tag tag--primary tag--small" href="http://rastamouse.me/tags/mimikatz/">mimikatz</a>
+
+  <a class="tag tag--primary tag--small" href="http://rastamouse.me/tags/pass-the-ticket/">pass the ticket</a>
+
+  <a class="tag tag--primary tag--small" href="http://rastamouse.me/tags/silver-tickets/">silver tickets</a>
+
+                  </div>
+                
+              
+            
+            <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2017 Rasta Mouse. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <ul class="share-options">
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Rasta Mouse</h4>
+    
+      <div id="about-card-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Penetration Tester
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        UK
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="http://rastamouse.me/2017/05/a-citrix-story/">
+                <h3 class="media-heading">A Citrix Story</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  May 5, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.</p>
+
+<p></p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="http://rastamouse.me/post/">
+                <h3 class="media-heading">Posts</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  May 5, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         2 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('http://rastamouse.me/images/cover.jpg');"></div>
+  
+
+
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.js"></script>
+
+
+<script src="http://rastamouse.me/js/script-wl33z0n6ocaypepiqrazthtivfrliqijej4rq8ek8gvrv1awftmgjuv8k4zc.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight').each(function(i, block) {
+    var code = "";
+    hljs.highlightAuto(block.innerText).value.split(/\r\n|\r|\n/).forEach(function(line) {
+      code += "<span class=\"line\">" + line + "</span><br>";
+    });
+    if (code.length > 0) {
+      block.innerHTML = code;  
+    }
+  });
+  $('pre > code').each(function(i, block) {
+    $(this).addClass('codeblock');
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = 'http:\/\/rastamouse.me\/2017\/05\/a-citrix-story\/';
+          
+            this.page.identifier = '\/2017\/05\/a-citrix-story\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'rasta-mouse';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+
+
+    
+  </body>
+</html>
+

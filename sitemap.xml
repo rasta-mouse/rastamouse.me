@@ -2,22 +2,72 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://rastamouse.me/2017/05/a-citrix-story/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://rastamouse.me/archives/</loc>
     <priority>0</priority>
   </url>
   
   <url>
+    <loc>http://rastamouse.me/categories/blog/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://rastamouse.me/categories/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://rastamouse.me/tags/citrix/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://rastamouse.me/tags/cobalt-strike/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://rastamouse.me/tags/mimikatz/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://rastamouse.me/tags/pass-the-ticket/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://rastamouse.me/post/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://rastamouse.me/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://rastamouse.me/tags/silver-tickets/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://rastamouse.me/tags/</loc>
+    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
