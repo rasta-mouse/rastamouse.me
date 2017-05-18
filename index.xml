@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Rasta Mouse</title>
-    <link>http://rastamouse.me/</link>
+    <link>https://rastamouse.me/</link>
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 13 May 2017 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>A Citrix Story</title>
-      <link>http://rastamouse.me/2017/05/a-citrix-story/</link>
+      <link>https://rastamouse.me/2017/05/a-citrix-story/</link>
       <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
       
-      <guid>http://rastamouse.me/2017/05/a-citrix-story/</guid>
+      <guid>https://rastamouse.me/2017/05/a-citrix-story/</guid>
       <description>&lt;p&gt;I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
