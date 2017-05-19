@@ -23,7 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.20.2">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>A Citrix Story</title>
+    <title>Playing with Cuckoo</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
@@ -31,19 +31,19 @@
     
 
     
-    <meta name="description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
+    <meta name="description" content="After the release and complete hubbub that WannaCry caused, I thought it would be fun to play with Cuckoo Sandbox.
 
 ">
-    <meta property="og:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
+    <meta property="og:description" content="After the release and complete hubbub that WannaCry caused, I thought it would be fun to play with Cuckoo Sandbox.
 
 ">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="A Citrix Story">
-    <meta property="og:url" content="/2017/05/a-citrix-story/">
+    <meta property="og:title" content="Playing with Cuckoo">
+    <meta property="og:url" content="/2017/05/playing-with-cuckoo/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
+    <meta name="twitter:description" content="After the release and complete hubbub that WannaCry caused, I thought it would be fun to play with Cuckoo Sandbox.
 
 ">
     
@@ -59,7 +59,7 @@
     
 
     
-      <meta property="og:image" content="https://rastamouse.me/images/citrix/citrix-icon.png">
+      <meta property="og:image" content="https://rastamouse.me/images/cuckoo/cuckoo-icon.png">
     
     
     
@@ -241,18 +241,18 @@
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      A Citrix Story
+      Playing with Cuckoo
     </h1>
   
   <div class="postShorten-meta post-meta">
   
-    <time itemprop="datePublished" datetime="2017-05-13T00:00:00Z">
+    <time itemprop="datePublished" datetime="2017-05-18T00:00:00Z">
       
   
   
   
   
-    13 May 2017
+    18 May 2017
   
 
     </time>
@@ -273,54 +273,32 @@
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <p>I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.</p>
+              <p>After the release and complete hubbub that <a href="https://en.wikipedia.org/wiki/WannaCry_ransomware_attack">WannaCry</a> caused, I thought it would be fun to play with <a href="https://cuckoosandbox.org/">Cuckoo Sandbox</a>.</p>
 
 <p></p>
 
-<h2 id="background">Background</h2>
+<p>It&rsquo;s something I&rsquo;ve always had an interest in, but have never taken the time to indulge.</p>
 
-<p>The purpose of the system was to provide staff a means of accessing internal resources via a BYOD model.  They would login to a publically available Citrix Access Gateway and receive a virtual desktop instance of Windows 7.</p>
+<p>The <a href="https://cuckoo.sh/docs/">Cuckoo Documentation</a> is very well written and will honestly get someone 95% towards getting a working instance setup.  I had a few niggling issues that I don&rsquo;t think are covered within the docs (I could be wrong, correct me if so).  This post is a quick whistle-stop tour of how I went about getting it working.</p>
 
-<p>The scope was limited to the VDI&rsquo;s so I wasn&rsquo;t to attack other elements of the domain, which made lateral movement a pain in particular.  This post is an outline of how, after initial local privilege escalation, I was able to leverage Kerberos Silver Tickets as a means of maintaining elevated persistence and lateral movement capability.</p>
+<blockquote>
+<p>Note: I didn&rsquo;t follow all the best practices and this is not a guide to setting up a complete, proper and scalable solution.  It assumes you don&rsquo;t have a dedicated server and are just looking to experiment with Cuckoo on an existing desktop/laptop.</p>
+</blockquote>
 
-<p>This was a partial white-box review, so I did have some valid credentials to log in with.  So we&rsquo;ll kick this off with a Cobalt Strike foothold.</p>
+<h2 id="foreword">Foreword</h2>
 
+<p>There are lots of virtualisation technologies that Cuckoo is compatible with - from VirtualBox, ESXi, KVM and so on.  I&rsquo;m running Windows 10 on my desktop, so I initially wanted to run Cuckoo in a VM within VirtualBox and have futher VirtualBox VMs inside that Cuckoo VM.  Nested hypervisors doesn&rsquo;t sound very efficient but with relatively mature VT-x and AMD-V technology, the performance impact seems rather negligible.</p>
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/1-vdi4_nlove.PNG" />
-    
-    
-</figure>
+<p>I ran into my first frustration with VirtualBox, as it doesn&rsquo;t pass VT-x/AMD-V through to its guest VMs.  The upshot of this is that if you run Cuckoo inside VirtualBox on your host, you then can&rsquo;t have 64-bit VMs for the malware sandboxes.  VMware Workstation Player doesn&rsquo;t have this restriction, so I opted to use this instead of VirtualBox on my host.</p>
 
+<p>You will obviously need to decide if this is an issue for you based on your planned usage.</p>
 
-<h2 id="persistence">Persistence</h2>
-
-<p>I have a session as <code>nlove</code>, and I&rsquo;d like to keep it that way.  One tricky aspect to VDI is that each time a user logs on, they get assigned a fresh desktop from the master image.  This means that once a user logs off a virtual desktop, any changes they may&rsquo;ve made are lost.  Provisions must be made for users&rsquo; files etc, but like regular domain roaming profiles, there are some elements that get left behind.</p>
-
-<p>In this case, it turns out practically everything that occurs within userland persist across different VDI sessions, including HKCU.  So I setup a really simple level of persistence in <code>HKCU\Software\Microsoft\Windows\CurrentVersion\Run</code>.</p>
-
-<p>This persistence method also helps us with our lateral movement problem - more on that later.</p>
-
-<h2 id="priv-esc">Priv Esc</h2>
-
-<p>This turned out to be relatively simple.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/2-vdi4_localadmins.PNG" />
-    
-    
-</figure>
-
-
-<p>One of the system administrators must&rsquo;ve put <code>bob</code> in at some point for testing or during early development, but it was a pretty big derp as it has no password.  The only difficultly I had was spawning a new session via Beacon.  The built-in parser won&rsquo;t handle a blank password and writing a custom aggressor script to run <code>bspawnas</code> didn&rsquo;t work either.  I tried a few others like <code>runas</code>, but I eventually resigned myself to elevating in the actual virtual desktop.  So I just uploaded a stageless PowerShell SMB payload and ran it manually.</p>
+<p>The architecture that we are going to setup, looks as follows:</p>
 
 <p>
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/3-vdi4_bob.PNG" />
+        <img src="https://rastamouse.me/images/cuckoo/arch.png" />
     
     
 </figure>
@@ -328,192 +306,258 @@
 
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/4-vdi4_smbbeacon.PNG" />
-    
-    
-</figure>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/5-vdi4_bobbeacon.PNG" />
+        <img src="https://rastamouse.me/images/cuckoo/network.png" />
     
     
 </figure>
 </p>
 
-<p>If any readers have a solution to this - please let me know!</p>
+<p>So that&rsquo;s a bunch of VirtualBox VMs running inside a VMware VM :)</p>
 
-<p>Now that we have admin access over the desktop, we can carry out the classic act of dumping all the password hashes.  The accounts we&rsquo;re interested in are <code>CitrixAdmin</code> and <code>VDI-004$</code>.</p>
+<h2 id="configuring-the-cuckoo-host">Configuring the Cuckoo Host</h2>
+
+<p>I&rsquo;m using Ubuntu Server 16.04.2 64-bit.  You will need enough resources for it to run itself and at least 1 concurrent VM inside; and a sh*t tonne of storage if you want to do full memory dumps.</p>
+
+<p>I gave mine:</p>
+
+<ul>
+<li>8 CPU Cores
+
+<ul>
+<li>Tick <code>Enable Virtualize Intel VT-x/EPT or AMD-V/RVI</code></li>
+</ul></li>
+<li>4GB RAM</li>
+<li>100GB Hard Disk</li>
+<li>NIC 1: NAT</li>
+<li>NIC 2: Host-Only</li>
+</ul>
+
+<h3 id="software">Software</h3>
+
+<pre><code class="language-bash">cuckoo@cuckoo:~$ echo deb http://download.virtualbox.org/virtualbox/debian xenial contrib | sudo tee -a /etc/apt/sources.list.d/virtualbox.list
+cuckoo@cuckoo:~$ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+cuckoo@cuckoo:~$ sudo apt-get update
+cuckoo@cuckoo:~$ sudo apt-get install python python-pip python-dev libffi-dev libssl-dev python-virtualenv python-setuptools libjpeg-dev zlib1g-dev swig mongodb xfce4 virtualbox-5.1 tcpdump apparmor-utils
+
+cuckoo@cuckoo:~$ sudo aa-disable /usr/sbin/tcpdump
+cuckoo@cuckoo:~$ sudo setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
+
+cuckoo@cuckoo:~$ git clone https://github.com/volatilityfoundation/volatility.git
+cuckoo@cuckoo:~$ pip install -U pip pycrypto distorm3
+cuckoo@cuckoo:~$ cd volatility/
+cuckoo@cuckoo:~/volatility$ sudo python setup.py install
+
+cuckoo@cuckoo:~$ virtualenv cuckoo
+cuckoo@cuckoo:~$ . cuckoo/bin/activate
+(cuckoo) cuckoo@cuckoo:~$ pip install -U yara-python cuckoo
+
+(cuckoo) cuckoo@cuckoo:~$ cuckoo
+
+            _       _                   _             _              _            _
+          /\ \     /\_\               /\ \           /\_\           /\ \         /\ \
+         /  \ \   / / /         _    /  \ \         / / /  _       /  \ \       /  \ \
+        / /\ \ \  \ \ \__      /\_\ / /\ \ \       / / /  /\_\    / /\ \ \     / /\ \ \
+       / / /\ \ \  \ \___\    / / // / /\ \ \     / / /__/ / /   / / /\ \ \   / / /\ \ \
+      / / /  \ \_\  \__  /   / / // / /  \ \_\   / /\_____/ /   / / /  \ \_\ / / /  \ \_\
+     / / /    \/_/  / / /   / / // / /    \/_/  / /\_______/   / / /   / / // / /   / / /
+    / / /          / / /   / / // / /          / / /\ \ \     / / /   / / // / /   / / /
+   / / /________  / / /___/ / // / /________  / / /  \ \ \   / / /___/ / // / /___/ / /
+  / / /_________\/ / /____\/ // / /_________\/ / /    \ \ \ / / /____\/ // / /____\/ /
+  \/____________/\/_________/ \/____________/\/_/      \_\_\\/_________/ \/_________/
+
+ Cuckoo Sandbox 2.0.2
+ www.cuckoosandbox.org
+ Copyright (c) 2010-2017
+
+=======================================================================
+    Welcome to Cuckoo Sandbox, this appears to be your first run!
+    We will now set you up with our default configuration.
+    You will be able to see and modify the Cuckoo configuration,
+    Yara rules, Cuckoo Signatures, and much more to your likings
+    by exploring the /home/cuckoo/.cuckoo directory.
+
+    Among other configurable items of most interest is the
+    new location for your Cuckoo configuration:
+              /home/cuckoo/.cuckoo/conf
+=======================================================================
+
+Cuckoo has finished setting up the default configuration.
+Please modify the default settings where required and
+start Cuckoo again (by running `cuckoo` or `cuckoo -d`).
+</code></pre>
+
+<h2 id="configuring-the-guest-vms">Configuring the Guest VMs</h2>
+
+<p>Hop into the GUI by running <code>startx</code>. Open VirtualBox and create your base VMs - I&rsquo;m just going to create Windows 7 32-bit &amp; 64-bit VMs called <code>Win7x86</code> and <code>Win7x64</code> respectively.  They small VMs with 1 CPU, 512MB RAM, 10GB HDD and 1 NIC attached to <code>vboxnet0</code>.</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/6-vdi4_creds.PNG" />
+        <img src="https://rastamouse.me/images/cuckoo/vbox.png" />
     
     
 </figure>
 
 
-<p>The Cobalt Strike credential parser doesn&rsquo;t grab machine hashes by default.  <a href="https://github.com/bluscreenofjeff/AggressorScripts/blob/master/silver-tickets.cna">Silver Ticket Monitor</a> is an aggressor extension built by <a href="https://twitter.com/bluscreenofjeff">Jeff Dimmock</a>, which enables machine hash tracking and provides a new GUI popup for crafting Silver Tickets.</p>
+<p>Set a static IP in each VM.</p>
 
-<h2 id="lateral-movement">Lateral Movement</h2>
+<ul>
+<li>Win7x86 - 192.168.56.10</li>
+<li>Win7x64 - 192.168.56.15</li>
+</ul>
 
-<p>Even though I have the credentials for 2 local admin accounts (the built-in Administrator account is disabled), they can&rsquo;t be used to move laterally across the other VDIs.  Non-RID 500 accounts cannot (by default) authenticate as administrators across a network, even if the credentials are identical across computers.  <a href="https://twitter.com/harmj0y">Will Schroeder</a> <a href="http://www.harmj0y.net/blog/redteaming/pass-the-hash-is-dead-long-live-localaccounttokenfilterpolicy/">blogged</a> about this a while ago.</p>
+<p>You will also want to:</p>
 
-<h2 id="the-desktop-shuffle">The Desktop Shuffle</h2>
+<ul>
+<li>Disable the Windows Firewall</li>
+<li>Disable UAC (Never Notify)</li>
+<li>Disable Windows Updates</li>
+</ul>
 
-<p>This is where things start getting at least a little more interesting.</p>
+<p>Download the latest <a href="https://www.python.org/downloads/windows/">Python 2.7.x for Windows</a> and place them in a convenient location on the Cuckoo VM (I got both the 32 and 64-bit versions).  You should also grab any additional software you may want, depending on the samples you want to submit (e.g. Office, Adobe Reader etc).</p>
 
-<p>Let&rsquo;s say <code>nlove</code> logs off for the day and we lose our Beacons.  Next morning he logs on and gets a fresh virtual desktop.  Because his user profile follows him from desktop to desktop, our registry persistence calls back and we get a new session.  This time on <code>VDI-001</code>.</p>
+<pre><code class="language-bash">cuckoo@cuckoo:~/Downloads$ ll
+-rw-rw-r--  1 cuckoo cuckoo 20082688 May 18 19:22 python-2.7.13.amd64.msi
+-rw-rw-r--  1 cuckoo cuckoo 19161088 May 18 19:22 python-2.7.13.msi
+
+cuckoo@cuckoo:~/Downloads$ python -m SimpleHTTPServer
+Serving HTTP on 0.0.0.0 port 8000 ...
+</code></pre>
+
+<p>On each VM, open <code>Internet Explorer</code> and navigate to <code>http://192.168.56.1:8000</code>, download the relevant Python package then install it.</p>
+
+<p>Use the same method to transfer the Cuckoo Agent (to somewhere easy like the Desktop).</p>
+
+<pre><code class="language-bash">cuckoo@cuckoo:~/Downloads$ cd ../.cuckoo/agent/
+cuckoo@cuckoo:~/.cuckoo/agent$ ll
+
+-rw-rw-r--  1 cuckoo cuckoo 12307 May 18 18:15 agent.py
+-rwxrwxr-x  1 cuckoo cuckoo   386 May 18 18:15 agent.sh*
+
+cuckoo@cuckoo:~/.cuckoo/agent$ python -m SimpleHTTPServer
+Serving HTTP on 0.0.0.0 port 8000 ...
+</code></pre>
+
+<p>Start the agent by opening a <code>Command Prompt as Administrator</code>.</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/7-vdi1_nlove.PNG" />
+        <img src="https://rastamouse.me/images/cuckoo/agent.png" />
     
     
 </figure>
 
 
-<p>We can elevate using the <code>CitrixAdmin</code> account, because the password is the same across all systems.  Here, we do a <code>spawnas</code> and <code>bypassuac</code>.</p>
+<p>You won&rsquo;t see any output, just minimise the window and leave it running.</p>
+
+<p>Whilst the VMs are running, follow these steps to snapshot them (repeat for each VM):</p>
+
+<pre><code class="language-bash">cuckoo@cuckoo:~$ VBoxManage snapshot &quot;Win7x86&quot; take &quot;Win7x86_snap&quot; --pause
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+Snapshot taken. UUID: 4ef19a21-25c8-4ddf-81b2-4a65ce2b5278
+
+cuckoo@cuckoo:~$ VBoxManage controlvm &quot;Win7x86&quot; poweroff
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+
+cuckoo@cuckoo:~$ VBoxManage snapshot &quot;Win7x86&quot; restorecurrent
+Restoring snapshot 4ef19a21-25c8-4ddf-81b2-4a65ce2b5278
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+</code></pre>
+
+<p>In the GUI, they should appear as <code>Saved</code>.</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/8-vdi1_elevate.PNG" />
+        <img src="https://rastamouse.me/images/cuckoo/vbox-saved.png" />
     
     
 </figure>
 
 
-<p>We can now dump the machine hash for <code>VDI-001</code>.  The next trick, is moving laterally back to <code>VDI-004</code>, which we can do using its machine hash that we obtained previously.  Using Jeff&rsquo;s extension:</p>
+<h2 id="configuring-cuckoo">Configuring Cuckoo</h2>
+
+<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ vim .cuckoo/conf/virtualbox.conf
+</code></pre>
+
+<ul>
+<li><code>mode = headless</code> -&gt; <code>mode = gui</code> is useful for testing.</li>
+<li><code>machines = cuckoo1</code> -&gt; <code>machines = Win7x86,Win7x64</code> plus any others you&rsquo;ve made.</li>
+</ul>
+
+<p><code>cuckoo1</code> is the default example.  Each VM needs its own little block.</p>
+
+<pre><code>[Win7x86]
+label = Win7x86
+platform = windows
+ip = 192.168.56.10
+snapshot = Win7x86_snap
+
+[Win7x64]
+label = Win7x64
+platform = windows
+ip = 192.168.56.15
+snapshot = Win7x64_snap
+</code></pre>
+
+<p>Now you should be able to run <code>cuckoo</code>.</p>
+
+<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ cuckoo
+
+                          .:
+                          ::
+    .-.     ,  :   .-.    ;;.-.  .-.   .-.
+   ;       ;   ;  ;       ;; .' ;   ;';   ;'
+   `;;;;'.'`..:;._`;;;;'_.'`  `.`;;'  `;;'
+
+ Cuckoo Sandbox 2.0.2
+ www.cuckoosandbox.org
+ Copyright (c) 2010-2017
+
+ Checking for updates...
+ You're good to go!
+2017-05-18 19:56:34,318 [cuckoo.core.scheduler] INFO: Using &quot;virtualbox&quot; as machine manager
+2017-05-18 19:56:34,928 [cuckoo.core.scheduler] INFO: Loaded 2 machine/s
+2017-05-18 19:56:34,933 [cuckoo.core.scheduler] WARNING: As you've configured Cuckoo to execute parallel analyses, we recommend you to switch to a MySQL ora PostgreSQL database as SQLite might cause some issues.
+2017-05-18 19:56:34,941 [cuckoo.core.scheduler] INFO: Waiting for analysis tasks.
+</code></pre>
+
+<p>To start the web GUI:</p>
+
+<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ vim .cuckoo/conf/reporting.conf
+</code></pre>
+
+<p>Under <code>[mongodb]</code> : <code>enabled = no</code> -&gt; <code>enabled = yes</code>.</p>
+
+<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ cuckoo web runserver 192.168.45.128:8080
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 18, 2017 - 20:00:31
+Django version 1.8.4, using settings 'cuckoo.web.web.settings'
+Starting development server at http://192.168.45.128:8080/
+Quit the server with CONTROL-C.
+</code></pre>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/9-silver_ticket.PNG" />
+        <img src="https://rastamouse.me/images/cuckoo/web-gui.png" />
     
     
 </figure>
 
 
-<p>The domain SID can be obtained via <code>shell whoami /all</code>; and the actual <code>mimiktaz</code> command to forge the Silver Ticket is <code>mimikatz kerberos::golden /user:CitrixAdmin /domain:wild-west.local /sid:S-1-5-21-4247185703-3639085842-2880657779 /target:VDI-004.wild-west.local /rc4:ea0830b4abd1f2c976bb443f64f8186d /service:cifs /ptt</code></p>
-
-<p>Once the ticket has been injected into our current session, we can simply do a <code>psexec_psh</code> (or whatever method you prefer) to take <code>VDI-004</code>.</p>
+<p>You can then submit a sample and enjoy the results  :)</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/10-vdi1_4.PNG" />
+        <img src="https://rastamouse.me/images/cuckoo/wannacry.png" />
     
     
 </figure>
-
-
-<p>Now we have control over 2 VDIs.</p>
-
-<p>If we take a look at <code>VDI-004</code> we can see that it&rsquo;s been assigned to another user, <code>rparker</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/11-vdi4_netlogons.PNG" />
-    
-    
-</figure>
-
-
-<p>We can obviously steal his password, inject a new Beacon into one of his processes and setup the same userland persistance as with <code>nlove</code>.</p>
-
-<p>
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/12-vdi4_creds.PNG" />
-    
-    
-</figure>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/13-vdi1_4.PNG" />
-    
-    
-</figure>
-</p>
-
-<h3 id="rince-and-repeat">Rince and Repeat</h3>
-
-<p>Let&rsquo;s say another day goes by, <code>nlove</code> and <code>rparker</code> have logged back in and are assigned <code>VDI-005</code> and <code>VDI-003</code> respectively.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/14-vdi3_5.PNG" />
-    
-    
-</figure>
-
-
-<p>We elevate on both desktops.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/15-vdi3_5_elevated.PNG" />
-    
-    
-</figure>
-
-
-<p>Dump the hashes.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/16-vdi1345_creds.PNG" />
-    
-    
-</figure>
-
-
-<p>And Pass the Ticket to take <code>VDI-001</code> and <code>VDI-004</code> again.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/17-moar_vdi.PNG" />
-    
-    
-</figure>
-
-
-<p>We now discover a new user on <code>VDI-004</code> - <code>jhardin</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/18-vdi4_jhardin.PNG" />
-    
-    
-</figure>
-
-
-<p>Follow the same process of persisting as <code>jhardin</code> and spreading to more desktops.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/19-final.PNG" />
-    
-    
-</figure>
-
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>There are obviously better and more elegent methods of moving laterally across machines.  Given the limitation of the scope, this seemed to be the best available option.  By default, computer hashes are automatically rotated every 30 days, so it would be a lot of work to maintain access across a large number of desktops.  As long as there is sufficient overlap between the computer and <code>CitrixAdmin</code> account passwords being changed, you could likely persist in this manner for a long time.</p>
               
             </div>
           </div>
@@ -525,15 +569,9 @@
                   <div class="post-footer-tags">
                     <span class="text-color-light text-small">TAGGED IN</span><br/>
                     
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/citrix/">citrix</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/cuckoo/">cuckoo</a>
 
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/cobalt-strike/">cobalt strike</a>
-
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/mimikatz/">mimikatz</a>
-
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/pass-the-ticket/">pass the ticket</a>
-
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/silver-tickets/">silver tickets</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/malware/">malware</a>
 
                   </div>
                 
@@ -545,7 +583,7 @@
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/playing-with-cuckoo/" data-tooltip="Playing with Cuckoo">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -553,7 +591,7 @@
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--disabled">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/a-citrix-story/" data-tooltip="A Citrix Story">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -570,17 +608,17 @@
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -626,7 +664,7 @@
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/playing-with-cuckoo/" data-tooltip="Playing with Cuckoo">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -634,7 +672,7 @@
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--disabled">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/a-citrix-story/" data-tooltip="A Citrix Story">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -651,17 +689,17 @@
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -688,17 +726,17 @@
       <div id="share-options-bar" class="share-options-bar" data-behavior="4">
   <ul class="share-options">
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
         <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
         <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
         <i class="fa fa-twitter"></i><span>Share on Twitter</span>
       </a>
     </li>
@@ -861,9 +899,9 @@ $(document).ready(function() {
     
       <script>
         var disqus_config = function () {
-          this.page.url = 'https:\/\/rastamouse.me\/2017\/05\/a-citrix-story\/';
+          this.page.url = 'https:\/\/rastamouse.me\/2017\/05\/playing-with-cuckoo\/';
           
-            this.page.identifier = '\/2017\/05\/a-citrix-story\/'
+            this.page.identifier = '\/2017\/05\/playing-with-cuckoo\/'
           
         };
         (function() {

@@ -6,10 +6,21 @@
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 13 May 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 18 May 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Playing with Cuckoo</title>
+      <link>https://rastamouse.me/2017/05/playing-with-cuckoo/</link>
+      <pubDate>Thu, 18 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2017/05/playing-with-cuckoo/</guid>
+      <description>&lt;p&gt;After the release and complete hubbub that &lt;a href=&#34;https://en.wikipedia.org/wiki/WannaCry_ransomware_attack&#34;&gt;WannaCry&lt;/a&gt; caused, I thought it would be fun to play with &lt;a href=&#34;https://cuckoosandbox.org/&#34;&gt;Cuckoo Sandbox&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>A Citrix Story</title>
