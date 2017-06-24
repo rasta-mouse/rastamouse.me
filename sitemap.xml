@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://rastamouse.me/2017/06/cobalt-strike---spawn-as/</loc>
+    <lastmod>2017-06-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/2017/06/psexec-much/</loc>
     <lastmod>2017-06-18T00:00:00+00:00</lastmod>
   </url>
@@ -41,13 +46,19 @@
   
   <url>
     <loc>https://rastamouse.me/tags/cobalt-strike/</loc>
-    <lastmod>2017-06-18T00:00:00+00:00</lastmod>
+    <lastmod>2017-06-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/cuckoo/</loc>
     <lastmod>2017-05-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/indicators-of-compromise/</loc>
+    <lastmod>2017-06-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -71,7 +82,7 @@
   
   <url>
     <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2017-06-18T00:00:00+00:00</lastmod>
+    <lastmod>2017-06-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -83,7 +94,7 @@
   
   <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2017-06-18T00:00:00+00:00</lastmod>
+    <lastmod>2017-06-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -94,8 +105,20 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/spawnas/</loc>
+    <lastmod>2017-06-24T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/tags/</loc>
     <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/categories/tradecraft/</loc>
+    <lastmod>2017-06-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
