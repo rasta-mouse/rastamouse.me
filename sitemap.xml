@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://rastamouse.me/2017/07/how-to-accidently-win-against-av/</loc>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/2017/06/cobalt-strike---spawn-as/</loc>
     <lastmod>2017-06-24T00:00:00+00:00</lastmod>
   </url>
@@ -22,19 +27,25 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/antivirus/</loc>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/archives/</loc>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/categories/blog/</loc>
-    <lastmod>2017-06-18T00:00:00+00:00</lastmod>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/categories/</loc>
-    <lastmod>2017-06-18T00:00:00+00:00</lastmod>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -75,6 +86,18 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/office/</loc>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/ole/</loc>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/tags/pass-the-ticket/</loc>
     <lastmod>2017-05-13T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -82,7 +105,7 @@
   
   <url>
     <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2017-06-24T00:00:00+00:00</lastmod>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -94,7 +117,7 @@
   
   <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2017-06-24T00:00:00+00:00</lastmod>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -112,7 +135,7 @@
   
   <url>
     <loc>https://rastamouse.me/tags/</loc>
-    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

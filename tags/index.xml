@@ -6,10 +6,19 @@
     <description>Recent content in Tags on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 13 May 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 05 Jul 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Antivirus</title>
+      <link>https://rastamouse.me/tags/antivirus/</link>
+      <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/antivirus/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Citrix</title>
@@ -62,6 +71,24 @@
       <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/mimikatz/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Office</title>
+      <link>https://rastamouse.me/tags/office/</link>
+      <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/office/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ole</title>
+      <link>https://rastamouse.me/tags/ole/</link>
+      <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/ole/</guid>
       <description></description>
     </item>
     

