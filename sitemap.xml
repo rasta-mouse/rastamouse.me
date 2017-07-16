@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://rastamouse.me/2017/07/de-ice-s1.100/</loc>
+    <lastmod>2017-07-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/2017/07/how-to-accidently-win-against-av/</loc>
     <lastmod>2017-07-05T00:00:00+00:00</lastmod>
   </url>
@@ -44,6 +49,12 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/bruteforce/</loc>
+    <lastmod>2017-07-15T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/categories/</loc>
     <lastmod>2017-07-05T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -64,6 +75,12 @@
   <url>
     <loc>https://rastamouse.me/tags/cuckoo/</loc>
     <lastmod>2017-05-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/de-ice/</loc>
+    <lastmod>2017-07-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -105,7 +122,7 @@
   
   <url>
     <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
+    <lastmod>2017-07-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -117,7 +134,7 @@
   
   <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
+    <lastmod>2017-07-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -128,8 +145,20 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/smtp/</loc>
+    <lastmod>2017-07-15T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/tags/spawnas/</loc>
     <lastmod>2017-06-24T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/ssh/</loc>
+    <lastmod>2017-07-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -142,6 +171,18 @@
   <url>
     <loc>https://rastamouse.me/categories/tradecraft/</loc>
     <lastmod>2017-06-24T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/vulnhub/</loc>
+    <lastmod>2017-07-15T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/categories/walkthroughs/</loc>
+    <lastmod>2017-07-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

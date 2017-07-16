@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Vulnhub on Rasta Mouse</title>
+    <link>https://rastamouse.me/tags/vulnhub/</link>
+    <description>Recent content in Vulnhub on Rasta Mouse</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 15 Jul 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://rastamouse.me/tags/vulnhub/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>De-ICE S1.100</title>
+      <link>https://rastamouse.me/2017/07/de-ice-s1.100/</link>
+      <pubDate>Sat, 15 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2017/07/de-ice-s1.100/</guid>
+      <description>&lt;h3 id=&#34;scenario&#34;&gt;Scenario&lt;/h3&gt;
+
+&lt;p&gt;The CEO of a small company has been pressured by the Board of Directors to have a penetration test done within the company. The CEO, believing his company is secure, feels this is a huge waste of money, especially since he already has a company scan their network for vulnerabilities (using Nessus). To make the BoD happy, he decides to hire you for a 5-day job; and because he really doesn&amp;rsquo;t believe the company is insecure, he has contracted you to look at only one server - an old system that only has a web-based list of the company&amp;rsquo;s contact information.&lt;/p&gt;
+
+&lt;p&gt;The CEO expects you to prove that the admins of the box follow all proper accepted security practices, and that you will not be able to obtain access to the box. Prove to him that a full penetration test of their entire corporation would be the best way to ensure his company is actually following best security practices.&lt;/p&gt;
+
+&lt;h3 id=&#34;flags&#34;&gt;Flags&lt;/h3&gt;
+
+&lt;p&gt;Encrypted salary file Broken FTP service&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
