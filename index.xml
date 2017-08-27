@@ -6,10 +6,25 @@
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 15 Jul 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 22 Aug 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Automated Red Team Infrastructure Deployment with Terraform - Part 1</title>
+      <link>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</link>
+      <pubDate>Tue, 22 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</guid>
+      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This &lt;a href=&#34;https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki&#34;&gt;wiki&lt;/a&gt; maintained by &lt;a href=&#34;https://twitter.com/424f424f&#34;&gt;Steve Borosh&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/bluscreenofjeff&#34;&gt;Jeff Dimmock&lt;/a&gt; is probably the best public resource I&amp;rsquo;ve seen in regards to design considerations and hardening tips.&lt;/p&gt;
+
+&lt;p&gt;For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>De-ICE S1.100</title>
@@ -17,15 +32,11 @@
       <pubDate>Sat, 15 Jul 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2017/07/de-ice-s1.100/</guid>
-      <description>&lt;h3 id=&#34;scenario&#34;&gt;Scenario&lt;/h3&gt;
+      <description>&lt;h1 id=&#34;scenario&#34;&gt;Scenario&lt;/h1&gt;
 
 &lt;p&gt;The CEO of a small company has been pressured by the Board of Directors to have a penetration test done within the company. The CEO, believing his company is secure, feels this is a huge waste of money, especially since he already has a company scan their network for vulnerabilities (using Nessus). To make the BoD happy, he decides to hire you for a 5-day job; and because he really doesn&amp;rsquo;t believe the company is insecure, he has contracted you to look at only one server - an old system that only has a web-based list of the company&amp;rsquo;s contact information.&lt;/p&gt;
 
 &lt;p&gt;The CEO expects you to prove that the admins of the box follow all proper accepted security practices, and that you will not be able to obtain access to the box. Prove to him that a full penetration test of their entire corporation would be the best way to ensure his company is actually following best security practices.&lt;/p&gt;
-
-&lt;h3 id=&#34;flags&#34;&gt;Flags&lt;/h3&gt;
-
-&lt;p&gt;Encrypted salary file Broken FTP service&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
     </item>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Terraform on Rasta Mouse</title>
+    <link>https://rastamouse.me/tags/terraform/</link>
+    <description>Recent content in Terraform on Rasta Mouse</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 22 Aug 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://rastamouse.me/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Automated Red Team Infrastructure Deployment with Terraform - Part 1</title>
+      <link>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</link>
+      <pubDate>Tue, 22 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</guid>
+      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This &lt;a href=&#34;https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki&#34;&gt;wiki&lt;/a&gt; maintained by &lt;a href=&#34;https://twitter.com/424f424f&#34;&gt;Steve Borosh&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/bluscreenofjeff&#34;&gt;Jeff Dimmock&lt;/a&gt; is probably the best public resource I&amp;rsquo;ve seen in regards to design considerations and hardening tips.&lt;/p&gt;
+
+&lt;p&gt;For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
