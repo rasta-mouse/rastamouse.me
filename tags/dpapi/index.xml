@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dpapi on Rasta Mouse</title>
+    <link>https://rastamouse.me/tags/dpapi/</link>
+    <description>Recent content in Dpapi on Rasta Mouse</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 31 Aug 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://rastamouse.me/tags/dpapi/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Jumping Network Segregation with RDP</title>
+      <link>https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/</link>
+      <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/</guid>
+      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;This short post demonstrates how it may be possible to pivot into a segregated/protected network, via an RDP Jump Box.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

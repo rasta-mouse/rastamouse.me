@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/</loc>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</loc>
     <lastmod>2017-08-22T00:00:00+00:00</lastmod>
   </url>
@@ -50,7 +55,7 @@
   
   <url>
     <loc>https://rastamouse.me/categories/blog/</loc>
-    <lastmod>2017-08-22T00:00:00+00:00</lastmod>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -62,7 +67,7 @@
   
   <url>
     <loc>https://rastamouse.me/categories/</loc>
-    <lastmod>2017-08-22T00:00:00+00:00</lastmod>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -91,6 +96,12 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/dpapi/</loc>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/tags/indicators-of-compromise/</loc>
     <lastmod>2017-06-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -110,7 +121,7 @@
   
   <url>
     <loc>https://rastamouse.me/tags/mimikatz/</loc>
-    <lastmod>2017-05-13T00:00:00+00:00</lastmod>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -134,7 +145,7 @@
   
   <url>
     <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2017-08-22T00:00:00+00:00</lastmod>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -146,13 +157,19 @@
   
   <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2017-08-22T00:00:00+00:00</lastmod>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/rdp/</loc>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/red-team/</loc>
-    <lastmod>2017-08-22T00:00:00+00:00</lastmod>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

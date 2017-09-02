@@ -66,6 +66,15 @@
     </item>
     
     <item>
+      <title>Dpapi</title>
+      <link>https://rastamouse.me/tags/dpapi/</link>
+      <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/dpapi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Indicators of Compromise</title>
       <link>https://rastamouse.me/tags/indicators-of-compromise/</link>
       <pubDate>Sat, 24 Jun 2017 00:00:00 +0000</pubDate>
@@ -95,7 +104,7 @@
     <item>
       <title>Mimikatz</title>
       <link>https://rastamouse.me/tags/mimikatz/</link>
-      <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/mimikatz/</guid>
       <description></description>
@@ -138,9 +147,18 @@
     </item>
     
     <item>
+      <title>Rdp</title>
+      <link>https://rastamouse.me/tags/rdp/</link>
+      <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/rdp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Red Team</title>
       <link>https://rastamouse.me/tags/red-team/</link>
-      <pubDate>Tue, 22 Aug 2017 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/red-team/</guid>
       <description></description>
