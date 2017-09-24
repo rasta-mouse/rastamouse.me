@@ -6,10 +6,23 @@
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 31 Aug 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 23 Sep 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Automated Red Team Infrastructure Deployment with Terraform - Part 2</title>
+      <link>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/</link>
+      <pubDate>Sat, 23 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/</guid>
+      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/&#34;&gt;&lt;b&gt;Part 1&lt;/b&gt;&lt;/a&gt;, we looked at using &lt;a href=&#34;https://www.terraform.io/&#34;&gt;Terraform&lt;/a&gt; to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&amp;rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Jumping Network Segregation with RDP</title>
