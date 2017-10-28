@@ -6,10 +6,21 @@
     <description>Recent content in Blog on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 23 Sep 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 28 Oct 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>HTB - Optimum</title>
+      <link>https://rastamouse.me/2017/10/htb---optimum/</link>
+      <pubDate>Sat, 28 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2017/10/htb---optimum/</guid>
+      <description>&lt;p&gt;Optimum is a Windows machine, with an average difficulty rating of &amp;ldquo;piece of cake&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Automated Red Team Infrastructure Deployment with Terraform - Part 2</title>

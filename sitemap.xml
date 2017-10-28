@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://rastamouse.me/2017/10/htb---optimum/</loc>
+    <lastmod>2017-10-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/</loc>
     <lastmod>2017-09-23T00:00:00+00:00</lastmod>
   </url>
@@ -60,7 +65,7 @@
   
   <url>
     <loc>https://rastamouse.me/categories/blog/</loc>
-    <lastmod>2017-09-23T00:00:00+00:00</lastmod>
+    <lastmod>2017-10-28T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -72,7 +77,7 @@
   
   <url>
     <loc>https://rastamouse.me/categories/</loc>
-    <lastmod>2017-09-23T00:00:00+00:00</lastmod>
+    <lastmod>2017-10-28T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -103,6 +108,12 @@
   <url>
     <loc>https://rastamouse.me/tags/dpapi/</loc>
     <lastmod>2017-08-31T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/hack-the-box/</loc>
+    <lastmod>2017-10-28T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -150,7 +161,7 @@
   
   <url>
     <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2017-09-23T00:00:00+00:00</lastmod>
+    <lastmod>2017-10-28T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -162,7 +173,7 @@
   
   <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2017-09-23T00:00:00+00:00</lastmod>
+    <lastmod>2017-10-28T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
