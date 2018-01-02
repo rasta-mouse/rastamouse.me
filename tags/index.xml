@@ -21,15 +21,6 @@
     </item>
     
     <item>
-      <title>Bruteforce</title>
-      <link>https://rastamouse.me/tags/bruteforce/</link>
-      <pubDate>Sat, 15 Jul 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/bruteforce/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Citrix</title>
       <link>https://rastamouse.me/tags/citrix/</link>
       <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
@@ -41,7 +32,7 @@
     <item>
       <title>Cobalt Strike</title>
       <link>https://rastamouse.me/tags/cobalt-strike/</link>
-      <pubDate>Sat, 24 Jun 2017 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 18 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/cobalt-strike/</guid>
       <description></description>
@@ -57,38 +48,11 @@
     </item>
     
     <item>
-      <title>De Ice</title>
-      <link>https://rastamouse.me/tags/de-ice/</link>
-      <pubDate>Sat, 15 Jul 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/de-ice/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Dpapi</title>
       <link>https://rastamouse.me/tags/dpapi/</link>
       <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/dpapi/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Hack the Box</title>
-      <link>https://rastamouse.me/tags/hack-the-box/</link>
-      <pubDate>Sat, 28 Oct 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/hack-the-box/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Indicators of Compromise</title>
-      <link>https://rastamouse.me/tags/indicators-of-compromise/</link>
-      <pubDate>Sat, 24 Jun 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/indicators-of-compromise/</guid>
       <description></description>
     </item>
     
@@ -183,47 +147,11 @@
     </item>
     
     <item>
-      <title>Smtp</title>
-      <link>https://rastamouse.me/tags/smtp/</link>
-      <pubDate>Sat, 15 Jul 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/smtp/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Spawnas</title>
-      <link>https://rastamouse.me/tags/spawnas/</link>
-      <pubDate>Sat, 24 Jun 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/spawnas/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Ssh</title>
-      <link>https://rastamouse.me/tags/ssh/</link>
-      <pubDate>Sat, 15 Jul 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/ssh/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Terraform</title>
       <link>https://rastamouse.me/tags/terraform/</link>
       <pubDate>Sat, 23 Sep 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/terraform/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Vulnhub</title>
-      <link>https://rastamouse.me/tags/vulnhub/</link>
-      <pubDate>Sat, 15 Jul 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/vulnhub/</guid>
       <description></description>
     </item>
     
