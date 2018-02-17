@@ -508,9 +508,9 @@ Credential Roaming
   Credentials:
 </code></pre>
 
-<p>The <code>UserAccountControl</code> field is great to target accounts that have <code>PasswordNeverExpires</code> set.</p>
+<p>The <code>UserAccountControl</code> field is great to target accounts that have <code>PasswordNeverExpires</code> set, then use those NTLM hashes with PTH or PSEXEC.  You could also attempt to crack the hashes to recover plaintext passwords.</p>
 
-<p>You are, of course, free to use NTLM hashes with PTH, PSEXEC etc.  Or you can attempt to crack them for plaintext passwords.</p>
+<p>There&rsquo;s also lots of fun to be had with the krbtgt hash, such as Golden Tickets.</p>
 
 <h2 id="improvements">Improvements?</h2>
 
