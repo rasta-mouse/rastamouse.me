@@ -6,10 +6,21 @@
     <description>Recent content in Infrastructure on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 23 Sep 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 25 Feb 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/infrastructure/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Red Team Infrastructure - AWS Encrypted EBS</title>
+      <link>https://rastamouse.me/2018/02/red-team-infrastructure---aws-encrypted-ebs/</link>
+      <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/02/red-team-infrastructure---aws-encrypted-ebs/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/malcomvetter&#34;&gt;Tim MalcomVetter&lt;/a&gt; caused a bit of stir over his &lt;a href=&#34;https://medium.com/@malcomvetter/responsible-red-teams-1c6209fd43cc&#34;&gt;Responsible Red Teams&lt;/a&gt; post last week, which is not surprising since he was pretty fucking rude about the whole thing.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Automated Red Team Infrastructure Deployment with Terraform - Part 2</title>

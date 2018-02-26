@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://rastamouse.me/2018/02/red-team-infrastructure---aws-encrypted-ebs/</loc>
+    <lastmod>2018-02-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/2018/02/vhd-to-da/</loc>
     <lastmod>2018-02-16T00:00:00+00:00</lastmod>
   </url>
@@ -55,13 +60,13 @@
   
   <url>
     <loc>https://rastamouse.me/categories/blog/</loc>
-    <lastmod>2018-02-16T00:00:00+00:00</lastmod>
+    <lastmod>2018-02-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/categories/</loc>
-    <lastmod>2018-02-16T00:00:00+00:00</lastmod>
+    <lastmod>2018-02-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -91,7 +96,7 @@
   
   <url>
     <loc>https://rastamouse.me/tags/infrastructure/</loc>
-    <lastmod>2017-09-23T00:00:00+00:00</lastmod>
+    <lastmod>2018-02-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -127,7 +132,7 @@
   
   <url>
     <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2018-02-16T00:00:00+00:00</lastmod>
+    <lastmod>2018-02-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -139,7 +144,7 @@
   
   <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2018-02-16T00:00:00+00:00</lastmod>
+    <lastmod>2018-02-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -151,7 +156,7 @@
   
   <url>
     <loc>https://rastamouse.me/tags/red-team/</loc>
-    <lastmod>2018-02-16T00:00:00+00:00</lastmod>
+    <lastmod>2018-02-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
