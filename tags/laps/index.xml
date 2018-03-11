@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Laps on Rasta Mouse</title>
+    <link>https://rastamouse.me/tags/laps/</link>
+    <description>Recent content in Laps on Rasta Mouse</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 10 Mar 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://rastamouse.me/tags/laps/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>LAPS - Part 1</title>
+      <link>https://rastamouse.me/2018/03/laps---part-1/</link>
+      <pubDate>Sat, 10 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/03/laps---part-1/</guid>
+      <description>&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
