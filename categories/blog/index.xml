@@ -6,10 +6,21 @@
     <description>Recent content in Blog on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 17 Mar 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 22 Mar 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>A View of Persistence</title>
+      <link>https://rastamouse.me/2018/03/a-view-of-persistence/</link>
+      <pubDate>Thu, 22 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/03/a-view-of-persistence/</guid>
+      <description>&lt;p&gt;Persistence, noun, the continued or prolonged existence of something.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>LAPS - Part 2</title>
