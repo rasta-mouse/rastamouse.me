@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://rastamouse.me/2018/04/gpo-abuse/</loc>
+    <lastmod>2018-04-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/2018/03/a-view-of-persistence/</loc>
     <lastmod>2018-03-22T00:00:00+00:00</lastmod>
   </url>
@@ -64,7 +69,7 @@
   
   <url>
     <loc>https://rastamouse.me/tags/active-directory/</loc>
-    <lastmod>2018-03-17T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -81,13 +86,13 @@
   
   <url>
     <loc>https://rastamouse.me/categories/blog/</loc>
-    <lastmod>2018-03-22T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/categories/</loc>
-    <lastmod>2018-03-22T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -112,6 +117,12 @@
   <url>
     <loc>https://rastamouse.me/tags/dpapi/</loc>
     <lastmod>2017-08-31T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/gpo/</loc>
+    <lastmod>2018-04-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -165,7 +176,7 @@
   
   <url>
     <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2018-03-22T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -183,7 +194,7 @@
   
   <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2018-03-22T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -207,7 +218,7 @@
   
   <url>
     <loc>https://rastamouse.me/tags/</loc>
-    <lastmod>2018-03-17T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
