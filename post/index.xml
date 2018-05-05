@@ -6,20 +6,18 @@
     <description>Recent content in Posts on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 07 Apr 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 05 May 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>GPO Abuse</title>
-      <link>https://rastamouse.me/2018/04/gpo-abuse/</link>
-      <pubDate>Sat, 07 Apr 2018 00:00:00 +0000</pubDate>
+      <title>Review: Active Directory Attacks for Red and Blue Teams</title>
+      <link>https://rastamouse.me/2018/05/review-active-directory-attacks-for-red-and-blue-teams/</link>
+      <pubDate>Sat, 05 May 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/04/gpo-abuse/</guid>
-      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
-
-&lt;p&gt;Being able to write to a Group Policy Object affords you some interesting opportunities.  Depending on circumstance, it can either be used as a priv esc vector - e.g. if you control a GPO that is applied to machines that have higher privileged accounts logged on; or as a persistence mechanism to maintain access to those machines.&lt;/p&gt;
+      <guid>https://rastamouse.me/2018/05/review-active-directory-attacks-for-red-and-blue-teams/</guid>
+      <description>&lt;p&gt;Along with &lt;a href=&#34;https://twitter.com/Cneelis&#34;&gt;Cn33liz&lt;/a&gt;, I recently had the pleasure of assisting &lt;a href=&#34;https://twitter.com/nikhil_mitt&#34;&gt;Nikhil Mittal&lt;/a&gt; with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
     </item>
