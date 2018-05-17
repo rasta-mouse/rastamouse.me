@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/</loc>
+    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/2018/05/review-active-directory-attacks-for-red-and-blue-teams/</loc>
     <lastmod>2018-05-05T00:00:00+00:00</lastmod>
   </url>
@@ -86,13 +91,13 @@
   
   <url>
     <loc>https://rastamouse.me/categories/blog/</loc>
-    <lastmod>2018-05-05T00:00:00+00:00</lastmod>
+    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/categories/</loc>
-    <lastmod>2018-05-05T00:00:00+00:00</lastmod>
+    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -109,8 +114,20 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/csharp/</loc>
+    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/tags/cuckoo/</loc>
     <lastmod>2017-05-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/dotnettojscript/</loc>
+    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -170,7 +187,7 @@
   
   <url>
     <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2018-05-05T00:00:00+00:00</lastmod>
+    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -188,7 +205,7 @@
   
   <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2018-05-05T00:00:00+00:00</lastmod>
+    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -219,6 +236,12 @@
   <url>
     <loc>https://rastamouse.me/tags/terraform/</loc>
     <lastmod>2017-09-23T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/xsl/</loc>
+    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

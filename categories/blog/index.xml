@@ -6,10 +6,21 @@
     <description>Recent content in Blog on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 05 May 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 15 May 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>CSharp, DotNetToJScript, XSL</title>
+      <link>https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/</link>
+      <pubDate>Tue, 15 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/</guid>
+      <description>&lt;p&gt;In April 2018, &lt;a href=&#34;https://twitter.com/subTee&#34;&gt;Casey Smith&lt;/a&gt; published a finding he dubbed &lt;a href=&#34;http://subt0x11.blogspot.co.uk/2018/04/wmicexe-whitelisting-bypass-hacking.html&#34;&gt;squiblytwo&lt;/a&gt;, which detailed how WMIC can be used to invoke arbitary code contained in the extensible stylesheet language (XSL) format.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Review: Active Directory Attacks for Red and Blue Teams</title>

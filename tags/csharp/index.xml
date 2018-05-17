@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Csharp on Rasta Mouse</title>
+    <link>https://rastamouse.me/tags/csharp/</link>
+    <description>Recent content in Csharp on Rasta Mouse</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 15 May 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://rastamouse.me/tags/csharp/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>CSharp, DotNetToJScript, XSL</title>
+      <link>https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/</link>
+      <pubDate>Tue, 15 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/</guid>
+      <description>&lt;p&gt;In April 2018, &lt;a href=&#34;https://twitter.com/subTee&#34;&gt;Casey Smith&lt;/a&gt; published a finding he dubbed &lt;a href=&#34;http://subt0x11.blogspot.co.uk/2018/04/wmicexe-whitelisting-bypass-hacking.html&#34;&gt;squiblytwo&lt;/a&gt;, which detailed how WMIC can be used to invoke arbitary code contained in the extensible stylesheet language (XSL) format.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
