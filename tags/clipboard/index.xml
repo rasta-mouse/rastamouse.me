@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Clipboard on Rasta Mouse</title>
+    <link>https://rastamouse.me/tags/clipboard/</link>
+    <description>Recent content in Clipboard on Rasta Mouse</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 09 Jun 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://rastamouse.me/tags/clipboard/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>RDPClip</title>
+      <link>https://rastamouse.me/2018/06/rdpclip/</link>
+      <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/06/rdpclip/</guid>
+      <description>&lt;p&gt;This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

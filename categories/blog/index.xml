@@ -6,10 +6,21 @@
     <description>Recent content in Blog on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 15 May 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 09 Jun 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>RDPClip</title>
+      <link>https://rastamouse.me/2018/06/rdpclip/</link>
+      <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/06/rdpclip/</guid>
+      <description>&lt;p&gt;This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>CSharp, DotNetToJScript, XSL</title>

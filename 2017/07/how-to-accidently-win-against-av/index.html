@@ -21,7 +21,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.26">
+    <meta name="generator" content="Hugo 0.41">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
     <title>How to Accidently Win Against AV</title>
     <meta name="author" content="Rasta Mouse">
@@ -79,13 +79,16 @@
     
       
 <script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-60712346-1', 'auto');
-ga('send', 'pageview');
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-60712346-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
     
@@ -125,7 +128,6 @@ ga('send', 'pageview');
     </a>
   
 </header>
-
       <nav id="sidebar" data-behavior="4">
   <div class="sidebar-container">
     
@@ -308,7 +310,7 @@ ga('send', 'pageview');
 <p>To the laboratory.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/antivirus/dexters-lab.jpg" />
     
@@ -319,7 +321,7 @@ ga('send', 'pageview');
 <p>This is the mock Word doc.  In all cases, the OLE is a simple batch file, called <code>unlock.bat</code> that contains my malicious code.  All it requires is the user to run the file.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/antivirus/doc.png" />
     
@@ -337,7 +339,7 @@ ga('send', 'pageview');
 <p>This resulted in only 1 hit on VT.  Congrats ClamAV&hellip;</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/antivirus/vt1.png" />
     
@@ -355,7 +357,7 @@ ga('send', 'pageview');
 <p>0 hits.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/antivirus/vt2.png" />
     
@@ -373,7 +375,7 @@ ga('send', 'pageview');
 <p>0 hits.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/antivirus/vt3.png" />
     
@@ -625,6 +627,25 @@ Of course on a real engagement there are other considerations apart from AV, thi
           <div class="media">
             
             <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/06/rdpclip/">
+                <h3 class="media-heading">RDPClip</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.</p>
+
+<p></p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
               <a class="link-unstyled" href="https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/">
                 <h3 class="media-heading">CSharp, DotNetToJScript, XSL</h3>
               </a>
@@ -797,29 +818,6 @@ Of course on a real engagement there are other considerations apart from AV, thi
             <hr>
           </div>
         
-          <div class="media">
-            
-            <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/">
-                <h3 class="media-heading">Automated Red Team Infrastructure Deployment with Terraform - Part 1</h3>
-              </a>
-              <span class="media-meta">
-                <span class="media-date text-small">
-                  Aug 8, 2017
-                </span>
-              </span>
-              <div class="media-content hide-xs font-merryweather"><h2 id="introduction">Introduction</h2>
-
-<p>Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This <a href="https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki">wiki</a> maintained by <a href="https://twitter.com/424f424f">Steve Borosh</a> and <a href="https://twitter.com/bluscreenofjeff">Jeff Dimmock</a> is probably the best public resource I&rsquo;ve seen in regards to design considerations and hardening tips.</p>
-
-<p>For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.</p>
-
-<p></p></div>
-            </div>
-            <div style="clear:both;"></div>
-            <hr>
-          </div>
-        
       </div>
     </div>
     <div class="modal-footer">
@@ -827,7 +825,7 @@ Of course on a real engagement there are other considerations apart from AV, thi
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         15 posts found
+         16 posts found
       </p>
     </div>
   </div>

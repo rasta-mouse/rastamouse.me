@@ -21,7 +21,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.26">
+    <meta name="generator" content="Hugo 0.41">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
     <title>A Citrix Story</title>
     <meta name="author" content="Rasta Mouse">
@@ -79,13 +79,16 @@
     
       
 <script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-60712346-1', 'auto');
-ga('send', 'pageview');
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-60712346-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
     
@@ -125,7 +128,6 @@ ga('send', 'pageview');
     </a>
   
 </header>
-
       <nav id="sidebar" data-behavior="4">
   <div class="sidebar-container">
     
@@ -308,7 +310,7 @@ ga('send', 'pageview');
 <p>This was a partial white-box review, so I did have some valid credentials to log in with.  So we&rsquo;ll kick this off with a Cobalt Strike foothold.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/1-vdi4_nlove.PNG" />
     
@@ -329,7 +331,7 @@ ga('send', 'pageview');
 <p>This turned out to be relatively simple.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/2-vdi4_localadmins.PNG" />
     
@@ -340,7 +342,7 @@ ga('send', 'pageview');
 <p>One of the system administrators must&rsquo;ve put <code>bob</code> in at some point for testing or during early development, but it was a pretty big derp as it has no password.  The only difficultly I had was spawning a new session via Beacon.  The built-in parser won&rsquo;t handle a blank password and writing a custom aggressor script to run <code>bspawnas</code> didn&rsquo;t work either.  I tried a few others like <code>runas</code>, but I eventually resigned myself to elevating in the actual virtual desktop.  So I just uploaded a stageless PowerShell SMB payload and ran it manually.</p>
 
 <p>
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/3-vdi4_bob.PNG" />
     
@@ -348,7 +350,7 @@ ga('send', 'pageview');
 </figure>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/4-vdi4_smbbeacon.PNG" />
     
@@ -356,7 +358,7 @@ ga('send', 'pageview');
 </figure>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/5-vdi4_bobbeacon.PNG" />
     
@@ -369,7 +371,7 @@ ga('send', 'pageview');
 <p>Now that we have admin access over the desktop, we can carry out the classic act of dumping all the password hashes.  The accounts we&rsquo;re interested in are <code>CitrixAdmin</code> and <code>VDI-004$</code>.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/6-vdi4_creds.PNG" />
     
@@ -390,7 +392,7 @@ ga('send', 'pageview');
 <p>Let&rsquo;s say <code>nlove</code> logs off for the day and we lose our Beacons.  Next morning he logs on and gets a fresh virtual desktop.  Because his user profile follows him from desktop to desktop, our registry persistence calls back and we get a new session.  This time on <code>VDI-001</code>.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/7-vdi1_nlove.PNG" />
     
@@ -401,7 +403,7 @@ ga('send', 'pageview');
 <p>We can elevate using the <code>CitrixAdmin</code> account, because the password is the same across all systems.  Here, we do a <code>spawnas</code> and <code>bypassuac</code>.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/8-vdi1_elevate.PNG" />
     
@@ -412,7 +414,7 @@ ga('send', 'pageview');
 <p>We can now dump the machine hash for <code>VDI-001</code>.  The next trick, is moving laterally back to <code>VDI-004</code>, which we can do using its machine hash that we obtained previously.  Using Jeff&rsquo;s extension:</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/9-silver_ticket.PNG" />
     
@@ -425,7 +427,7 @@ ga('send', 'pageview');
 <p>Once the ticket has been injected into our current session, we can simply do a <code>psexec_psh</code> (or whatever method you prefer) to take <code>VDI-004</code>.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/10-vdi1_4.PNG" />
     
@@ -438,7 +440,7 @@ ga('send', 'pageview');
 <p>If we take a look at <code>VDI-004</code> we can see that it&rsquo;s been assigned to another user, <code>rparker</code>.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/11-vdi4_netlogons.PNG" />
     
@@ -449,7 +451,7 @@ ga('send', 'pageview');
 <p>We can obviously steal his password, inject a new Beacon into one of his processes and setup the same userland persistance as with <code>nlove</code>.</p>
 
 <p>
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/12-vdi4_creds.PNG" />
     
@@ -457,7 +459,7 @@ ga('send', 'pageview');
 </figure>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/13-vdi1_4.PNG" />
     
@@ -470,7 +472,7 @@ ga('send', 'pageview');
 <p>Let&rsquo;s say another day goes by, <code>nlove</code> and <code>rparker</code> have logged back in and are assigned <code>VDI-005</code> and <code>VDI-003</code> respectively.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/14-vdi3_5.PNG" />
     
@@ -481,7 +483,7 @@ ga('send', 'pageview');
 <p>We elevate on both desktops.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/15-vdi3_5_elevated.PNG" />
     
@@ -492,7 +494,7 @@ ga('send', 'pageview');
 <p>Dump the hashes.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/16-vdi1345_creds.PNG" />
     
@@ -503,7 +505,7 @@ ga('send', 'pageview');
 <p>And Pass the Ticket to take <code>VDI-001</code> and <code>VDI-004</code> again.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/17-moar_vdi.PNG" />
     
@@ -514,7 +516,7 @@ ga('send', 'pageview');
 <p>We now discover a new user on <code>VDI-004</code> - <code>jhardin</code>.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/18-vdi4_jhardin.PNG" />
     
@@ -525,7 +527,7 @@ ga('send', 'pageview');
 <p>Follow the same process of persisting as <code>jhardin</code> and spreading to more desktops.</p>
 
 
-<figure >
+<figure>
     
         <img src="https://rastamouse.me/images/citrix/19-final.PNG" />
     
@@ -780,6 +782,25 @@ ga('send', 'pageview');
           <div class="media">
             
             <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/06/rdpclip/">
+                <h3 class="media-heading">RDPClip</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.</p>
+
+<p></p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
               <a class="link-unstyled" href="https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/">
                 <h3 class="media-heading">CSharp, DotNetToJScript, XSL</h3>
               </a>
@@ -952,29 +973,6 @@ ga('send', 'pageview');
             <hr>
           </div>
         
-          <div class="media">
-            
-            <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/">
-                <h3 class="media-heading">Automated Red Team Infrastructure Deployment with Terraform - Part 1</h3>
-              </a>
-              <span class="media-meta">
-                <span class="media-date text-small">
-                  Aug 8, 2017
-                </span>
-              </span>
-              <div class="media-content hide-xs font-merryweather"><h2 id="introduction">Introduction</h2>
-
-<p>Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This <a href="https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki">wiki</a> maintained by <a href="https://twitter.com/424f424f">Steve Borosh</a> and <a href="https://twitter.com/bluscreenofjeff">Jeff Dimmock</a> is probably the best public resource I&rsquo;ve seen in regards to design considerations and hardening tips.</p>
-
-<p>For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.</p>
-
-<p></p></div>
-            </div>
-            <div style="clear:both;"></div>
-            <hr>
-          </div>
-        
       </div>
     </div>
     <div class="modal-footer">
@@ -982,7 +980,7 @@ ga('send', 'pageview');
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         15 posts found
+         16 posts found
       </p>
     </div>
   </div>

