@@ -6,17 +6,32 @@
     <description>Recent content in Blog on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 29 Oct 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 31 Oct 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>AmsiScanBuffer Bypass</title>
-      <link>https://rastamouse.me/2018/10/amsiscanbuffer-bypass/</link>
+      <title>AmsiScanBuffer Bypass - Part 2</title>
+      <link>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/</link>
+      <pubDate>Wed, 31 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/</guid>
+      <description>&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/&#34;&gt;Part 1&lt;/a&gt;, we had a brief look at the AmsiScanBuffer bypass technique.  We found some circumstances where the bypass code would be identified as malicious before it could be executed (which turned out to be a simple string detection), and modified the code to circumvent this.&lt;/p&gt;
+
+&lt;p&gt;In this post, we&amp;rsquo;ll explore a delivery method to help stage a Cobalt Strike / Empire / &amp;lt;insert framework here&amp;gt; agent.  As with Part 1, this is not about some 1337 code drop - it&amp;rsquo;s a demonstration of how I walked through engineering the final result.&lt;/p&gt;
+
+&lt;p&gt;So, let&amp;rsquo;s get cracking.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>AmsiScanBuffer Bypass - Part 1</title>
+      <link>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/</link>
       <pubDate>Mon, 29 Oct 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/10/amsiscanbuffer-bypass/</guid>
+      <guid>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/</guid>
       <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/_zc00l&#34;&gt;Andre Marques&lt;/a&gt; recently &lt;a href=&#34;https://twitter.com/_zc00l/status/1056523259246718976&#34;&gt;posted&lt;/a&gt; a pretty nice &lt;a href=&#34;https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html&#34;&gt;write-up&lt;/a&gt; for circumventing AMSI, based on previous work by &lt;a href=&#34;https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/&#34;&gt;CyberArk&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
