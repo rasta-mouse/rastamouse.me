@@ -6,10 +6,21 @@
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 31 Oct 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 01 Nov 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>AmsiScanBuffer Bypass - Part 3</title>
+      <link>https://rastamouse.me/2018/11/amsiscanbuffer-bypass---part-3/</link>
+      <pubDate>Thu, 01 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/11/amsiscanbuffer-bypass---part-3/</guid>
+      <description>&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/&#34;&gt;Part 2&lt;/a&gt;, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in &lt;a href=&#34;https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/&#34;&gt;Part 1&lt;/a&gt;.  In this post, we&amp;rsquo;ll make some modifications to the bypass itself.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>AmsiScanBuffer Bypass - Part 2</title>
