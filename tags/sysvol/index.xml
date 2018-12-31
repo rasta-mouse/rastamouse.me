@@ -17,9 +17,7 @@
       <pubDate>Sat, 08 Sep 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2018/09/enumerating-applocker-config/</guid>
-      <description>&lt;p&gt;Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.&lt;/p&gt;</description>
     </item>
     
   </channel>

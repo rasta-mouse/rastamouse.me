@@ -6,46 +6,49 @@
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 01 Nov 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 31 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>AmsiScanBuffer Bypass - Part 4</title>
+      <link>https://rastamouse.me/2018/12/amsiscanbuffer-bypass-part-4/</link>
+      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2018/12/amsiscanbuffer-bypass-part-4/</guid>
+      <description>&lt;p&gt;As 2018 rapidly comes to an end, I thought I&amp;rsquo;d close out the year by clearing up some confusions over this AmsiScanBuffer bypass and why it appears to fail under some circumstances.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>AmsiScanBuffer Bypass - Part 3</title>
-      <link>https://rastamouse.me/2018/11/amsiscanbuffer-bypass---part-3/</link>
+      <link>https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/</link>
       <pubDate>Thu, 01 Nov 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/11/amsiscanbuffer-bypass---part-3/</guid>
-      <description>&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/&#34;&gt;Part 2&lt;/a&gt;, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in &lt;a href=&#34;https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/&#34;&gt;Part 1&lt;/a&gt;.  In this post, we&amp;rsquo;ll make some modifications to the bypass itself.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <guid>https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/</guid>
+      <description>&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/&#34;&gt;Part 2&lt;/a&gt;, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in &lt;a href=&#34;https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/&#34;&gt;Part 1&lt;/a&gt;.  In this post, we&amp;rsquo;ll make some modifications to the bypass itself.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>AmsiScanBuffer Bypass - Part 2</title>
-      <link>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/</link>
+      <link>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/</link>
       <pubDate>Wed, 31 Oct 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/</guid>
+      <guid>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/</guid>
       <description>&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/&#34;&gt;Part 1&lt;/a&gt;, we had a brief look at the AmsiScanBuffer bypass technique.  We found some circumstances where the bypass code would be identified as malicious before it could be executed (which turned out to be a simple string detection), and modified the code to circumvent this.&lt;/p&gt;
 
 &lt;p&gt;In this post, we&amp;rsquo;ll explore a delivery method to help stage a Cobalt Strike / Empire / &amp;lt;insert framework here&amp;gt; agent.  As with Part 1, this is not about some 1337 code drop - it&amp;rsquo;s a demonstration of how I walked through engineering the final result.&lt;/p&gt;
 
-&lt;p&gt;So, let&amp;rsquo;s get cracking.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;So, let&amp;rsquo;s get cracking.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>AmsiScanBuffer Bypass - Part 1</title>
-      <link>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/</link>
+      <link>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/</link>
       <pubDate>Mon, 29 Oct 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/_zc00l&#34;&gt;Andre Marques&lt;/a&gt; recently &lt;a href=&#34;https://twitter.com/_zc00l/status/1056523259246718976&#34;&gt;posted&lt;/a&gt; a pretty nice &lt;a href=&#34;https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html&#34;&gt;write-up&lt;/a&gt; for circumventing AMSI, based on previous work by &lt;a href=&#34;https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/&#34;&gt;CyberArk&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <guid>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/_zc00l&#34;&gt;Andre Marques&lt;/a&gt; recently &lt;a href=&#34;https://twitter.com/_zc00l/status/1056523259246718976&#34;&gt;posted&lt;/a&gt; a pretty nice &lt;a href=&#34;https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html&#34;&gt;write-up&lt;/a&gt; for circumventing AMSI, based on previous work by &lt;a href=&#34;https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/&#34;&gt;CyberArk&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -54,9 +57,7 @@
       <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2018/09/a-lesson-in-.net-framework-versions/</guid>
-      <description>&lt;p&gt;With the emergence of more C# and .NET tooling, I occasionally see people tripping up over this.  It&amp;rsquo;s not a huge issue, just something to be aware of.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;With the emergence of more C# and .NET tooling, I occasionally see people tripping up over this.  It&amp;rsquo;s not a huge issue, just something to be aware of.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -65,9 +66,7 @@
       <pubDate>Sat, 08 Sep 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2018/09/enumerating-applocker-config/</guid>
-      <description>&lt;p&gt;Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -76,9 +75,7 @@
       <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2018/06/rdpclip/</guid>
-      <description>&lt;p&gt;This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -87,9 +84,7 @@
       <pubDate>Tue, 15 May 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/</guid>
-      <description>&lt;p&gt;In April 2018, &lt;a href=&#34;https://twitter.com/subTee&#34;&gt;Casey Smith&lt;/a&gt; published a finding he dubbed &lt;a href=&#34;http://subt0x11.blogspot.co.uk/2018/04/wmicexe-whitelisting-bypass-hacking.html&#34;&gt;squiblytwo&lt;/a&gt;, which detailed how WMIC can be used to invoke arbitary code contained in the extensible stylesheet language (XSL) format.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;In April 2018, &lt;a href=&#34;https://twitter.com/subTee&#34;&gt;Casey Smith&lt;/a&gt; published a finding he dubbed &lt;a href=&#34;http://subt0x11.blogspot.co.uk/2018/04/wmicexe-whitelisting-bypass-hacking.html&#34;&gt;squiblytwo&lt;/a&gt;, which detailed how WMIC can be used to invoke arbitary code contained in the extensible stylesheet language (XSL) format.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -98,9 +93,7 @@
       <pubDate>Sat, 05 May 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2018/05/review-active-directory-attacks-for-red-and-blue-teams/</guid>
-      <description>&lt;p&gt;Along with &lt;a href=&#34;https://twitter.com/Cneelis&#34;&gt;Cn33liz&lt;/a&gt;, I recently had the pleasure of assisting &lt;a href=&#34;https://twitter.com/nikhil_mitt&#34;&gt;Nikhil Mittal&lt;/a&gt; with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Along with &lt;a href=&#34;https://twitter.com/Cneelis&#34;&gt;Cn33liz&lt;/a&gt;, I recently had the pleasure of assisting &lt;a href=&#34;https://twitter.com/nikhil_mitt&#34;&gt;Nikhil Mittal&lt;/a&gt; with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -111,40 +104,36 @@
       <guid>https://rastamouse.me/2018/03/a-view-of-persistence/</guid>
       <description>&lt;blockquote&gt;
 &lt;p&gt;Persistence, noun, the continued or prolonged existence of something.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;/blockquote&gt;</description>
     </item>
     
     <item>
       <title>LAPS - Part 2</title>
-      <link>https://rastamouse.me/2018/03/laps---part-2/</link>
+      <link>https://rastamouse.me/2018/03/laps-part-2/</link>
       <pubDate>Sat, 17 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/03/laps---part-2/</guid>
-      <description>&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2018/03/laps---part-1/&#34;&gt;Part 1&lt;/a&gt; we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&amp;rsquo;ll look at various ways LAPS can be abused for persistence purposes.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <guid>https://rastamouse.me/2018/03/laps-part-2/</guid>
+      <description>&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2018/03/laps---part-1/&#34;&gt;Part 1&lt;/a&gt; we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&amp;rsquo;ll look at various ways LAPS can be abused for persistence purposes.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>LAPS - Part 1</title>
-      <link>https://rastamouse.me/2018/03/laps---part-1/</link>
+      <link>https://rastamouse.me/2018/03/laps-part-1/</link>
       <pubDate>Sat, 10 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/03/laps---part-1/</guid>
-      <description>&lt;p&gt;&lt;/p&gt;</description>
+      <guid>https://rastamouse.me/2018/03/laps-part-1/</guid>
+      <description>I suspect the majority of folk are familiar with the &amp;ldquo;Local Administrator Password Solution&amp;rdquo; (LAPS) from Microsoft. If not, the tl;dr is that it:
+ periodically changes the local admin account password stores the password in a extended attribute of the computer object in AD allows password read &amp;amp; reset permissions to be delegated to AD users/groups  More detailed information can be found here, here and here.
+The purpose of this post, is to put together a more complete end-to-end process for mapping out the LAPS configuration in a domain.</description>
     </item>
     
     <item>
       <title>Red Team Infrastructure - AWS Encrypted EBS</title>
-      <link>https://rastamouse.me/2018/02/red-team-infrastructure---aws-encrypted-ebs/</link>
+      <link>https://rastamouse.me/2018/02/red-team-infrastructure-aws-encrypted-ebs/</link>
       <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/02/red-team-infrastructure---aws-encrypted-ebs/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/malcomvetter&#34;&gt;Tim MalcomVetter&lt;/a&gt; caused a bit of stir over his &lt;a href=&#34;https://medium.com/@malcomvetter/responsible-red-teams-1c6209fd43cc&#34;&gt;Responsible Red Teams&lt;/a&gt; post last week, which is not surprising since he was pretty fucking rude about the whole thing.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <guid>https://rastamouse.me/2018/02/red-team-infrastructure-aws-encrypted-ebs/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/malcomvetter&#34;&gt;Tim MalcomVetter&lt;/a&gt; caused a bit of stir over his &lt;a href=&#34;https://medium.com/@malcomvetter/responsible-red-teams-1c6209fd43cc&#34;&gt;Responsible Red Teams&lt;/a&gt; post last week, which is not surprising since he was pretty fucking rude about the whole thing.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -153,22 +142,18 @@
       <pubDate>Fri, 16 Feb 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2018/02/vhd-to-da/</guid>
-      <description>&lt;p&gt;Where a 10-year old backup can fcuk you in the ass&amp;hellip;&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Where a 10-year old backup can fcuk you in the ass&amp;hellip;&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Automated Red Team Infrastructure Deployment with Terraform - Part 2</title>
-      <link>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/</link>
+      <link>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform-part-2/</link>
       <pubDate>Sat, 23 Sep 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/</guid>
+      <guid>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform-part-2/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
 
-&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/&#34;&gt;&lt;b&gt;Part 1&lt;/b&gt;&lt;/a&gt;, we looked at using &lt;a href=&#34;https://www.terraform.io/&#34;&gt;Terraform&lt;/a&gt; to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&amp;rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/&#34;&gt;&lt;b&gt;Part 1&lt;/b&gt;&lt;/a&gt;, we looked at using &lt;a href=&#34;https://www.terraform.io/&#34;&gt;Terraform&lt;/a&gt; to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&amp;rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -179,24 +164,20 @@
       <guid>https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
 
-&lt;p&gt;This short post demonstrates how it may be possible to pivot into a segregated/protected network, via an RDP Jump Box.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;This short post demonstrates how it may be possible to pivot into a segregated/protected network, via an RDP Jump Box.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Automated Red Team Infrastructure Deployment with Terraform - Part 1</title>
-      <link>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</link>
+      <link>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/</link>
       <pubDate>Tue, 22 Aug 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</guid>
+      <guid>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This &lt;a href=&#34;https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki&#34;&gt;wiki&lt;/a&gt; maintained by &lt;a href=&#34;https://twitter.com/424f424f&#34;&gt;Steve Borosh&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/bluscreenofjeff&#34;&gt;Jeff Dimmock&lt;/a&gt; is probably the best public resource I&amp;rsquo;ve seen in regards to design considerations and hardening tips.&lt;/p&gt;
 
-&lt;p&gt;For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -205,9 +186,7 @@
       <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2017/07/how-to-accidently-win-against-av/</guid>
-      <description>&lt;p&gt;Computer viruses have been around since as early as the 1970&amp;rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Computer viruses have been around since as early as the 1970&amp;rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -216,9 +195,7 @@
       <pubDate>Sun, 18 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2017/06/psexec-much/</guid>
-      <description>&lt;p&gt;I recently completed an adversary simulation and thought I would write a short post about some of my experiences.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;I recently completed an adversary simulation and thought I would write a short post about some of my experiences.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -227,9 +204,7 @@
       <pubDate>Thu, 18 May 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2017/05/playing-with-cuckoo/</guid>
-      <description>&lt;p&gt;After the release and complete hubbub that &lt;a href=&#34;https://en.wikipedia.org/wiki/WannaCry_ransomware_attack&#34;&gt;WannaCry&lt;/a&gt; caused, I thought it would be fun to play with &lt;a href=&#34;https://cuckoosandbox.org/&#34;&gt;Cuckoo Sandbox&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;After the release and complete hubbub that &lt;a href=&#34;https://en.wikipedia.org/wiki/WannaCry_ransomware_attack&#34;&gt;WannaCry&lt;/a&gt; caused, I thought it would be fun to play with &lt;a href=&#34;https://cuckoosandbox.org/&#34;&gt;Cuckoo Sandbox&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -238,9 +213,7 @@
       <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2017/05/a-citrix-story/</guid>
-      <description>&lt;p&gt;I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.&lt;/p&gt;</description>
     </item>
     
   </channel>

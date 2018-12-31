@@ -13,41 +13,35 @@
     
     <item>
       <title>Red Team Infrastructure - AWS Encrypted EBS</title>
-      <link>https://rastamouse.me/2018/02/red-team-infrastructure---aws-encrypted-ebs/</link>
+      <link>https://rastamouse.me/2018/02/red-team-infrastructure-aws-encrypted-ebs/</link>
       <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/02/red-team-infrastructure---aws-encrypted-ebs/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/malcomvetter&#34;&gt;Tim MalcomVetter&lt;/a&gt; caused a bit of stir over his &lt;a href=&#34;https://medium.com/@malcomvetter/responsible-red-teams-1c6209fd43cc&#34;&gt;Responsible Red Teams&lt;/a&gt; post last week, which is not surprising since he was pretty fucking rude about the whole thing.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <guid>https://rastamouse.me/2018/02/red-team-infrastructure-aws-encrypted-ebs/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/malcomvetter&#34;&gt;Tim MalcomVetter&lt;/a&gt; caused a bit of stir over his &lt;a href=&#34;https://medium.com/@malcomvetter/responsible-red-teams-1c6209fd43cc&#34;&gt;Responsible Red Teams&lt;/a&gt; post last week, which is not surprising since he was pretty fucking rude about the whole thing.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Automated Red Team Infrastructure Deployment with Terraform - Part 2</title>
-      <link>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/</link>
+      <link>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform-part-2/</link>
       <pubDate>Sat, 23 Sep 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/</guid>
+      <guid>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform-part-2/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
 
-&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/&#34;&gt;&lt;b&gt;Part 1&lt;/b&gt;&lt;/a&gt;, we looked at using &lt;a href=&#34;https://www.terraform.io/&#34;&gt;Terraform&lt;/a&gt; to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&amp;rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/&#34;&gt;&lt;b&gt;Part 1&lt;/b&gt;&lt;/a&gt;, we looked at using &lt;a href=&#34;https://www.terraform.io/&#34;&gt;Terraform&lt;/a&gt; to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&amp;rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Automated Red Team Infrastructure Deployment with Terraform - Part 1</title>
-      <link>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</link>
+      <link>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/</link>
       <pubDate>Tue, 22 Aug 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</guid>
+      <guid>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This &lt;a href=&#34;https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki&#34;&gt;wiki&lt;/a&gt; maintained by &lt;a href=&#34;https://twitter.com/424f424f&#34;&gt;Steve Borosh&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/bluscreenofjeff&#34;&gt;Jeff Dimmock&lt;/a&gt; is probably the best public resource I&amp;rsquo;ve seen in regards to design considerations and hardening tips.&lt;/p&gt;
 
-&lt;p&gt;For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.&lt;/p&gt;</description>
     </item>
     
   </channel>

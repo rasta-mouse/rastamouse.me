@@ -21,7 +21,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.41">
+    <meta name="generator" content="Hugo 0.53">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
     <title>A Citrix Story</title>
     <meta name="author" content="Rasta Mouse">
@@ -31,21 +31,15 @@
     
 
     
-    <meta name="description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
-
-">
-    <meta property="og:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
-
-">
+    <meta name="description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.">
+    <meta property="og:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.">
     <meta property="og:type" content="blog">
     <meta property="og:title" content="A Citrix Story">
     <meta property="og:url" content="/2017/05/a-citrix-story/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.
-
-">
+    <meta name="twitter:description" content="I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.">
     
       <meta name="twitter:creator" content="@_RastaMouse">
     
@@ -78,7 +72,7 @@
 
     
       
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -287,8 +281,6 @@ if (!doNotTrack) {
             <div class="main-content-wrap">
               <p>I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.</p>
 
-<p></p>
-
 <h2 id="background">Background</h2>
 
 <p>The purpose of the system was to provide staff a means of accessing internal resources via a BYOD model.  They would login to a publically available Citrix Access Gateway and receive a virtual desktop instance of Windows 7.</p>
@@ -297,12 +289,8 @@ if (!doNotTrack) {
 
 <p>This was a partial white-box review, so I did have some valid credentials to log in with.  So we&rsquo;ll kick this off with a Cobalt Strike foothold.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/1-vdi4_nlove.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/1-vdi4_nlove.PNG"/> 
 </figure>
 
 
@@ -318,39 +306,23 @@ if (!doNotTrack) {
 
 <p>This turned out to be relatively simple.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/2-vdi4_localadmins.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/2-vdi4_localadmins.PNG"/> 
 </figure>
 
 
 <p>One of the system administrators must&rsquo;ve put <code>bob</code> in at some point for testing or during early development, but it was a pretty big derp as it has no password.  The only difficultly I had was spawning a new session via Beacon.  The built-in parser won&rsquo;t handle a blank password and writing a custom aggressor script to run <code>bspawnas</code> didn&rsquo;t work either.  I tried a few others like <code>runas</code>, but I eventually resigned myself to elevating in the actual virtual desktop.  So I just uploaded a stageless PowerShell SMB payload and ran it manually.</p>
 
-<p>
-<figure>
-    
-        <img src="https://rastamouse.me/images/citrix/3-vdi4_bob.PNG" />
-    
-    
+<p><figure>
+    <img src="https://rastamouse.me/images/citrix/3-vdi4_bob.PNG"/> 
 </figure>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/4-vdi4_smbbeacon.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/4-vdi4_smbbeacon.PNG"/> 
 </figure>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/5-vdi4_bobbeacon.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/5-vdi4_bobbeacon.PNG"/> 
 </figure>
 </p>
 
@@ -358,12 +330,8 @@ if (!doNotTrack) {
 
 <p>Now that we have admin access over the desktop, we can carry out the classic act of dumping all the password hashes.  The accounts we&rsquo;re interested in are <code>CitrixAdmin</code> and <code>VDI-004$</code>.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/6-vdi4_creds.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/6-vdi4_creds.PNG"/> 
 </figure>
 
 
@@ -379,34 +347,22 @@ if (!doNotTrack) {
 
 <p>Let&rsquo;s say <code>nlove</code> logs off for the day and we lose our Beacons.  Next morning he logs on and gets a fresh virtual desktop.  Because his user profile follows him from desktop to desktop, our registry persistence calls back and we get a new session.  This time on <code>VDI-001</code>.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/7-vdi1_nlove.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/7-vdi1_nlove.PNG"/> 
 </figure>
 
 
 <p>We can elevate using the <code>CitrixAdmin</code> account, because the password is the same across all systems.  Here, we do a <code>spawnas</code> and <code>bypassuac</code>.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/8-vdi1_elevate.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/8-vdi1_elevate.PNG"/> 
 </figure>
 
 
 <p>We can now dump the machine hash for <code>VDI-001</code>.  The next trick, is moving laterally back to <code>VDI-004</code>, which we can do using its machine hash that we obtained previously.  Using Jeff&rsquo;s extension:</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/9-silver_ticket.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/9-silver_ticket.PNG"/> 
 </figure>
 
 
@@ -414,12 +370,8 @@ if (!doNotTrack) {
 
 <p>Once the ticket has been injected into our current session, we can simply do a <code>psexec_psh</code> (or whatever method you prefer) to take <code>VDI-004</code>.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/10-vdi1_4.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/10-vdi1_4.PNG"/> 
 </figure>
 
 
@@ -427,31 +379,19 @@ if (!doNotTrack) {
 
 <p>If we take a look at <code>VDI-004</code> we can see that it&rsquo;s been assigned to another user, <code>rparker</code>.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/11-vdi4_netlogons.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/11-vdi4_netlogons.PNG"/> 
 </figure>
 
 
 <p>We can obviously steal his password, inject a new Beacon into one of his processes and setup the same userland persistance as with <code>nlove</code>.</p>
 
-<p>
-<figure>
-    
-        <img src="https://rastamouse.me/images/citrix/12-vdi4_creds.PNG" />
-    
-    
+<p><figure>
+    <img src="https://rastamouse.me/images/citrix/12-vdi4_creds.PNG"/> 
 </figure>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/13-vdi1_4.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/13-vdi1_4.PNG"/> 
 </figure>
 </p>
 
@@ -459,67 +399,43 @@ if (!doNotTrack) {
 
 <p>Let&rsquo;s say another day goes by, <code>nlove</code> and <code>rparker</code> have logged back in and are assigned <code>VDI-005</code> and <code>VDI-003</code> respectively.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/14-vdi3_5.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/14-vdi3_5.PNG"/> 
 </figure>
 
 
 <p>We elevate on both desktops.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/15-vdi3_5_elevated.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/15-vdi3_5_elevated.PNG"/> 
 </figure>
 
 
 <p>Dump the hashes.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/16-vdi1345_creds.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/16-vdi1345_creds.PNG"/> 
 </figure>
 
 
 <p>And Pass the Ticket to take <code>VDI-001</code> and <code>VDI-004</code> again.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/17-moar_vdi.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/17-moar_vdi.PNG"/> 
 </figure>
 
 
 <p>We now discover a new user on <code>VDI-004</code> - <code>jhardin</code>.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/18-vdi4_jhardin.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/18-vdi4_jhardin.PNG"/> 
 </figure>
 
 
 <p>Follow the same process of persisting as <code>jhardin</code> and spreading to more desktops.</p>
 
-
 <figure>
-    
-        <img src="https://rastamouse.me/images/citrix/19-final.PNG" />
-    
-    
+    <img src="https://rastamouse.me/images/citrix/19-final.PNG"/> 
 </figure>
 
 
@@ -770,17 +686,15 @@ if (!doNotTrack) {
           <div class="media">
             
             <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2018/11/amsiscanbuffer-bypass---part-3/">
-                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 3</h3>
+              <a class="link-unstyled" href="https://rastamouse.me/2018/12/amsiscanbuffer-bypass-part-4/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 4</h3>
               </a>
               <span class="media-meta">
                 <span class="media-date text-small">
-                  Nov 11, 2018
+                  Dec 12, 2018
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/">Part 2</a>, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>.  In this post, we&rsquo;ll make some modifications to the bypass itself.</p>
-
-<p></p></div>
+              <div class="media-content hide-xs font-merryweather"><p>As 2018 rapidly comes to an end, I thought I&rsquo;d close out the year by clearing up some confusions over this AmsiScanBuffer bypass and why it appears to fail under some circumstances.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -789,7 +703,24 @@ if (!doNotTrack) {
           <div class="media">
             
             <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 3</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Nov 11, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/">Part 2</a>, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>.  In this post, we&rsquo;ll make some modifications to the bypass itself.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/">
                 <h3 class="media-heading">AmsiScanBuffer Bypass - Part 2</h3>
               </a>
               <span class="media-meta">
@@ -801,9 +732,7 @@ if (!doNotTrack) {
 
 <p>In this post, we&rsquo;ll explore a delivery method to help stage a Cobalt Strike / Empire / &lt;insert framework here&gt; agent.  As with Part 1, this is not about some 1337 code drop - it&rsquo;s a demonstration of how I walked through engineering the final result.</p>
 
-<p>So, let&rsquo;s get cracking.</p>
-
-<p></p></div>
+<p>So, let&rsquo;s get cracking.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -812,7 +741,7 @@ if (!doNotTrack) {
           <div class="media">
             
             <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/">
                 <h3 class="media-heading">AmsiScanBuffer Bypass - Part 1</h3>
               </a>
               <span class="media-meta">
@@ -820,9 +749,7 @@ if (!doNotTrack) {
                   Oct 10, 2018
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p><a href="https://twitter.com/_zc00l">Andre Marques</a> recently <a href="https://twitter.com/_zc00l/status/1056523259246718976">posted</a> a pretty nice <a href="https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html">write-up</a> for circumventing AMSI, based on previous work by <a href="https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/">CyberArk</a>.</p>
-
-<p></p></div>
+              <div class="media-content hide-xs font-merryweather"><p><a href="https://twitter.com/_zc00l">Andre Marques</a> recently <a href="https://twitter.com/_zc00l/status/1056523259246718976">posted</a> a pretty nice <a href="https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html">write-up</a> for circumventing AMSI, based on previous work by <a href="https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/">CyberArk</a>.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -839,9 +766,7 @@ if (!doNotTrack) {
                   Sep 9, 2018
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>With the emergence of more C# and .NET tooling, I occasionally see people tripping up over this.  It&rsquo;s not a huge issue, just something to be aware of.</p>
-
-<p></p></div>
+              <div class="media-content hide-xs font-merryweather"><p>With the emergence of more C# and .NET tooling, I occasionally see people tripping up over this.  It&rsquo;s not a huge issue, just something to be aware of.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -858,9 +783,7 @@ if (!doNotTrack) {
                   Sep 9, 2018
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.</p>
-
-<p></p></div>
+              <div class="media-content hide-xs font-merryweather"><p>Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -877,9 +800,7 @@ if (!doNotTrack) {
                   Jun 6, 2018
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.</p>
-
-<p></p></div>
+              <div class="media-content hide-xs font-merryweather"><p>This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -896,9 +817,7 @@ if (!doNotTrack) {
                   May 5, 2018
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>In April 2018, <a href="https://twitter.com/subTee">Casey Smith</a> published a finding he dubbed <a href="http://subt0x11.blogspot.co.uk/2018/04/wmicexe-whitelisting-bypass-hacking.html">squiblytwo</a>, which detailed how WMIC can be used to invoke arbitary code contained in the extensible stylesheet language (XSL) format.</p>
-
-<p></p></div>
+              <div class="media-content hide-xs font-merryweather"><p>In April 2018, <a href="https://twitter.com/subTee">Casey Smith</a> published a finding he dubbed <a href="http://subt0x11.blogspot.co.uk/2018/04/wmicexe-whitelisting-bypass-hacking.html">squiblytwo</a>, which detailed how WMIC can be used to invoke arbitary code contained in the extensible stylesheet language (XSL) format.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -915,9 +834,7 @@ if (!doNotTrack) {
                   May 5, 2018
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>Along with <a href="https://twitter.com/Cneelis">Cn33liz</a>, I recently had the pleasure of assisting <a href="https://twitter.com/nikhil_mitt">Nikhil Mittal</a> with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.</p>
-
-<p></p></div>
+              <div class="media-content hide-xs font-merryweather"><p>Along with <a href="https://twitter.com/Cneelis">Cn33liz</a>, I recently had the pleasure of assisting <a href="https://twitter.com/nikhil_mitt">Nikhil Mittal</a> with his 2018 BruCON spring training: Active Directory Attacks for Red and Blue Teams.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -936,28 +853,7 @@ if (!doNotTrack) {
               </span>
               <div class="media-content hide-xs font-merryweather"><blockquote>
 <p>Persistence, noun, the continued or prolonged existence of something.</p>
-</blockquote>
-
-<p></p></div>
-            </div>
-            <div style="clear:both;"></div>
-            <hr>
-          </div>
-        
-          <div class="media">
-            
-            <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2018/03/laps---part-2/">
-                <h3 class="media-heading">LAPS - Part 2</h3>
-              </a>
-              <span class="media-meta">
-                <span class="media-date text-small">
-                  Mar 3, 2018
-                </span>
-              </span>
-              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/03/laps---part-1/">Part 1</a> we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&rsquo;ll look at various ways LAPS can be abused for persistence purposes.</p>
-
-<p></p></div>
+</blockquote></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -970,7 +866,7 @@ if (!doNotTrack) {
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         21 posts found
+         22 posts found
       </p>
     </div>
   </div>

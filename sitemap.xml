@@ -3,17 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://rastamouse.me/2018/11/amsiscanbuffer-bypass---part-3/</loc>
+    <loc>https://rastamouse.me/2018/12/amsiscanbuffer-bypass-part-4/</loc>
+    <lastmod>2018-12-31T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/</loc>
     <lastmod>2018-11-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/</loc>
+    <loc>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/</loc>
     <lastmod>2018-10-31T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/</loc>
+    <loc>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/</loc>
     <lastmod>2018-10-29T00:00:00+00:00</lastmod>
   </url>
   
@@ -48,17 +53,17 @@
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/03/laps---part-2/</loc>
+    <loc>https://rastamouse.me/2018/03/laps-part-2/</loc>
     <lastmod>2018-03-17T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/03/laps---part-1/</loc>
+    <loc>https://rastamouse.me/2018/03/laps-part-1/</loc>
     <lastmod>2018-03-10T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/02/red-team-infrastructure---aws-encrypted-ebs/</loc>
+    <loc>https://rastamouse.me/2018/02/red-team-infrastructure-aws-encrypted-ebs/</loc>
     <lastmod>2018-02-25T00:00:00+00:00</lastmod>
   </url>
   
@@ -68,7 +73,7 @@
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/</loc>
+    <loc>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform-part-2/</loc>
     <lastmod>2017-09-23T00:00:00+00:00</lastmod>
   </url>
   
@@ -78,7 +83,7 @@
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/</loc>
+    <loc>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/</loc>
     <lastmod>2017-08-22T00:00:00+00:00</lastmod>
   </url>
   
@@ -116,7 +121,7 @@
   
   <url>
     <loc>https://rastamouse.me/tags/amsi/</loc>
-    <lastmod>2018-11-01T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -139,25 +144,25 @@
   
   <url>
     <loc>https://rastamouse.me/categories/blog/</loc>
-    <lastmod>2018-11-01T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/bypass/</loc>
-    <lastmod>2018-11-01T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/tags/c#/</loc>
+    <loc>https://rastamouse.me/tags/c/</loc>
     <lastmod>2018-09-19T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/categories/</loc>
-    <lastmod>2018-11-01T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -253,7 +258,7 @@
   
   <url>
     <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2018-11-01T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -271,7 +276,7 @@
   
   <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2018-11-01T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
