@@ -23,7 +23,7 @@
     <item>
       <title>Active Directory</title>
       <link>https://rastamouse.me/tags/active-directory/</link>
-      <pubDate>Sat, 17 Mar 2018 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 06 Jan 2019 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/active-directory/</guid>
       <description></description>
@@ -134,6 +134,15 @@
       <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/dpapi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gpo</title>
+      <link>https://rastamouse.me/tags/gpo/</link>
+      <pubDate>Sun, 06 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/gpo/</guid>
       <description></description>
     </item>
     

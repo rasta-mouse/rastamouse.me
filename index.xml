@@ -6,10 +6,19 @@
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 31 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 06 Jan 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>GPO Abuse - Part 1</title>
+      <link>https://rastamouse.me/2019/01/gpo-abuse-part-1/</link>
+      <pubDate>Sun, 06 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/01/gpo-abuse-part-1/</guid>
+      <description>&lt;p&gt;Group Policy Objects (GPOs) is a subject I&amp;rsquo;ve wanted to write about for a long time and I&amp;rsquo;m happy to have &lt;em&gt;finally&lt;/em&gt; started.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>AmsiScanBuffer Bypass - Part 4</title>
