@@ -6,10 +6,19 @@
     <description>Recent content in Active Directory on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 06 Jan 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 08 Jan 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/active-directory/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>GPO Abuse - Part 2</title>
+      <link>https://rastamouse.me/2019/01/gpo-abuse-part-2/</link>
+      <pubDate>Tue, 08 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/01/gpo-abuse-part-2/</guid>
+      <description>&lt;p&gt;Before we can really dive into modifying GPOs, we need to try and understand some of the intricacies of how they&amp;rsquo;re updated normally in GPMC and AD.  Because believe me, it aint as simple as it appears.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>GPO Abuse - Part 1</title>

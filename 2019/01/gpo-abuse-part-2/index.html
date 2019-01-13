@@ -1,5 +1,9 @@
 
 
+  
+    
+  
+
 
   
 
@@ -19,25 +23,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.53">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
-    <title>Rdp</title>
+    <title>GPO Abuse - Part 2</title>
     <meta name="author" content="Rasta Mouse">
     <meta name="keywords" content="">
 
     <link rel="icon" href="https://rastamouse.me/favicon.ico">
     
-      <link rel="alternate" type="application/rss+xml" title="RSS" href="https://rastamouse.me/tags/rdp/index.xml">
-    
 
     
-    <meta name="description" content="Rasta Mouse">
-    <meta property="og:description" content="Rasta Mouse">
+    <meta name="description" content="Before we can really dive into modifying GPOs, we need to try and understand some of the intricacies of how they&rsquo;re updated normally in GPMC and AD.  Because believe me, it aint as simple as it appears.">
+    <meta property="og:description" content="Before we can really dive into modifying GPOs, we need to try and understand some of the intricacies of how they&rsquo;re updated normally in GPMC and AD.  Because believe me, it aint as simple as it appears.">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="Rdp">
-    <meta property="og:url" content="/tags/rdp/">
+    <meta property="og:title" content="GPO Abuse - Part 2">
+    <meta property="og:url" content="/2019/01/gpo-abuse-part-2/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="Rasta Mouse">
+    <meta name="twitter:description" content="Before we can really dive into modifying GPOs, we need to try and understand some of the intricacies of how they&rsquo;re updated normally in GPMC and AD.  Because believe me, it aint as simple as it appears.">
     
       <meta name="twitter:creator" content="@_RastaMouse">
     
@@ -50,6 +52,8 @@
       <meta property="og:image" content="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=640">
     
 
+    
+      <meta property="og:image" content="https://rastamouse.me/images/gpo-abuse-pt1/thumb.png">
     
     
     
@@ -87,7 +91,7 @@ if (!doNotTrack) {
 
   <body>
     <div id="blog">
-      <header id="header" data-behavior="1"> 
+      <header id="header" data-behavior="4"> 
   <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
   <div class="header-title">
     <a class="header-title-link" href="https://rastamouse.me/">Rasta Mouse</a>
@@ -106,7 +110,7 @@ if (!doNotTrack) {
     </a>
   
 </header>
-      <nav id="sidebar" data-behavior="1">
+      <nav id="sidebar" data-behavior="4">
   <div class="sidebar-container">
     
       <div class="sidebar-profile">
@@ -232,43 +236,29 @@ if (!doNotTrack) {
 </nav>
 
       
-        
 
-      
-      <div id="main" data-behavior="1"
+      <div id="main" data-behavior="4"
         class="
                hasCoverMetaIn
                ">
-        
-          <section class="postShorten-group main-content-wrap">
-            
-            
-              
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
   
-    
+    <h1 class="post-title" itemprop="headline">
+      GPO Abuse - Part 2
+    </h1>
   
-
-
+  <div class="postShorten-meta post-meta">
   
-
-<article class="postShorten postShorten--thumbnailimg-left" itemscope itemType="http://schema.org/BlogPosting">
-  <div class="postShorten-wrap">
-    
-    <div class="postShorten-header">
-      <h1 class="postShorten-title" itemprop="headline">
-        <a class="link-unstyled" href="https://rastamouse.me/2018/06/rdpclip/">
-          RDPClip
-        </a>
-      </h1>
-      <div class="postShorten-meta post-meta">
-  
-    <time itemprop="datePublished" datetime="2018-06-09T00:00:00Z">
+    <time itemprop="datePublished" datetime="2019-01-08T00:00:00Z">
       
   
   
   
   
-    9 June 2018
+    8 January 2019
   
 
     </time>
@@ -285,94 +275,216 @@ if (!doNotTrack) {
 
 </div>
 
-    </div>
-    <div class="postShorten-excerpt" itemprop="articleBody">
-      <p>
-        This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.
-        <br>
-        <a href="https://rastamouse.me/2018/06/rdpclip/" class="postShorten-excerpt_link link">Continue reading</a>
-        
-      </p>
-    </div>
-  </div>
-  
-    <a href="https://rastamouse.me/2018/06/rdpclip/">
-      <div class="postShorten-thumbnailimg">
-        <img alt="" itemprop="image" src="https://rastamouse.me/images/rdpclip/thumb.jpg"/>
-      </div>
-    </a>
-  
-</article>
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p>Before we can really dive into modifying GPOs, we need to try and understand some of the intricacies of how they&rsquo;re updated normally in GPMC and AD.  Because believe me, it aint as simple as it appears.</p>
+
+<p>When you first create and name a GPO and then look at it the Details tab, you&rsquo;ll see it has these <code>User</code> and <code>Computer</code> version fields, with <code># (AD), # (SYSVOL)</code>.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/gpo-abuse-pt2/test-gpo.png"/> 
+</figure>
+
+
+<p>For every GPO, there is also a corresponding path on disk (which I believe is called the Group Policy Template) at <code>C:\Windows\SYSVOL\domain\Policies\&lt;guid&gt;</code>.  For this GPO, it would be <code>C:\Windows\SYSVOL\domain\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}</code>.  From a domain member, you can also access SYSVOL over its network share e.g. <code>\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}</code>.</p>
+
+<p>Inside the GPT, you have a <code>Machine</code> and <code>User</code> directory and a <code>GPT.INI</code> file.</p>
+
+<pre><code class="language-text">PS &gt; ls &quot;\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}&quot;
+
+
+    Directory: \\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       13/01/2019     11:13                Machine
+d-----       13/01/2019     11:13                User
+-a----       13/01/2019     11:13             59 GPT.INI
+</code></pre>
+
+<p>No points for guessing that <code>Computer</code> policies are dropped into <code>Machine</code> and <code>User</code> policies into <code>User</code>.</p>
+
+<p><code>GPT.INI</code> is a really simple file that contains:</p>
+
+<pre><code class="language-text">PS &gt; cat &quot;\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}\GPT.INI&quot;
+[General]
+Version=0
+displayName=New Group Policy Object
+</code></pre>
+
+<blockquote>
+<p>Note that the <code>displayName</code> parameter never changes <code>¯\_(ツ)_/¯</code>.</p>
+</blockquote>
+
+<p>If we make some changes to the GPO and refresh GPMC, we can see that the <code>AD</code> and <code>SYSVOL</code> numbers for <code>Computer</code> have been pushed up.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/gpo-abuse-pt2/gpo-change-1.png"/> 
+</figure>
+
+
+<p>They seem to increase for every individual change that happens, but since GPMC does all sorts in the background that you can&rsquo;t see unless you&rsquo;re monitoring with something like Process Monitor, seemingly small changes can result in a large increase.</p>
+
+<p>The <code>AD</code> and <code>SYSVOL</code> values are stored in different places, but are pretty important to understand.</p>
+
+<p><code>SYSVOL</code> is stored in that <code>GPT.INI</code> file. If we read it again, we&rsquo;ll see that the version has changed.</p>
+
+<pre><code class="language-text">PS &gt; cat &quot;\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}\GPT.INI&quot;
+[General]
+Version=12
+displayName=New Group Policy Object
+</code></pre>
+
+<p>It gets a bit more complicated if you have a GPO that applies both <code>Computer</code> and <code>User</code> policies, since the number format of <code>GPT.INI</code> changes.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/gpo-abuse-pt2/gpo-change-2.png"/> 
+</figure>
+
+
+<pre><code class="language-text">PS &gt; cat &quot;\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}\GPT.INI&quot;
+[General]
+Version=65548
+displayName=New Group Policy Object
+</code></pre>
+
+<p><code>version = [user verion][computer version]</code> where each value is <code>16 bits</code>.</p>
+
+<p>To &ldquo;translate&rdquo;, we first convert the <code>decimal</code> to <code>hex</code>.  With a calculator in scientific mode, this comes out to be <code>1000C</code>.  But to make up for the fact these are 16 bit, it&rsquo;s actually <code>0001000C</code>, because a calculator won&rsquo;t display the leading zeros.</p>
+
+<p>So <code>0001</code> is <code>1</code> and <code>000C</code> is <code>12</code>.</p>
+
+<p>The <code>AD</code> number is stored as an attribute on the Group Policy object in AD.  You can query it with PowerView like:</p>
+
+<pre><code class="language-text">PS &gt; Get-DomainGPO -Identity &quot;Test GPO&quot; -Properties VersionNumber
+
+versionnumber
+-------------
+       65548
+</code></pre>
+
+<p>And it uses exactly the same format.</p>
+
+<p>When you modify a GPO in GPMC it will update the corresponding files in SYSVOL, update the value in <code>GPT.INI</code> and then update its <code>versionnumber</code> attribute in AD.</p>
+
+<p>To modify the GPO without GPMC, you have to go into SYSVOL and modify the files manually. E.g. if we wanted to deploy some new local admins using Restricted Groups, we&rsquo;d have to modify <code>C:\Windows\SYSVOL\domain\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}\Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf</code>.</p>
+
+<p>The limitation of updating the file without incrementing the <code>AD</code> or <code>SYSVOL</code> version numbers is that:</p>
+
+<ol>
+<li>Clients will not automatically pull the changes because they think they already have the latest configuration
+(unless you have code exec on a box and can issue a <code>gpupdate /force</code>)</li>
+<li>The changes will not be replicated across domain controllers</li>
+</ol>
+
+<p>To enable all clients to pull the changes as part of their regular group policy update schedule, you must increment both <code>AD</code> and <code>SYSVOL</code> version numbers manually.</p>
+
+<p><code>GPT.INI</code> is straight forward as it&rsquo;s just a text file.  The <code>versionnumber</code> attribute can be updated with PowerView:</p>
+
+<pre><code class="language-text">PS &gt; Get-DomainGPO -Identity &quot;Test GPO&quot; | Set-DomainObject -Set @{'versionnumber'='1337'}
+PS &gt; Get-DomainGPO -Identity &quot;Test GPO&quot; -Properties VersionNumber
+
+versionnumber
+-------------
+         1337
+</code></pre>
+
+<p>You must always keep the two values identical, otherwise you will cause <code>AD / SYSVOL Version Mismatch</code> errors.</p>
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/gpo/">GPO</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/active-directory/">Active Directory</a>
+
+                  </div>
+                
+              
+            
+            <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/01/gpo-abuse-part-1/" data-tooltip="GPO Abuse - Part 1">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f01%2fgpo-abuse-part-2%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f01%2fgpo-abuse-part-2%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f01%2fgpo-abuse-part-2%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
 
             
               
-  
-    
-  
-
-
-  
-
-<article class="postShorten postShorten--thumbnailimg-left" itemscope itemType="http://schema.org/BlogPosting">
-  <div class="postShorten-wrap">
-    
-    <div class="postShorten-header">
-      <h1 class="postShorten-title" itemprop="headline">
-        <a class="link-unstyled" href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/">
-          Jumping Network Segregation with RDP
-        </a>
-      </h1>
-      <div class="postShorten-meta post-meta">
-  
-    <time itemprop="datePublished" datetime="2017-08-31T00:00:00Z">
-      
-  
-  
-  
-  
-    31 August 2017
-  
-
-    </time>
-  
-  
-  
-  
-    <span>in</span>
-    
-      <a class="category-link" href="https://rastamouse.me/categories/blog">blog</a>
-    
-  
-
-
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
-
-    </div>
-    <div class="postShorten-excerpt" itemprop="articleBody">
-      <p>
-        <h2 id="introduction">Introduction</h2>
-
-<p>This short post demonstrates how it may be possible to pivot into a segregated/protected network, via an RDP Jump Box.
-        <br>
-        <a href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/" class="postShorten-excerpt_link link">Continue reading</a>
-        
-      </p>
-    </div>
-  </div>
-  
-    <a href="https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/">
-      <div class="postShorten-thumbnailimg">
-        <img alt="" itemprop="image" src="https://rastamouse.me/images/rdp/icon.png"/>
-      </div>
-    </a>
-  
-</article>
-
+              
             
-            
-
-          </section>
-        
+          </div>
+        </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
     &copy; 2019 Rasta Mouse. All Rights Reserved
@@ -380,6 +492,92 @@ if (!doNotTrack) {
 </footer>
 
       </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/01/gpo-abuse-part-1/" data-tooltip="GPO Abuse - Part 1">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f01%2fgpo-abuse-part-2%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f01%2fgpo-abuse-part-2%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f01%2fgpo-abuse-part-2%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <ul class="share-options">
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f01%2fgpo-abuse-part-2%2f">
+        <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f01%2fgpo-abuse-part-2%2f">
+        <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f01%2fgpo-abuse-part-2%2f">
+        <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
     </div>
     
     <div id="about">
@@ -650,6 +848,32 @@ $(document).ready(function() {
   });
 });
 </script>
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/rastamouse.me\/2019\/01\/gpo-abuse-part-2\/';
+          
+            this.page.identifier = '\/2019\/01\/gpo-abuse-part-2\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'rastamouse';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
 
 
 
