@@ -6,10 +6,21 @@
     <description>Recent content in Posts on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 13 Jan 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 20 Mar 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>TikiTorch</title>
+      <link>https://rastamouse.me/2019/03/tikitorch/</link>
+      <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/03/tikitorch/</guid>
+      <description>&lt;p&gt;When TikiTorch was &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/882cbd1d74e9ddcfb3409f6d5a200f03beb79e7a&#34;&gt;first released&lt;/a&gt; in February, it consisted of a single .NET assembly.  Almost exactly a month later, I &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/3116ad0cbb4343bcc720f1e850b08d938971cd9c&#34;&gt;commited&lt;/a&gt; an updated that increased that to four assemblies.&lt;/p&gt;
+
+&lt;p&gt;This blog post will cover what these assemblies are and how to use them.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>GPO Abuse - Part 2</title>

