@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ews on Rasta Mouse</title>
+    <link>https://rastamouse.me/tags/ews/</link>
+    <description>Recent content in Ews on Rasta Mouse</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 21 Mar 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://rastamouse.me/tags/ews/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>EWS - InstallApp</title>
+      <link>https://rastamouse.me/2019/03/ews-installapp/</link>
+      <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/03/ews-installapp/</guid>
+      <description>&lt;p&gt;I recently created the &lt;a href=&#34;https://github.com/rasta-mouse/EWSToolkit&#34;&gt;EWSToolkit&lt;/a&gt; off the back of an assessment for Exchange Client Access Services.  I realised I committed with tool with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
