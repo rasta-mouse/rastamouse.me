@@ -31,15 +31,15 @@
     
 
     
-    <meta name="description" content="I recently created the EWSToolkit off the back of an assessment for Exchange Client Access Services.  I realised I committed with tool with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.">
-    <meta property="og:description" content="I recently created the EWSToolkit off the back of an assessment for Exchange Client Access Services.  I realised I committed with tool with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.">
+    <meta name="description" content="I recently created the EWSToolkit off the back of an assessment for Exchange Client Access Services.  I realise I committed it with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.">
+    <meta property="og:description" content="I recently created the EWSToolkit off the back of an assessment for Exchange Client Access Services.  I realise I committed it with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.">
     <meta property="og:type" content="blog">
     <meta property="og:title" content="EWS - InstallApp">
     <meta property="og:url" content="/2019/03/ews-installapp/">
     <meta property="og:site_name" content="Rasta Mouse">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Rasta Mouse">
-    <meta name="twitter:description" content="I recently created the EWSToolkit off the back of an assessment for Exchange Client Access Services.  I realised I committed with tool with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.">
+    <meta name="twitter:description" content="I recently created the EWSToolkit off the back of an assessment for Exchange Client Access Services.  I realise I committed it with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.">
     
       <meta name="twitter:creator" content="@_RastaMouse">
     
@@ -279,17 +279,33 @@ if (!doNotTrack) {
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <p>I recently created the <a href="https://github.com/rasta-mouse/EWSToolkit">EWSToolkit</a> off the back of an assessment for Exchange Client Access Services.  I realised I committed with tool with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.</p>
+              <p>I recently created the <a href="https://github.com/rasta-mouse/EWSToolkit">EWSToolkit</a> off the back of an assessment for Exchange Client Access Services.  I realise I committed it with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.</p>
 
 <h2 id="why-ews">Why EWS?</h2>
 
-<p>The aforementioned assessment was of a public-facing CAS, which was part of a hybrid Exchange Online model.  In this hybrid model, the Exchange Online service talks back to on-prem mailbox servers.  The only protocol required for this to work is Exchange Web Services (EWS) - and so a properly configured CAS has everything else disabled (notibly OWA and MAPI).</p>
+<p>The aforementioned assessment was of a public-facing CAS, which was part of a hybrid Exchange Online model.  In this hybrid model, the Exchange Online service talks back to on-prem mailbox servers.</p>
 
-<p><a href="https://github.com/dafthack/MailSniper">MailSniper</a> already has a number of abuses for EWS including password spraying and searching emails.  But we were looking for more &ldquo;offensive&rdquo; options, akin to the old <a href="https://github.com/sensepost/ruler">Ruler</a> days.</p>
+<figure>
+    <img src="https://rastamouse.me/images/ews/hybrid.png"/> 
+</figure>
 
-<h2 id="installapp">InstallApp</h2>
 
-<p>The EWS API has a metric boatload of <a href="https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/ews-operations-in-exchange">operations</a> available.  Whilst scrolling through the list, <a href="https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/installapp-operation">InstallApp</a> caught my eye.  The InstallApp operation installs a mail app for Outlook in a mailbox.  At first I was hoping this would include the older style C# VSTO Add-in, but it appears this is for the newer Web Add-in only.</p>
+<p>The only protocol <a href="https://docs.microsoft.com/en-us/exchange/hybrid-deployment-prerequisites#hybrid-deployment-protocols-ports-and-endpoints">required</a> for this to work is Exchange Web Services (EWS) - and so a properly configured CAS has everything else disabled (notibly OWA and MAPI).</p>
+
+<h2 id="password-spraying">Password Spraying</h2>
+
+<p><a href="https://github.com/dafthack/MailSniper">MailSniper</a> already has the ability to password spray against EWS and you&rsquo;ll generally get lucky with the usual candidates of <code>Month+Year</code>, <code>Season+Year</code> etc.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/ews/spray.png"/> 
+</figure>
+
+
+<p>MailSniper has a couple more functions built around EWS, including downloading the GAL and searching emails.  But we were looking for some more &ldquo;aggressive&rdquo; actions, akin to the old <a href="https://github.com/sensepost/ruler">Ruler</a> days.  So we started looking into EWS and what type of capabilities it provides.</p>
+
+<h2 id="managed-api">Managed API</h2>
+
+<p>We discovered the EWS API, which has a metric boatload of <a href="https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/ews-operations-in-exchange">operations</a> available.  Whilst scrolling through the list, <a href="https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/installapp-operation">InstallApp</a> caught my eye.  The InstallApp operation installs a mail app for Outlook in a mailbox.  At first I was hoping this would include the older style C# VSTO Add-in, but it appears this is for the newer Web Add-in only.</p>
 
 <p><a href="https://twitter.com/ustayready">Mike Felch</a> and <a href="https://twitter.com/dafthack">Beau Bullock</a> presented a talk at the 2018 Wild West Hackin&rsquo; Fest called <a href="https://www.youtube.com/watch?v=XFk-b0aT6cs">Covert Attack Mystery Box</a>, where they talked about pushing a malicious Outlook Add-In via OWA to Beef hook a victim&rsquo;s browser.  <a href="https://twitter.com/two06">James Williams</a> also published a <a href="https://www.mdsec.co.uk/2019/01/abusing-office-web-add-ins-for-fun-and-limited-profit/">blog</a> referencing Mike and Beau&rsquo;s work, where he creates an Outlook Add-In to steal users&rsquo; emails (also via OWA), disguised as a &ldquo;Windows Defender for Office 365&rdquo; app.</p>
 
@@ -301,7 +317,7 @@ if (!doNotTrack) {
 
 <p>Change all instance of <code>https://attacker.domain</code> in <code>McAfeeForOutlook.xml</code> for the domain where you&rsquo;ll host the add-in; and <code>https://beef/hook.js</code> in <code>index.html</code> for wherever you&rsquo;re hosting Beef.  You can then right-click <code>McAfeeForOutlookWeb</code> in VS and <code>Publish</code> to a <code>FolderProfile</code> (e.g. your desktop).  You need then to simply upload the content to your host.</p>
 
-<p>EWS (and OWA) will only let you install web add-ins that are hosted via HTTPS, and the Beef hook also needs to be HTTPS due to mixed content restrictions.  LetsEncrypt is your friend.</p>
+<p>EWS (and OWA) will only let you install web add-ins that are hosted via HTTPS, and the Beef hook also needs to be HTTPS due to mixed content restrictions (EDIT: It think this later point is only applicable to OWA, not Outlook).  LetsEncrypt is your friend.</p>
 
 <h5 id="install-the-manifest">Install the Manifest</h5>
 
@@ -336,6 +352,32 @@ if (!doNotTrack) {
 <figure>
     <img src="https://rastamouse.me/images/ews/rickroll.png"/> 
 </figure>
+
+
+<h2 id="detections">Detections</h2>
+
+<p>Failed authentication from the password spraying creates <code>4776 Audit Failure</code>, where error code <code>C000006A</code> is <code>user name is correct but the password is wrong</code>.  If email addresses were obtained via OSINT, it&rsquo;s possible some of the email addresses belong to staff who no longer work there.  In which case, <code>C0000064 :    user name does not exist</code> might be interesting to look for.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/ews/4776_1.png"/> 
+</figure>
+
+
+<p>Because EWS uses NTLMSSP, the hostname of the &ldquo;attacking&rdquo; computer is recorded in the log.  This can be changed to something more arbitrary, or to make it look like it&rsquo;s coming from an internal machine.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/ews/4776_2.png"/> 
+</figure>
+
+
+<p>Successful authentication creates a <code>4776 Audit Success</code> with with an error code of <code>0x0</code>.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/ews/4776_3.png"/> 
+</figure>
+
+
+<p>Web add-ins don&rsquo;t seem to appear under the normal <code>Outlook Event 45</code> log.  If anybody knows where/how you can audit when these are installed, please let me know.</p>
               
             </div>
           </div>
@@ -580,7 +622,7 @@ if (!doNotTrack) {
                   Mar 3, 2019
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>I recently created the <a href="https://github.com/rasta-mouse/EWSToolkit">EWSToolkit</a> off the back of an assessment for Exchange Client Access Services.  I realised I committed with tool with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.</p></div>
+              <div class="media-content hide-xs font-merryweather"><p>I recently created the <a href="https://github.com/rasta-mouse/EWSToolkit">EWSToolkit</a> off the back of an assessment for Exchange Client Access Services.  I realise I committed it with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
