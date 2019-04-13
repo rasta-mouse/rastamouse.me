@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dacl on Rasta Mouse</title>
+    <link>https://rastamouse.me/tags/dacl/</link>
+    <description>Recent content in Dacl on Rasta Mouse</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 13 Apr 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://rastamouse.me/tags/dacl/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Weaponizing CVE-2019-0841 with LAPS</title>
+      <link>https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/</link>
+      <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/</guid>
+      <description>&lt;p&gt;On April 9, &lt;a href=&#34;https://twitter.com/rogue_kdc&#34;&gt;Nabeel Ahmed&lt;/a&gt; &lt;a href=&#34;https://twitter.com/rogue_kdc/status/1115664188821639173&#34;&gt;annouced&lt;/a&gt; details of &lt;a href=&#34;https://nvd.nist.gov/vuln/detail/CVE-2019-0841&#34;&gt;CVE-2019-0841&lt;/a&gt; - the tl;dr being that it allows low privilged users to take Full Control of files owned by &lt;code&gt;NT AUTHORITY\SYSTEM&lt;/code&gt;, which can lead to EoP.  Nabeel published a comprehensive &lt;a href=&#34;https://krbtgt.pw/dacl-permissions-overwrite-privilege-escalation-cve-2019-0841/&#34;&gt;blog&lt;/a&gt; describing the vulnerability, &lt;a href=&#34;https://github.com/rogue-kdc&#34;&gt;PoC code&lt;/a&gt; and a &lt;a href=&#34;https://youtu.be/vP468ZjJ3hU&#34;&gt;video demonstration&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
