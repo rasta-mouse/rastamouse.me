@@ -1,0 +1,859 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.53">
+    <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
+    <title>Weaponising Privileged File Writes with Windows Collector Service</title>
+    <meta name="author" content="Rasta Mouse">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://rastamouse.me/favicon.ico">
+    
+
+    
+    <meta name="description" content="In my previous post, I described how one could leverage CVE-2019-0841 to backdoor the LAPS AdmPwd.dll for EoP to NT AUTHORITY\SYSTEM.  The obvious question is that if a machine is not using LAPS, what can you do&hellip;?  Well Rich Warren provided one solution, by using the Windows Diagnostics Hub Standard Collector Service.">
+    <meta property="og:description" content="In my previous post, I described how one could leverage CVE-2019-0841 to backdoor the LAPS AdmPwd.dll for EoP to NT AUTHORITY\SYSTEM.  The obvious question is that if a machine is not using LAPS, what can you do&hellip;?  Well Rich Warren provided one solution, by using the Windows Diagnostics Hub Standard Collector Service.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Weaponising Privileged File Writes with Windows Collector Service">
+    <meta property="og:url" content="/2019/04/weaponising-privileged-file-writes-with-windows-collector-service/">
+    <meta property="og:site_name" content="Rasta Mouse">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rasta Mouse">
+    <meta name="twitter:description" content="In my previous post, I described how one could leverage CVE-2019-0841 to backdoor the LAPS AdmPwd.dll for EoP to NT AUTHORITY\SYSTEM.  The obvious question is that if a machine is not using LAPS, what can you do&hellip;?  Well Rich Warren provided one solution, by using the Windows Diagnostics Hub Standard Collector Service.">
+    
+      <meta name="twitter:creator" content="@_RastaMouse">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=640">
+    
+
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" />
+    
+    
+    <link rel="stylesheet" href="https://rastamouse.me/css/style-u6mk0ojoywresbx8iepslrmmhl4stuhrsxuwhkpwrkrx7mryjcaimasnk4pi.min.css" />
+    
+    
+
+    
+      
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-60712346-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4"> 
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://rastamouse.me/">Rasta Mouse</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="https://rastamouse.me/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://rastamouse.me/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Rasta Mouse</h4>
+        
+          <h5 class="sidebar-profile-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/#about">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://twitter.com/_RastaMouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+      
+      <span class="sidebar-button-desc">Twitter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://keybase.io/rasta_mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-lock"></i>
+      
+      <span class="sidebar-button-desc">Keybase</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://zeropointsecurity.co.uk/rastalabs/" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-shield"></i>
+      
+      <span class="sidebar-button-desc">RastaLabs</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/rasta-mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      Weaponising Privileged File Writes with Windows Collector Service
+    </h1>
+  
+  <div class="postShorten-meta post-meta">
+  
+    <time itemprop="datePublished" datetime="2019-04-27T00:00:00Z">
+      
+  
+  
+  
+  
+    27 April 2019
+  
+
+    </time>
+  
+  
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://rastamouse.me/categories/blog">blog</a>
+    
+  
+
+
+</div>
+
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p>In my <a href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/">previous post</a>, I described how one could leverage CVE-2019-0841 to backdoor the LAPS <code>AdmPwd.dll</code> for EoP to <code>NT AUTHORITY\SYSTEM</code>.  The obvious question is that if a machine is not using LAPS, what can you do&hellip;?  Well <a href="https://twitter.com/buffaloverflow">Rich Warren</a> provided <a href="https://twitter.com/buffaloverflow/status/1117507864824881153">one solution</a>, by using the Windows Diagnostics Hub Standard Collector Service.</p>
+
+<h2 id="design-ethos">Design Ethos</h2>
+
+<p>Before we dive into any code, let&rsquo;s think about the situation more generically.</p>
+
+<p>CVE-2019-0841 allows low privileged users to overwrite the DACL on files that are owned by <code>NT AUTHORITY\SYSTEM</code>.  Successful exploitation results in <code>Full Control</code> over the target file for the low priv user.  This, in isolation, doesn&rsquo;t result in code exec as <code>SYSTEM</code>, pop a <code>SYSTEM</code> shell or anything like that.  But having <code>Full Control</code> over a file means that you can modify it in some way, e.g. write or delete.</p>
+
+<p>The great aspect of using the Collector Service to load and run DLLs, is that it&rsquo;s compatible with any similar arbitrary privileged file write vulnerability - so if you can write content into <code>System32</code>, regardless how, you&rsquo;re golden.  To that end, I decided to create a .NET Class Library to house the Collector Service code.</p>
+
+<p>The idea being - you write your .NET PoC for arbitrary file write, add the CollectorService DLL as a dependancy, and call a single function within it to handle the magic of:</p>
+
+<ol>
+<li>Backing up the target file</li>
+<li>Overwriting the target file with your malicious DLL</li>
+<li>Loading and running the malicious DLL</li>
+</ol>
+
+<h2 id="cve-2019-0841">CVE-2019-0841</h2>
+
+<p>To test the idea, I ported the original C++ PoC for CVE-2019-0841 to C#, using <a href="https://twitter.com/tiraniddo">James Forshaw&rsquo;s</a> <a href="https://github.com/googleprojectzero/sandbox-attacksurface-analysis-tools/tree/master/NtApiDotNet">NtApiDotNet</a> package.  This makes creating the required hardlink relatively simple:</p>
+
+<pre><code class="language-c#">NtFile ntFile;
+ntFile = NtFile.Open($@&quot;\??\{path}&quot;, null, FileAccessRights.MaximumAllowed);
+ntFile.CreateHardlink($@&quot;\??\{settings}&quot;);
+</code></pre>
+
+<p>Where <code>path</code> is the target file to take <code>Full Control</code> over (<code>C:\Windows\System32\license.rtf</code>) and <code>settings</code> is the path to the users&rsquo; MSEdge <code>settings.dat</code> file.</p>
+
+<p>My project is in the same Solution as SystemCollector, so I can a project reference.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/system-collector/reference.png"/> 
+</figure>
+
+
+<p>After the exploit has verified that the user has taken control of the file, we simply add the following line:</p>
+
+<pre><code class="language-c#">SystemCollector.DLL.Load(filename);
+</code></pre>
+
+<p>Where <code>filename</code> is <code>license.rtf</code>.</p>
+
+<h2 id="systemcollector">SystemCollector</h2>
+
+<p>99.9% of this code comes from <a href="https://twitter.com/ryHanson">Ryan Hanson&rsquo;s</a> <a href="https://github.com/atredispartners/CVE-2018-0952-SystemCollector/blob/master/SystemCollector/Program.cs">CVE-2018-0952-SystemCollector PoC</a>, so I won&rsquo;t explain it here.  For a detailed description, see his <a href="https://www.atredis.com/blog/cve-2018-0952-privilege-escalation-vulnerability-in-windows-standard-collector-service">blog post</a>.  I will just conver my modifications.</p>
+
+<p>The first line I added is:</p>
+
+<pre><code class="language-c#">var dll = DecompressDLL(Convert.FromBase64String(&quot;blah&quot;));
+</code></pre>
+
+<p>Which is the same GZip (de)compression method I used in <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/TikiLoader/Loader.cs#L73-L94">TikiTorch</a>.  This allows you to embedd your malicious DLL as a compressed, base64 encoded string, which is expanded and written to disk later.</p>
+
+<p>I changed the <code>scratch</code> directory to <code>$@&quot;C:\Users\{Environment.UserName}\AppData\Local\Temp&quot;</code>.</p>
+
+<p>First, we backup the original target file.</p>
+
+<pre><code class="language-c#">// backup
+Console.WriteLine($@&quot; [&gt;] Backing up {filename} to {scratch}&quot;);
+File.Copy($@&quot;C:\Windows\System32\{filename}&quot;, $@&quot;{scratch}\{filename}&quot;);
+</code></pre>
+
+<p>We then overwrite the file with our DLL.</p>
+
+<pre><code class="language-c#">// overwrite
+Console.WriteLine($@&quot; [&gt;] Overwriting C:\Windows\System32\{filename} with malicious DLL&quot;);
+File.WriteAllBytes($@&quot;C:\Windows\System32\{filename}&quot;, dll);
+</code></pre>
+
+<p>The final change was to replace <code>Console.ReadLine();</code> with <code>Thread.Sleep(3000);</code>.  I found that if the application closes too quickly, the Collector Service does not load the DLL.</p>
+
+<p>The DLL is loaded by <code>DiagnosticsHub.StandardCollector.Service.exe</code> which, in my testing, closes after about 5 minutes and subsequently kills the Beacon.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/system-collector/procexp.png"/> 
+</figure>
+
+
+<h2 id="demo">Demo</h2>
+
+<p>In this demo, we have a foothold as a standard user.  Let&rsquo;s priv esc with a Cobalt Strike SMB DLL.</p>
+
+<iframe width="1024" height="576" src="https://www.youtube.com/embed/LTzXiw-4o5Q" frameborder="1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/standard-collector/">Standard Collector</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/cve-2019-0841/">CVE-2019-0841</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/arbitrary-file-write/">Arbitrary File Write</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/elevation-of-privilege/">Elevation of Privilege</a>
+
+                  </div>
+                
+              
+            
+            <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/" data-tooltip="Weaponizing CVE-2019-0841 with LAPS">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f04%2fweaponising-privileged-file-writes-with-windows-collector-service%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f04%2fweaponising-privileged-file-writes-with-windows-collector-service%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f04%2fweaponising-privileged-file-writes-with-windows-collector-service%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2019 Rasta Mouse. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/" data-tooltip="Weaponizing CVE-2019-0841 with LAPS">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f04%2fweaponising-privileged-file-writes-with-windows-collector-service%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f04%2fweaponising-privileged-file-writes-with-windows-collector-service%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f04%2fweaponising-privileged-file-writes-with-windows-collector-service%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <ul class="share-options">
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f04%2fweaponising-privileged-file-writes-with-windows-collector-service%2f">
+        <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f04%2fweaponising-privileged-file-writes-with-windows-collector-service%2f">
+        <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f04%2fweaponising-privileged-file-writes-with-windows-collector-service%2f">
+        <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Rasta Mouse</h4>
+    
+      <div id="about-card-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Penetration Tester
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        UK
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/04/weaponising-privileged-file-writes-with-windows-collector-service/">
+                <h3 class="media-heading">Weaponising Privileged File Writes with Windows Collector Service</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Apr 4, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In my <a href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/">previous post</a>, I described how one could leverage CVE-2019-0841 to backdoor the LAPS <code>AdmPwd.dll</code> for EoP to <code>NT AUTHORITY\SYSTEM</code>.  The obvious question is that if a machine is not using LAPS, what can you do&hellip;?  Well <a href="https://twitter.com/buffaloverflow">Rich Warren</a> provided <a href="https://twitter.com/buffaloverflow/status/1117507864824881153">one solution</a>, by using the Windows Diagnostics Hub Standard Collector Service.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/">
+                <h3 class="media-heading">Weaponizing CVE-2019-0841 with LAPS</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Apr 4, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>On April 9, <a href="https://twitter.com/rogue_kdc">Nabeel Ahmed</a> <a href="https://twitter.com/rogue_kdc/status/1115664188821639173">annouced</a> details of <a href="https://nvd.nist.gov/vuln/detail/CVE-2019-0841">CVE-2019-0841</a> - the tl;dr being that it allows low privileged users to take Full Control of files owned by <code>NT AUTHORITY\SYSTEM</code>, which can lead to EoP.  Nabeel published a comprehensive <a href="https://krbtgt.pw/dacl-permissions-overwrite-privilege-escalation-cve-2019-0841/">blog</a> describing the vulnerability, <a href="https://github.com/rogue-kdc">PoC code</a> and a <a href="https://youtu.be/vP468ZjJ3hU">video demonstration</a>.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/03/ews-installapp/">
+                <h3 class="media-heading">EWS - InstallApp</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Mar 3, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>I recently created the <a href="https://github.com/rasta-mouse/EWSToolkit">EWSToolkit</a> off the back of an assessment for Exchange Client Access Services.  I realise I committed it with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/03/tikitorch/">
+                <h3 class="media-heading">TikiTorch</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Mar 3, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>When TikiTorch was <a href="https://github.com/rasta-mouse/TikiTorch/tree/882cbd1d74e9ddcfb3409f6d5a200f03beb79e7a">first released</a> in February, it consisted of a single .NET assembly.  Almost exactly a month later, I <a href="https://github.com/rasta-mouse/TikiTorch/tree/3116ad0cbb4343bcc720f1e850b08d938971cd9c">commited</a> an update that increased that to four assemblies.</p>
+
+<p>This blog post will cover what these assemblies are and how to use them.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/01/gpo-abuse-part-2/">
+                <h3 class="media-heading">GPO Abuse - Part 2</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jan 1, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Before we can really dive into modifying GPOs, we need to try and understand some of the intricacies of how they&rsquo;re updated normally in GPMC and AD.  Because believe me, it aint as simple as it appears.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/01/gpo-abuse-part-1/">
+                <h3 class="media-heading">GPO Abuse - Part 1</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jan 1, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Group Policy Objects (GPOs) is a subject I&rsquo;ve wanted to write about for a long time and I&rsquo;m happy to have <em>finally</em> started.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/12/amsiscanbuffer-bypass-part-4/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 4</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Dec 12, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>As 2018 rapidly comes to an end, I thought I&rsquo;d close out the year by clearing up some confusions over this AmsiScanBuffer bypass and why it appears to fail under some circumstances.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 3</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Nov 11, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-2/">Part 2</a>, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>.  In this post, we&rsquo;ll make some modifications to the bypass itself.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 2</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Oct 10, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In <a href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>, we had a brief look at the AmsiScanBuffer bypass technique.  We found some circumstances where the bypass code would be identified as malicious before it could be executed (which turned out to be a simple string detection), and modified the code to circumvent this.</p>
+
+<p>In this post, we&rsquo;ll explore a delivery method to help stage a Cobalt Strike / Empire / &lt;insert framework here&gt; agent.  As with Part 1, this is not about some 1337 code drop - it&rsquo;s a demonstration of how I walked through engineering the final result.</p>
+
+<p>So, let&rsquo;s get cracking.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/">
+                <h3 class="media-heading">AmsiScanBuffer Bypass - Part 1</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Oct 10, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p><a href="https://twitter.com/_zc00l">Andre Marques</a> recently <a href="https://twitter.com/_zc00l/status/1056523259246718976">posted</a> a pretty nice <a href="https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html">write-up</a> for circumventing AMSI, based on previous work by <a href="https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/">CyberArk</a>.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         28 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('https://rastamouse.me/images/cover.jpg');"></div>
+  
+
+
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.js"></script>
+
+
+<script src="https://rastamouse.me/js/script-wl33z0n6ocaypepiqrazthtivfrliqijej4rq8ek8gvrv1awftmgjuv8k4zc.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight').each(function(i, block) {
+    var code = "";
+    hljs.highlightAuto(block.innerText).value.split(/\r\n|\r|\n/).forEach(function(line) {
+      code += "<span class=\"line\">" + line + "</span><br>";
+    });
+    if (code.length > 0) {
+      block.innerHTML = code;  
+    }
+  });
+  $('pre > code').each(function(i, block) {
+    $(this).addClass('codeblock');
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/rastamouse.me\/2019\/04\/weaponising-privileged-file-writes-with-windows-collector-service\/';
+          
+            this.page.identifier = '\/2019\/04\/weaponising-privileged-file-writes-with-windows-collector-service\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'rastamouse';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+
+
+    
+  </body>
+</html>
+
