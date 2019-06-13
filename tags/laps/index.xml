@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Laps on Rasta Mouse</title>
+    <title>laps on Rasta Mouse</title>
     <link>https://rastamouse.me/tags/laps/</link>
-    <description>Recent content in Laps on Rasta Mouse</description>
+    <description>Recent content in laps on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 13 Apr 2019 00:00:00 +0000</lastBuildDate>
@@ -35,9 +35,7 @@
       <pubDate>Sat, 10 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/2018/03/laps-part-1/</guid>
-      <description>I suspect the majority of folk are familiar with the &amp;ldquo;Local Administrator Password Solution&amp;rdquo; (LAPS) from Microsoft. If not, the tl;dr is that it:
- periodically changes the local admin account password stores the password in a extended attribute of the computer object in AD allows password read &amp;amp; reset permissions to be delegated to AD users/groups  More detailed information can be found here, here and here.
-The purpose of this post, is to put together a more complete end-to-end process for mapping out the LAPS configuration in a domain.</description>
+      <description></description>
     </item>
     
   </channel>

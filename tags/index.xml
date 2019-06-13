@@ -6,53 +6,35 @@
     <description>Recent content in Tags on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 19 Sep 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 12 Jun 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>.Net</title>
-      <link>https://rastamouse.me/tags/.net/</link>
-      <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
+      <title>LOLBin</title>
+      <link>https://rastamouse.me/tags/lolbin/</link>
+      <pubDate>Wed, 12 Jun 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/tags/.net/</guid>
+      <guid>https://rastamouse.me/tags/lolbin/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Active Directory</title>
-      <link>https://rastamouse.me/tags/active-directory/</link>
-      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
+      <title>MSBuild</title>
+      <link>https://rastamouse.me/tags/msbuild/</link>
+      <pubDate>Wed, 12 Jun 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/tags/active-directory/</guid>
+      <guid>https://rastamouse.me/tags/msbuild/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Amsi</title>
-      <link>https://rastamouse.me/tags/amsi/</link>
-      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
+      <title>TikiSpawn</title>
+      <link>https://rastamouse.me/tags/tikispawn/</link>
+      <pubDate>Wed, 12 Jun 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/tags/amsi/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Antivirus</title>
-      <link>https://rastamouse.me/tags/antivirus/</link>
-      <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/antivirus/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Applocker</title>
-      <link>https://rastamouse.me/tags/applocker/</link>
-      <pubDate>Sat, 08 Sep 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/applocker/</guid>
+      <guid>https://rastamouse.me/tags/tikispawn/</guid>
       <description></description>
     </item>
     
@@ -66,101 +48,11 @@
     </item>
     
     <item>
-      <title>Bypass</title>
-      <link>https://rastamouse.me/tags/bypass/</link>
-      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/bypass/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>C#</title>
-      <link>https://rastamouse.me/tags/c/</link>
-      <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/c/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Citrix</title>
-      <link>https://rastamouse.me/tags/citrix/</link>
-      <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/citrix/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Clipboard</title>
-      <link>https://rastamouse.me/tags/clipboard/</link>
-      <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/clipboard/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Cobalt Strike</title>
-      <link>https://rastamouse.me/tags/cobalt-strike/</link>
-      <pubDate>Sun, 18 Jun 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/cobalt-strike/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Csharp</title>
-      <link>https://rastamouse.me/tags/csharp/</link>
-      <pubDate>Tue, 15 May 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/csharp/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Cuckoo</title>
-      <link>https://rastamouse.me/tags/cuckoo/</link>
-      <pubDate>Thu, 18 May 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/cuckoo/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Cve 2019 0841</title>
+      <title>CVE-2019-0841</title>
       <link>https://rastamouse.me/tags/cve-2019-0841/</link>
       <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/cve-2019-0841/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Dacl</title>
-      <link>https://rastamouse.me/tags/dacl/</link>
-      <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/dacl/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Dotnettojscript</title>
-      <link>https://rastamouse.me/tags/dotnettojscript/</link>
-      <pubDate>Tue, 15 May 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/dotnettojscript/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Dpapi</title>
-      <link>https://rastamouse.me/tags/dpapi/</link>
-      <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/dpapi/</guid>
       <description></description>
     </item>
     
@@ -174,34 +66,25 @@
     </item>
     
     <item>
-      <title>Ews</title>
-      <link>https://rastamouse.me/tags/ews/</link>
-      <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
+      <title>Standard Collector</title>
+      <link>https://rastamouse.me/tags/standard-collector/</link>
+      <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/tags/ews/</guid>
+      <guid>https://rastamouse.me/tags/standard-collector/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Gpo</title>
-      <link>https://rastamouse.me/tags/gpo/</link>
-      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
+      <title>dacl</title>
+      <link>https://rastamouse.me/tags/dacl/</link>
+      <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/tags/gpo/</guid>
+      <guid>https://rastamouse.me/tags/dacl/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Infrastructure</title>
-      <link>https://rastamouse.me/tags/infrastructure/</link>
-      <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/infrastructure/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Laps</title>
+      <title>laps</title>
       <link>https://rastamouse.me/tags/laps/</link>
       <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
       
@@ -210,47 +93,11 @@
     </item>
     
     <item>
-      <title>Malware</title>
-      <link>https://rastamouse.me/tags/malware/</link>
-      <pubDate>Thu, 18 May 2017 00:00:00 +0000</pubDate>
+      <title>ews</title>
+      <link>https://rastamouse.me/tags/ews/</link>
+      <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/tags/malware/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Mimikatz</title>
-      <link>https://rastamouse.me/tags/mimikatz/</link>
-      <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/mimikatz/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Office</title>
-      <link>https://rastamouse.me/tags/office/</link>
-      <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/office/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Ole</title>
-      <link>https://rastamouse.me/tags/ole/</link>
-      <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/ole/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Pass the Ticket</title>
-      <link>https://rastamouse.me/tags/pass-the-ticket/</link>
-      <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/pass-the-ticket/</guid>
+      <guid>https://rastamouse.me/tags/ews/</guid>
       <description></description>
     </item>
     
@@ -264,24 +111,6 @@
     </item>
     
     <item>
-      <title>Persistence</title>
-      <link>https://rastamouse.me/tags/persistence/</link>
-      <pubDate>Thu, 22 Mar 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/persistence/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Privilege Escalation</title>
-      <link>https://rastamouse.me/tags/privilege-escalation/</link>
-      <pubDate>Sat, 17 Mar 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/privilege-escalation/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Process Hollowing</title>
       <link>https://rastamouse.me/tags/process-hollowing/</link>
       <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
@@ -291,79 +120,7 @@
     </item>
     
     <item>
-      <title>Psexec</title>
-      <link>https://rastamouse.me/tags/psexec/</link>
-      <pubDate>Sun, 18 Jun 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/psexec/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Rdp</title>
-      <link>https://rastamouse.me/tags/rdp/</link>
-      <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/rdp/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Red Team</title>
-      <link>https://rastamouse.me/tags/red-team/</link>
-      <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/red-team/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Registry</title>
-      <link>https://rastamouse.me/tags/registry/</link>
-      <pubDate>Sat, 08 Sep 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/registry/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Silver Tickets</title>
-      <link>https://rastamouse.me/tags/silver-tickets/</link>
-      <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/silver-tickets/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Standard Collector</title>
-      <link>https://rastamouse.me/tags/standard-collector/</link>
-      <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/standard-collector/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Sysvol</title>
-      <link>https://rastamouse.me/tags/sysvol/</link>
-      <pubDate>Sat, 08 Sep 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/sysvol/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Terraform</title>
-      <link>https://rastamouse.me/tags/terraform/</link>
-      <pubDate>Sat, 23 Sep 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/terraform/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Tikitorch</title>
+      <title>TikiTorch</title>
       <link>https://rastamouse.me/tags/tikitorch/</link>
       <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
       
@@ -372,11 +129,281 @@
     </item>
     
     <item>
-      <title>Xsl</title>
+      <title>Active Directory</title>
+      <link>https://rastamouse.me/tags/active-directory/</link>
+      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/active-directory/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>GPO</title>
+      <link>https://rastamouse.me/tags/gpo/</link>
+      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/gpo/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>AMSI</title>
+      <link>https://rastamouse.me/tags/amsi/</link>
+      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/amsi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Bypass</title>
+      <link>https://rastamouse.me/tags/bypass/</link>
+      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/bypass/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>.net</title>
+      <link>https://rastamouse.me/tags/.net/</link>
+      <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/.net/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>c#</title>
+      <link>https://rastamouse.me/tags/c#/</link>
+      <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/c#/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>applocker</title>
+      <link>https://rastamouse.me/tags/applocker/</link>
+      <pubDate>Sat, 08 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/applocker/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>registry</title>
+      <link>https://rastamouse.me/tags/registry/</link>
+      <pubDate>Sat, 08 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/registry/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>sysvol</title>
+      <link>https://rastamouse.me/tags/sysvol/</link>
+      <pubDate>Sat, 08 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/sysvol/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>clipboard</title>
+      <link>https://rastamouse.me/tags/clipboard/</link>
+      <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/clipboard/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rdp</title>
+      <link>https://rastamouse.me/tags/rdp/</link>
+      <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/rdp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>csharp</title>
+      <link>https://rastamouse.me/tags/csharp/</link>
+      <pubDate>Tue, 15 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/csharp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dotnettojscript</title>
+      <link>https://rastamouse.me/tags/dotnettojscript/</link>
+      <pubDate>Tue, 15 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/dotnettojscript/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>xsl</title>
       <link>https://rastamouse.me/tags/xsl/</link>
       <pubDate>Tue, 15 May 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/xsl/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>persistence</title>
+      <link>https://rastamouse.me/tags/persistence/</link>
+      <pubDate>Thu, 22 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/persistence/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>privilege escalation</title>
+      <link>https://rastamouse.me/tags/privilege-escalation/</link>
+      <pubDate>Sat, 17 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/privilege-escalation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>infrastructure</title>
+      <link>https://rastamouse.me/tags/infrastructure/</link>
+      <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/infrastructure/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>red team</title>
+      <link>https://rastamouse.me/tags/red-team/</link>
+      <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/red-team/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>terraform</title>
+      <link>https://rastamouse.me/tags/terraform/</link>
+      <pubDate>Sat, 23 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/terraform/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dpapi</title>
+      <link>https://rastamouse.me/tags/dpapi/</link>
+      <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/dpapi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>mimikatz</title>
+      <link>https://rastamouse.me/tags/mimikatz/</link>
+      <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/mimikatz/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>antivirus</title>
+      <link>https://rastamouse.me/tags/antivirus/</link>
+      <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/antivirus/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>office</title>
+      <link>https://rastamouse.me/tags/office/</link>
+      <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/office/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ole</title>
+      <link>https://rastamouse.me/tags/ole/</link>
+      <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/ole/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cobalt strike</title>
+      <link>https://rastamouse.me/tags/cobalt-strike/</link>
+      <pubDate>Sun, 18 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/cobalt-strike/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>psexec</title>
+      <link>https://rastamouse.me/tags/psexec/</link>
+      <pubDate>Sun, 18 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/psexec/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cuckoo</title>
+      <link>https://rastamouse.me/tags/cuckoo/</link>
+      <pubDate>Thu, 18 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/cuckoo/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>malware</title>
+      <link>https://rastamouse.me/tags/malware/</link>
+      <pubDate>Thu, 18 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/malware/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>citrix</title>
+      <link>https://rastamouse.me/tags/citrix/</link>
+      <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/citrix/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pass the ticket</title>
+      <link>https://rastamouse.me/tags/pass-the-ticket/</link>
+      <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/pass-the-ticket/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>silver tickets</title>
+      <link>https://rastamouse.me/tags/silver-tickets/</link>
+      <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/silver-tickets/</guid>
       <description></description>
     </item>
     
