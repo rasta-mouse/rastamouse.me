@@ -6,10 +6,19 @@
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 13 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 15 Jun 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>TikiVader</title>
+      <link>https://rastamouse.me/2019/06/tikivader/</link>
+      <pubDate>Sat, 15 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/06/tikivader/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve added a new experimental project to &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch&#34;&gt;TikiTorch&lt;/a&gt;, called &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/master/TikiVader&#34;&gt;TikiVader&lt;/a&gt;.  I originally thought of &amp;ldquo;vader&amp;rdquo; as a play-on for &amp;ldquo;evade&amp;rdquo;/&amp;ldquo;evader&amp;rdquo;, until I realised TikiVader was never meant to evade anything&amp;hellip; but nevermind 😒&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>TikiSpawn &amp; MSBuild</title>

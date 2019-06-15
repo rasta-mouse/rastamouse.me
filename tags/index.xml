@@ -6,10 +6,37 @@
     <description>Recent content in Tags on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 13 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 15 Jun 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>TikiTorch</title>
+      <link>https://rastamouse.me/tags/tikitorch/</link>
+      <pubDate>Sat, 15 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/tikitorch/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>keying</title>
+      <link>https://rastamouse.me/tags/keying/</link>
+      <pubDate>Sat, 15 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/keying/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tikivader</title>
+      <link>https://rastamouse.me/tags/tikivader/</link>
+      <pubDate>Sat, 15 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/tikivader/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>LOLBin</title>
@@ -48,15 +75,6 @@
     </item>
     
     <item>
-      <title>CVE-2019-0841</title>
-      <link>https://rastamouse.me/tags/cve-2019-0841/</link>
-      <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/cve-2019-0841/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Elevation of Privilege</title>
       <link>https://rastamouse.me/tags/elevation-of-privilege/</link>
       <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
@@ -71,6 +89,15 @@
       <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/standard-collector/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cve-2019-0841</title>
+      <link>https://rastamouse.me/tags/cve-2019-0841/</link>
+      <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/cve-2019-0841/</guid>
       <description></description>
     </item>
     
@@ -116,15 +143,6 @@
       <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/process-hollowing/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>TikiTorch</title>
-      <link>https://rastamouse.me/tags/tikitorch/</link>
-      <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/tikitorch/</guid>
       <description></description>
     </item>
     
