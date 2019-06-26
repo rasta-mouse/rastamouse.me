@@ -6,10 +6,19 @@
     <description>Recent content in Posts on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 15 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 26 Jun 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>The Return of Aggressor</title>
+      <link>https://rastamouse.me/2019/06/the-return-of-aggressor/</link>
+      <pubDate>Wed, 26 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/06/the-return-of-aggressor/</guid>
+      <description>&lt;p&gt;FortyNorth Security recently &lt;a href=&#34;https://www.fortynorthsecurity.com/aggressive-msbuild-bypass-detection/&#34;&gt;posted an article&lt;/a&gt; detailing the process for leveraging MSBuild to execute unmanaged PowerShell, and automating it in Aggressor script for Cobalt Strike users.  Being a native binary in the Windows OS, the use of MSBuild is a &lt;a href=&#34;https://lolbas-project.github.io/lolbas/Binaries/Msbuild/&#34;&gt;common AWL bypass technique&lt;/a&gt;, which is handy in relatively well locked down environments.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>TikiVader</title>
