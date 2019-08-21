@@ -6,10 +6,19 @@
     <description>Recent content on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 26 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 20 Aug 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Covenant, Donut, TikiTorch</title>
+      <link>https://rastamouse.me/2019/08/covenant-donut-tikitorch/</link>
+      <pubDate>Tue, 20 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/08/covenant-donut-tikitorch/</guid>
+      <description>&lt;p&gt;Covenant &lt;a href=&#34;https://github.com/cobbr/Covenant/commit/bde0df315f26b01a4ef5c5c00679b1e150998a35&#34;&gt;v0.1&lt;/a&gt; was first released in February 2019 and has since received a lot of really good updates.  &lt;a href=&#34;https://github.com/cobbr/Covenant/commit/a2df643e01aea3ad7330bdba88ddd560692e46b4&#34;&gt;v0.2&lt;/a&gt; was released in May which added p2p comms over SMB named pipes, and &lt;a href=&#34;https://github.com/cobbr/Covenant/commit/abcba78006c29b687f6e1a43a1ea1793784714fd&#34;&gt;v0.3&lt;/a&gt; was released in August which added a brand new web interface.  Even though it&amp;rsquo;s such a young project, it has really proven itself to be a capable tool for offensive operators.  I&amp;rsquo;ve not taken a look at Covenant since v0.1.x but since providing some new &lt;a href=&#34;https://github.com/cobbr/SharpSploit/blob/master/SharpSploit/Persistence/WMI.cs&#34;&gt;additions&lt;/a&gt; to SharpSploit, it kinda got my geek going.  One of my areas of interest is weaponising the Grunt stager.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>The Return of Aggressor</title>

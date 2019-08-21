@@ -21,7 +21,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.55.6">
+    <meta name="generator" content="Hugo 0.56.0">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
     <title>Automated Red Team Infrastructure Deployment with Terraform - Part 1</title>
     <meta name="author" content="Rasta Mouse">
@@ -411,18 +411,18 @@ sub4 = &quot;webdisk&quot;
 <h4 id="providers-tf">providers.tf</h4>
 
 <pre><code class="language-text">provider &quot;aws&quot; {
-    access_key = &quot;${var.aws-akey}&quot;
-    secret_key = &quot;${var.aws-skey}&quot;
-    region = &quot;eu-west-2&quot;
+	access_key = &quot;${var.aws-akey}&quot;
+	secret_key = &quot;${var.aws-skey}&quot;
+	region = &quot;eu-west-2&quot;
 }
 
 provider &quot;digitalocean&quot; {
-    token = &quot;${var.do-token}&quot;
+	token = &quot;${var.do-token}&quot;
 }
 
 provider &quot;cloudflare&quot; {
-    email = &quot;${var.cf-email}&quot;
-    token = &quot;${var.cf-token}&quot;
+	email = &quot;${var.cf-email}&quot;
+	token = &quot;${var.cf-token}&quot;
 }
 </code></pre>
 
@@ -431,13 +431,13 @@ provider &quot;cloudflare&quot; {
 <h4 id="ssh-keys-tf">ssh-keys.tf</h4>
 
 <pre><code class="language-text">resource &quot;aws_key_pair&quot; &quot;rasta&quot; {
-    key_name   = &quot;rasta&quot;
-    public_key = &quot;${file(&quot;${var.rasta-key}&quot;)}&quot;
+	key_name   = &quot;rasta&quot;
+	public_key = &quot;${file(&quot;${var.rasta-key}&quot;)}&quot;
 }
 
 resource &quot;digitalocean_ssh_key&quot; &quot;rasta&quot; {
-    name = &quot;rasta&quot;
-    public_key = &quot;${file(&quot;${var.rasta-key}&quot;)}&quot;
+	name = &quot;rasta&quot;
+	public_key = &quot;${file(&quot;${var.rasta-key}&quot;)}&quot;
 }
 </code></pre>
 
@@ -450,31 +450,31 @@ resource &quot;digitalocean_ssh_key&quot; &quot;rasta&quot; {
 <h4 id="aws-vpc-tf">aws-vpc.tf</h4>
 
 <pre><code class="language-text">resource &quot;aws_vpc&quot; &quot;default&quot; {
-    cidr_block = &quot;10.0.0.0/16&quot;
-    enable_dns_hostnames = true
+	cidr_block = &quot;10.0.0.0/16&quot;
+	enable_dns_hostnames = true
 }
 
 resource &quot;aws_subnet&quot; &quot;default&quot; {
-    vpc_id = &quot;${aws_vpc.default.id}&quot;
-    cidr_block = &quot;10.0.0.0/24&quot;
+	vpc_id = &quot;${aws_vpc.default.id}&quot;
+	cidr_block = &quot;10.0.0.0/24&quot;
 }
 
 resource &quot;aws_internet_gateway&quot; &quot;default&quot; {
-    vpc_id = &quot;${aws_vpc.default.id}&quot;
+	vpc_id = &quot;${aws_vpc.default.id}&quot;
 }
 
 resource &quot;aws_route_table&quot; &quot;default&quot; {
-    vpc_id = &quot;${aws_vpc.default.id}&quot;
+	vpc_id = &quot;${aws_vpc.default.id}&quot;
 
-    route {
-        cidr_block = &quot;0.0.0.0/0&quot;
-        gateway_id = &quot;${aws_internet_gateway.default.id}&quot;
-    }
+	route {
+		cidr_block = &quot;0.0.0.0/0&quot;
+		gateway_id = &quot;${aws_internet_gateway.default.id}&quot;
+	}
 }
 
 resource &quot;aws_route_table_association&quot; &quot;default&quot; {
-    subnet_id = &quot;${aws_subnet.default.id}&quot;
-    route_table_id = &quot;${aws_route_table.default.id}&quot;
+	subnet_id = &quot;${aws_subnet.default.id}&quot;
+	route_table_id = &quot;${aws_route_table.default.id}&quot;
 }
 </code></pre>
 
@@ -537,7 +537,7 @@ resource &quot;aws_security_group&quot; &quot;http-rdir&quot; {
         protocol = &quot;tcp&quot;
         cidr_blocks = [&quot;0.0.0.0/0&quot;]
     }
-    ingress {
+	ingress {
         from_port = 443
         to_port = 443
         protocol = &quot;tcp&quot;
@@ -572,21 +572,21 @@ resource &quot;aws_security_group&quot; &quot;http-rdir&quot; {
 <h4 id="aws-instances-tf">aws-instances.tf</h4>
 
 <pre><code class="language-text">resource &quot;aws_instance&quot; &quot;dns-rdir&quot; {
-    ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
-    instance_type = &quot;t2.micro&quot;
-    key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
-    vpc_security_group_ids = [&quot;${aws_security_group.dns-rdir.id}&quot;]
-    subnet_id = &quot;${aws_subnet.default.id}&quot;
-    associate_public_ip_address = true
+	ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
+	instance_type = &quot;t2.micro&quot;
+	key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
+	vpc_security_group_ids = [&quot;${aws_security_group.dns-rdir.id}&quot;]
+	subnet_id = &quot;${aws_subnet.default.id}&quot;
+	associate_public_ip_address = true
 }
 
 resource &quot;aws_instance&quot; &quot;http-rdir&quot; {
-    ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
-    instance_type = &quot;t2.micro&quot;
-    key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
-    vpc_security_group_ids = [&quot;${aws_security_group.http-rdir.id}&quot;]
-    subnet_id = &quot;${aws_subnet.default.id}&quot;
-    associate_public_ip_address = true
+	ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
+	instance_type = &quot;t2.micro&quot;
+	key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
+	vpc_security_group_ids = [&quot;${aws_security_group.http-rdir.id}&quot;]
+	subnet_id = &quot;${aws_subnet.default.id}&quot;
+	associate_public_ip_address = true
 }
 </code></pre>
 
@@ -597,51 +597,51 @@ resource &quot;aws_instance&quot; &quot;http-rdir&quot; {
 <h4 id="aws-cloudfront-tf">aws-cloudfront.tf</h4>
 
 <pre><code class="language-text">resource &quot;aws_cloudfront_distribution&quot; &quot;http-c2&quot; {
-    enabled = true
-    is_ipv6_enabled = false
+	enabled = true
+	is_ipv6_enabled = false
 
-    origin {
-        domain_name = &quot;${var.sub3}.${var.dom1}&quot;
-        origin_id = &quot;domain-front&quot;
+	origin {
+		domain_name = &quot;${var.sub3}.${var.dom1}&quot;
+		origin_id = &quot;domain-front&quot;
 
-        custom_origin_config {
-            http_port = 80
-            https_port = 443
-            origin_protocol_policy = &quot;match-viewer&quot;
-            origin_ssl_protocols = [&quot;TLSv1&quot;, &quot;TLSv1.1&quot;, &quot;TLSv1.2&quot;]
-        }
-    }
+		custom_origin_config {
+			http_port = 80
+			https_port = 443
+			origin_protocol_policy = &quot;match-viewer&quot;
+			origin_ssl_protocols = [&quot;TLSv1&quot;, &quot;TLSv1.1&quot;, &quot;TLSv1.2&quot;]
+		}
+	}
 
-    default_cache_behavior {
-        target_origin_id = &quot;domain-front&quot;
-        allowed_methods = [&quot;GET&quot;, &quot;HEAD&quot;, &quot;OPTIONS&quot;, &quot;PUT&quot;, &quot;POST&quot;, &quot;PATCH&quot;, &quot;DELETE&quot;]
-        cached_methods = [&quot;GET&quot;, &quot;HEAD&quot;]
-        viewer_protocol_policy = &quot;allow-all&quot;
-        min_ttl = 0
-        default_ttl = 86400
-        max_ttl = 31536000
+	default_cache_behavior {
+		target_origin_id = &quot;domain-front&quot;
+		allowed_methods = [&quot;GET&quot;, &quot;HEAD&quot;, &quot;OPTIONS&quot;, &quot;PUT&quot;, &quot;POST&quot;, &quot;PATCH&quot;, &quot;DELETE&quot;]
+		cached_methods = [&quot;GET&quot;, &quot;HEAD&quot;]
+		viewer_protocol_policy = &quot;allow-all&quot;
+		min_ttl = 0
+		default_ttl = 86400
+		max_ttl = 31536000
 
-        forwarded_values {
-            query_string = true
-            headers = [&quot;*&quot;]
+		forwarded_values {
+			query_string = true
+			headers = [&quot;*&quot;]
 
-            cookies {
-                forward = &quot;all&quot;
-            }
-        }
+			cookies {
+				forward = &quot;all&quot;
+			}
+		}
 
-    }
+	}
 
-    restrictions {
-        geo_restriction {
-            restriction_type = &quot;whitelist&quot;
-            locations = [&quot;GB&quot;]
-        }
-    }
+	restrictions {
+		geo_restriction {
+			restriction_type = &quot;whitelist&quot;
+			locations = [&quot;GB&quot;]
+		}
+	}
 
-    viewer_certificate {
-        cloudfront_default_certificate = true
-    }
+	viewer_certificate {
+		cloudfront_default_certificate = true
+	}
 }
 </code></pre>
 
@@ -650,27 +650,27 @@ resource &quot;aws_instance&quot; &quot;http-rdir&quot; {
 <h4 id="do-droplets-tf">do-droplets.tf</h4>
 
 <pre><code class="language-text">resource &quot;digitalocean_droplet&quot; &quot;http-c2&quot; {
-    image = &quot;ubuntu-14-04-x64&quot;
-    name = &quot;http-c2&quot;
-    region = &quot;lon1&quot;
-    size = &quot;2gb&quot;
-    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+	image = &quot;ubuntu-14-04-x64&quot;
+	name = &quot;http-c2&quot;
+	region = &quot;lon1&quot;
+	size = &quot;2gb&quot;
+	ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
 }
 
 resource &quot;digitalocean_droplet&quot; &quot;dns-c2&quot; {
-    image = &quot;ubuntu-14-04-x64&quot;
-    name = &quot;dns-c2&quot;
-    region = &quot;lon1&quot;
-    size = &quot;2gb&quot;
-    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+	image = &quot;ubuntu-14-04-x64&quot;
+	name = &quot;dns-c2&quot;
+	region = &quot;lon1&quot;
+	size = &quot;2gb&quot;
+	ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
 }
 
 resource &quot;digitalocean_droplet&quot; &quot;paydel&quot; {
-    image = &quot;ubuntu-14-04-x64&quot;
-    name = &quot;payload-delivery&quot;
-    region = &quot;lon1&quot;
-    size = &quot;512mb&quot;
-    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+	image = &quot;ubuntu-14-04-x64&quot;
+	name = &quot;payload-delivery&quot;
+	region = &quot;lon1&quot;
+	size = &quot;512mb&quot;
+	ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
 }
 </code></pre>
 
@@ -681,139 +681,139 @@ resource &quot;digitalocean_droplet&quot; &quot;paydel&quot; {
 <h4 id="do-firewalls-tf">do-firewalls.tf</h4>
 
 <pre><code class="language-text">resource &quot;digitalocean_firewall&quot; &quot;http-c2&quot; {
-    name = &quot;http-c2&quot;
+	name = &quot;http-c2&quot;
 
-    droplet_ids = [&quot;${digitalocean_droplet.http-c2.id}&quot;]
+	droplet_ids = [&quot;${digitalocean_droplet.http-c2.id}&quot;]
 
-    inbound_rule = [
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;22&quot;
-        source_addresses = [&quot;${var.attacker-ip}&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;80&quot;
-        source_addresses = [&quot;0.0.0.0/0&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;443&quot;
-        source_addresses = [&quot;0.0.0.0/0&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;50050&quot;
-        source_addresses = [&quot;${var.attacker-ip}&quot;]
-    }
-    ]
+	inbound_rule = [
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;22&quot;
+		source_addresses = [&quot;${var.attacker-ip}&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;80&quot;
+		source_addresses = [&quot;0.0.0.0/0&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;443&quot;
+		source_addresses = [&quot;0.0.0.0/0&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;50050&quot;
+		source_addresses = [&quot;${var.attacker-ip}&quot;]
+	}
+	]
 
-    outbound_rule = [
-    {
-        protocol = &quot;udp&quot;
-        port_range = &quot;53&quot;
-        destination_addresses = [&quot;0.0.0.0/0&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;80&quot;
-        destination_addresses = [&quot;0.0.0.0/0&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;443&quot;
-        destination_addresses = [&quot;0.0.0.0/0&quot;]
-    }
-    ]
+	outbound_rule = [
+	{
+		protocol = &quot;udp&quot;
+		port_range = &quot;53&quot;
+		destination_addresses = [&quot;0.0.0.0/0&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;80&quot;
+		destination_addresses = [&quot;0.0.0.0/0&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;443&quot;
+		destination_addresses = [&quot;0.0.0.0/0&quot;]
+	}
+	]
 }
 
 resource &quot;digitalocean_firewall&quot; &quot;c2-dns&quot; {
-    name = &quot;c2-dns&quot;
+	name = &quot;c2-dns&quot;
 
-    droplet_ids = [&quot;${digitalocean_droplet.dns-c2.id}&quot;]
+	droplet_ids = [&quot;${digitalocean_droplet.dns-c2.id}&quot;]
 
-    inbound_rule = [
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;22&quot;
-        source_addresses = [&quot;${var.attacker-ip}&quot;]
-    },
-    {
-        protocol = &quot;udp&quot;
-        port_range = &quot;53&quot;
-        source_addresses = [&quot;${aws_instance.dns-rdir.public_ip}&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;50050&quot;
-        source_addresses = [&quot;${var.attacker-ip}&quot;]
-    }
-    ]
+	inbound_rule = [
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;22&quot;
+		source_addresses = [&quot;${var.attacker-ip}&quot;]
+	},
+	{
+		protocol = &quot;udp&quot;
+		port_range = &quot;53&quot;
+		source_addresses = [&quot;${aws_instance.dns-rdir.public_ip}&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;50050&quot;
+		source_addresses = [&quot;${var.attacker-ip}&quot;]
+	}
+	]
 
-    outbound_rule = [
-    {
-        protocol = &quot;udp&quot;
-        port_range = &quot;53&quot;
-        destination_addresses = [&quot;0.0.0.0/0&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;80&quot;
-        destination_addresses = [&quot;0.0.0.0/0&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;443&quot;
-        destination_addresses = [&quot;0.0.0.0/0&quot;]
-    }
-    ]
+	outbound_rule = [
+	{
+		protocol = &quot;udp&quot;
+		port_range = &quot;53&quot;
+		destination_addresses = [&quot;0.0.0.0/0&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;80&quot;
+		destination_addresses = [&quot;0.0.0.0/0&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;443&quot;
+		destination_addresses = [&quot;0.0.0.0/0&quot;]
+	}
+	]
 }
 
 resource &quot;digitalocean_firewall&quot; &quot;paydel&quot; {
-    name = &quot;paydel&quot;
+	name = &quot;paydel&quot;
 
-    droplet_ids = [&quot;${digitalocean_droplet.paydel.id}&quot;]
+	droplet_ids = [&quot;${digitalocean_droplet.paydel.id}&quot;]
 
-    inbound_rule = [
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;22&quot;
-        source_addresses = [&quot;${var.attacker-ip}&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;80&quot;
-        source_addresses = [&quot;${aws_instance.http-rdir.public_ip}&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;443&quot;
-        source_addresses = [&quot;${aws_instance.http-rdir.public_ip}&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;50050&quot;
-        source_addresses = [&quot;${var.attacker-ip}&quot;]
-    }
-    ]
+	inbound_rule = [
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;22&quot;
+		source_addresses = [&quot;${var.attacker-ip}&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;80&quot;
+		source_addresses = [&quot;${aws_instance.http-rdir.public_ip}&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;443&quot;
+		source_addresses = [&quot;${aws_instance.http-rdir.public_ip}&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;50050&quot;
+		source_addresses = [&quot;${var.attacker-ip}&quot;]
+	}
+	]
 
-    outbound_rule = [
-    {
-        protocol = &quot;udp&quot;
-        port_range = &quot;53&quot;
-        destination_addresses = [&quot;0.0.0.0/0&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;80&quot;
-        destination_addresses = [&quot;0.0.0.0/0&quot;]
-    },
-    {
-        protocol = &quot;tcp&quot;
-        port_range = &quot;443&quot;
-        destination_addresses = [&quot;0.0.0.0/0&quot;]
-    }
-    ]
+	outbound_rule = [
+	{
+		protocol = &quot;udp&quot;
+		port_range = &quot;53&quot;
+		destination_addresses = [&quot;0.0.0.0/0&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;80&quot;
+		destination_addresses = [&quot;0.0.0.0/0&quot;]
+	},
+	{
+		protocol = &quot;tcp&quot;
+		port_range = &quot;443&quot;
+		destination_addresses = [&quot;0.0.0.0/0&quot;]
+	}
+	]
 }
 </code></pre>
 
@@ -822,43 +822,43 @@ resource &quot;digitalocean_firewall&quot; &quot;paydel&quot; {
 <h4 id="cf-records-tf">cf-records.tf</h4>
 
 <pre><code class="language-text">resource &quot;cloudflare_record&quot; &quot;http-rdir1&quot; {
-    domain = &quot;${var.dom1}&quot;
-    name   = &quot;${var.sub1}&quot;
-    value  = &quot;${aws_instance.http-rdir.public_ip}&quot;
-    type   = &quot;A&quot;
-    ttl    = 300
+	domain = &quot;${var.dom1}&quot;
+	name   = &quot;${var.sub1}&quot;
+	value  = &quot;${aws_instance.http-rdir.public_ip}&quot;
+	type   = &quot;A&quot;
+	ttl    = 300
 }
 
 resource &quot;cloudflare_record&quot; &quot;http-rdir2&quot; {
-    domain = &quot;${var.dom1}&quot;
-    name   = &quot;${var.sub2}&quot;
-    value  = &quot;${aws_instance.http-rdir.public_ip}&quot;
-    type   = &quot;A&quot;
-    ttl    = 300
+	domain = &quot;${var.dom1}&quot;
+	name   = &quot;${var.sub2}&quot;
+	value  = &quot;${aws_instance.http-rdir.public_ip}&quot;
+	type   = &quot;A&quot;
+	ttl    = 300
 }
 
 resource &quot;cloudflare_record&quot; &quot;http-df&quot; {
-    domain = &quot;${var.dom1}&quot;
-    name   = &quot;${var.sub3}&quot;
-    value  = &quot;${digitalocean_droplet.http-c2.ipv4_address}&quot;
-    type   = &quot;A&quot;
-    ttl    = 300
+	domain = &quot;${var.dom1}&quot;
+	name   = &quot;${var.sub3}&quot;
+	value  = &quot;${digitalocean_droplet.http-c2.ipv4_address}&quot;
+	type   = &quot;A&quot;
+	ttl    = 300
 }
 
 resource &quot;cloudflare_record&quot; &quot;dns-c2-ns1&quot; {
-    domain = &quot;${var.dom2}&quot;
-    name   = &quot;ns1&quot;
-    value  = &quot;${aws_instance.dns-rdir.public_ip}&quot;
-    type   = &quot;A&quot;
-    ttl    = 300
+	domain = &quot;${var.dom2}&quot;
+	name   = &quot;ns1&quot;
+	value  = &quot;${aws_instance.dns-rdir.public_ip}&quot;
+	type   = &quot;A&quot;
+	ttl    = 300
 }
 
 resource &quot;cloudflare_record&quot; &quot;dns-c2-a&quot; {
-    domain = &quot;${var.dom2}&quot;
-    name   = &quot;${var.sub4}&quot;
-    value  = &quot;ns1.${var.dom2}&quot;
-    type   = &quot;NS&quot;
-    ttl    = 300
+	domain = &quot;${var.dom2}&quot;
+	name   = &quot;${var.sub4}&quot;
+	value  = &quot;ns1.${var.dom2}&quot;
+	type   = &quot;NS&quot;
+	ttl    = 300
 }
 </code></pre>
 
@@ -869,27 +869,27 @@ resource &quot;cloudflare_record&quot; &quot;dns-c2-a&quot; {
 <h4 id="outputs-tf">outputs.tf</h4>
 
 <pre><code class="language-text">output &quot;dns-rdir-ip&quot; {
-    value = &quot;${aws_instance.dns-rdir.public_ip}&quot;
+	value = &quot;${aws_instance.dns-rdir.public_ip}&quot;
 }
 
 output &quot;http-rdir-ip&quot; {
-    value = &quot;${aws_instance.http-rdir.public_ip}&quot;
+	value = &quot;${aws_instance.http-rdir.public_ip}&quot;
 }
 
 output &quot;paydel-ip&quot; {
-    value = &quot;${digitalocean_droplet.paydel.ipv4_address}&quot;
+	value = &quot;${digitalocean_droplet.paydel.ipv4_address}&quot;
 }
 
 output &quot;http-c2-ip&quot; {
-    value = &quot;${digitalocean_droplet.http-c2.ipv4_address}&quot;
+	value = &quot;${digitalocean_droplet.http-c2.ipv4_address}&quot;
 }
 
 output &quot;dns-c2-ip&quot; {
-    value = &quot;${digitalocean_droplet.dns-c2.ipv4_address}&quot;
+	value = &quot;${digitalocean_droplet.dns-c2.ipv4_address}&quot;
 }
 
 output &quot;cf-domain&quot; {
-    value = &quot;${aws_cloudfront_distribution.http-c2.domain_name}&quot;
+	value = &quot;${aws_cloudfront_distribution.http-c2.domain_name}&quot;
 }
 </code></pre>
 
@@ -1216,12 +1216,29 @@ this is my http/s c2 server
           <div class="media">
             
             <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/08/covenant-donut-tikitorch/">
+                <h3 class="media-heading">Covenant, Donut, TikiTorch</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Covenant <a href="https://github.com/cobbr/Covenant/commit/bde0df315f26b01a4ef5c5c00679b1e150998a35">v0.1</a> was first released in February 2019 and has since received a lot of really good updates.  <a href="https://github.com/cobbr/Covenant/commit/a2df643e01aea3ad7330bdba88ddd560692e46b4">v0.2</a> was released in May which added p2p comms over SMB named pipes, and <a href="https://github.com/cobbr/Covenant/commit/abcba78006c29b687f6e1a43a1ea1793784714fd">v0.3</a> was released in August which added a brand new web interface.  Even though it&rsquo;s such a young project, it has really proven itself to be a capable tool for offensive operators.  I&rsquo;ve not taken a look at Covenant since v0.1.x but since providing some new <a href="https://github.com/cobbr/SharpSploit/blob/master/SharpSploit/Persistence/WMI.cs">additions</a> to SharpSploit, it kinda got my geek going.  One of my areas of interest is weaponising the Grunt stager.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
               <a class="link-unstyled" href="https://rastamouse.me/post/">
                 <h3 class="media-heading">Posts</h3>
               </a>
               <span class="media-meta">
                 <span class="media-date text-small">
-                  Jun 6, 2019
+                  Aug 8, 2019
                 </span>
               </span>
               <div class="media-content hide-xs font-merryweather"></div>
@@ -1368,23 +1385,6 @@ this is my http/s c2 server
             <hr>
           </div>
         
-          <div class="media">
-            
-            <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2019/01/gpo-abuse-part-1/">
-                <h3 class="media-heading">GPO Abuse - Part 1</h3>
-              </a>
-              <span class="media-meta">
-                <span class="media-date text-small">
-                  Jan 1, 2019
-                </span>
-              </span>
-              <div class="media-content hide-xs font-merryweather"><p>Group Policy Objects (GPOs) is a subject I&rsquo;ve wanted to write about for a long time and I&rsquo;m happy to have <em>finally</em> started.</p></div>
-            </div>
-            <div style="clear:both;"></div>
-            <hr>
-          </div>
-        
       </div>
     </div>
     <div class="modal-footer">
@@ -1392,7 +1392,7 @@ this is my http/s c2 server
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         31 posts found
+         32 posts found
       </p>
     </div>
   </div>

@@ -21,7 +21,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.55.6">
+    <meta name="generator" content="Hugo 0.56.0">
     <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
     <title>Automated Red Team Infrastructure Deployment with Terraform - Part 2</title>
     <meta name="author" content="Rasta Mouse">
@@ -302,7 +302,7 @@ if (!doNotTrack) {
 <p>The <code>local-exec</code> provisioner allow you to run shell commands on your local machine.</p>
 
 <pre><code class="language-text">provisioner &quot;local-exec&quot; {
-    command = &quot;something&quot;
+	command = &quot;something&quot;
 }
 </code></pre>
 
@@ -311,20 +311,20 @@ if (!doNotTrack) {
 <p>This is quite useful for writing information about your infrastructure to file.  It also has a method for running a different command when an instance is destroyed.</p>
 
 <pre><code class="language-text">resource &quot;digitalocean_droplet&quot; &quot;paydel&quot; {
-    image = &quot;ubuntu-14-04-x64&quot;
-    name = &quot;payload-delivery&quot;
-    region = &quot;lon1&quot;
-    size = &quot;512mb&quot;
-    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+	image = &quot;ubuntu-14-04-x64&quot;
+	name = &quot;payload-delivery&quot;
+	region = &quot;lon1&quot;
+	size = &quot;512mb&quot;
+	ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
 
-    provisioner &quot;local-exec&quot; {
-        command = &quot;echo ${digitalocean_droplet.paydel.ipv4_address}&gt;&gt;paydel-ip.txt&quot;
-    }
+	provisioner &quot;local-exec&quot; {
+		command = &quot;echo ${digitalocean_droplet.paydel.ipv4_address}&gt;&gt;paydel-ip.txt&quot;
+	}
 
-    provisioner &quot;local-exec&quot; {
-        when = &quot;destroy&quot;
-        command = &quot;del paydel-ip.txt&quot;
-    }
+	provisioner &quot;local-exec&quot; {
+		when = &quot;destroy&quot;
+		command = &quot;del paydel-ip.txt&quot;
+	}
 }
 </code></pre>
 
@@ -353,9 +353,9 @@ gc : Cannot find path 'C:\Users\Rasta\Desktop\terraform\paydel-ip.txt' because i
 <p>The <code>remote-exec</code> provisioner allows you to run shell commands on the VM, but be aware that some environment variables may not be available.</p>
 
 <pre><code class="language-text">provisioner &quot;remote-exec&quot; {
-    inline = [
-        &quot;touch /root/test.txt&quot;
-    ]
+	inline = [
+		&quot;touch /root/test.txt&quot;
+	]
 }
 </code></pre>
 
@@ -366,33 +366,34 @@ gc : Cannot find path 'C:\Users\Rasta\Desktop\terraform\paydel-ip.txt' because i
 <ul>
 <li>Install Socat</li>
 <li>Configure the VM to start socat on boot</li>
-<li>Reboot the VM</li>
-</ul>
+
+<li><p>Reboot the VM</p>
 
 <pre><code class="language-text">resource &quot;aws_instance&quot; &quot;dns-rdir&quot; {
-    ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
-    instance_type = &quot;t2.micro&quot;
-    key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
-    vpc_security_group_ids = [&quot;${aws_security_group.dns-rdir.id}&quot;]
-    subnet_id = &quot;${aws_subnet.default.id}&quot;
-    associate_public_ip_address = true
+	ami = &quot;ami-489f8e2c&quot; # Amazon Linux AMI 2017.03.1
+	instance_type = &quot;t2.micro&quot;
+	key_name = &quot;${aws_key_pair.rasta.key_name}&quot;
+	vpc_security_group_ids = [&quot;${aws_security_group.dns-rdir.id}&quot;]
+	subnet_id = &quot;${aws_subnet.default.id}&quot;
+	associate_public_ip_address = true
 
-    provisioner &quot;remote-exec&quot; {
-        inline = [
-            &quot;sudo yum -y update&quot;,
-            &quot;sudo yum -y install socat&quot;,
-            &quot;echo \&quot;socat udp4-listen:53,reuseaddr,fork udp:${digitalocean_droplet.dns-c2.ipv4_address}; echo -ne \\n &amp;\&quot; | sudo tee -a /etc/rc.local&quot;,
-            &quot;sudo reboot&quot;
-        ]
+	provisioner &quot;remote-exec&quot; {
+		inline = [
+			&quot;sudo yum -y update&quot;,
+			&quot;sudo yum -y install socat&quot;,
+			&quot;echo \&quot;socat udp4-listen:53,reuseaddr,fork udp:${digitalocean_droplet.dns-c2.ipv4_address}; echo -ne \\n &amp;\&quot; | sudo tee -a /etc/rc.local&quot;,
+			&quot;sudo reboot&quot;
+		]
 
-        connection {
-            type = &quot;ssh&quot;
-            user = &quot;ec2-user&quot;
-            private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
-        }
-    }
+		connection {
+			type = &quot;ssh&quot;
+			user = &quot;ec2-user&quot;
+			private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
+		}
+	}
 }
-</code></pre>
+</code></pre></li>
+</ul>
 
 <p>Because these are relatively simple tasks - we can just do them on the command line.  The other advantage you can see, is that we don&rsquo;t need to know what the IP address of the DNS C2 server will be up front - we can just reference it through Terraform and it will take care of the rest :)</p>
 
@@ -418,8 +419,8 @@ root      2527  0.0  0.3  42408  3972 ?        S    Sep23   0:00 socat udp4-list
 <p>The <code>file</code> provisioner is simply used to copy files or directories from your local machine to the VM.</p>
 
 <pre><code class="language-text">provisioner &quot;file&quot; {
-    source      = &quot;test.txt&quot;
-    destination = &quot;/root/test.txt&quot;
+	source      = &quot;test.txt&quot;
+	destination = &quot;/root/test.txt&quot;
 }
 </code></pre>
 
@@ -471,36 +472,36 @@ git clone https://github.com/rsmudge/Malleable-C2-Profiles.git /opt/cobaltstrike
 <p>We can then combine provisioners, i.e. use <code>file</code> to upload the script and <code>remote-exec</code> to execute it.  They are executed in the order placed (from top to bottom).</p>
 
 <pre><code class="language-text">resource &quot;digitalocean_droplet&quot; &quot;http-c2&quot; {
-    image = &quot;ubuntu-14-04-x64&quot;
-    name = &quot;http-c2&quot;
-    region = &quot;lon1&quot;
-    size = &quot;2gb&quot;
-    ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
+	image = &quot;ubuntu-14-04-x64&quot;
+	name = &quot;http-c2&quot;
+	region = &quot;lon1&quot;
+	size = &quot;2gb&quot;
+	ssh_keys = [&quot;${digitalocean_ssh_key.rasta.id}&quot;]
 
-    provisioner &quot;file&quot; {
-        source = &quot;scripts\\install-c2.txt&quot;
-        destination = &quot;/tmp/install-c2.sh&quot;
+	provisioner &quot;file&quot; {
+		source = &quot;scripts\\install-c2.txt&quot;
+		destination = &quot;/tmp/install-c2.sh&quot;
 
-        connection {
-            type = &quot;ssh&quot;
-            user = &quot;ec2-user&quot;
-            private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
-        }
-    }
+		connection {
+			type = &quot;ssh&quot;
+			user = &quot;ec2-user&quot;
+			private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
+		}
+	}
 
-    provisioner &quot;remote-exec&quot; {
-        inline = [
-            &quot;chmod +x /tmp/install-c2.sh&quot;,
-            &quot;/tmp/install-c2.sh&quot;,
-            &quot;rm -rf /tmp/*&quot;
-        ]
+	provisioner &quot;remote-exec&quot; {
+		inline = [
+			&quot;chmod +x /tmp/install-c2.sh&quot;,
+			&quot;/tmp/install-c2.sh&quot;,
+			&quot;rm -rf /tmp/*&quot;
+		]
 
-        connection {
-            type = &quot;ssh&quot;
-            user = &quot;ec2-user&quot;
-            private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
-        }
-    }
+		connection {
+			type = &quot;ssh&quot;
+			user = &quot;ec2-user&quot;
+			private_key = &quot;${file(&quot;${var.private-key}&quot;)}&quot;
+		}
+	}
 }
 </code></pre>
 
@@ -774,12 +775,29 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
           <div class="media">
             
             <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/08/covenant-donut-tikitorch/">
+                <h3 class="media-heading">Covenant, Donut, TikiTorch</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Covenant <a href="https://github.com/cobbr/Covenant/commit/bde0df315f26b01a4ef5c5c00679b1e150998a35">v0.1</a> was first released in February 2019 and has since received a lot of really good updates.  <a href="https://github.com/cobbr/Covenant/commit/a2df643e01aea3ad7330bdba88ddd560692e46b4">v0.2</a> was released in May which added p2p comms over SMB named pipes, and <a href="https://github.com/cobbr/Covenant/commit/abcba78006c29b687f6e1a43a1ea1793784714fd">v0.3</a> was released in August which added a brand new web interface.  Even though it&rsquo;s such a young project, it has really proven itself to be a capable tool for offensive operators.  I&rsquo;ve not taken a look at Covenant since v0.1.x but since providing some new <a href="https://github.com/cobbr/SharpSploit/blob/master/SharpSploit/Persistence/WMI.cs">additions</a> to SharpSploit, it kinda got my geek going.  One of my areas of interest is weaponising the Grunt stager.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
               <a class="link-unstyled" href="https://rastamouse.me/post/">
                 <h3 class="media-heading">Posts</h3>
               </a>
               <span class="media-meta">
                 <span class="media-date text-small">
-                  Jun 6, 2019
+                  Aug 8, 2019
                 </span>
               </span>
               <div class="media-content hide-xs font-merryweather"></div>
@@ -926,23 +944,6 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
             <hr>
           </div>
         
-          <div class="media">
-            
-            <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2019/01/gpo-abuse-part-1/">
-                <h3 class="media-heading">GPO Abuse - Part 1</h3>
-              </a>
-              <span class="media-meta">
-                <span class="media-date text-small">
-                  Jan 1, 2019
-                </span>
-              </span>
-              <div class="media-content hide-xs font-merryweather"><p>Group Policy Objects (GPOs) is a subject I&rsquo;ve wanted to write about for a long time and I&rsquo;m happy to have <em>finally</em> started.</p></div>
-            </div>
-            <div style="clear:both;"></div>
-            <hr>
-          </div>
-        
       </div>
     </div>
     <div class="modal-footer">
@@ -950,7 +951,7 @@ drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         31 posts found
+         32 posts found
       </p>
     </div>
   </div>
