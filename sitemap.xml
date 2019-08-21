@@ -32,12 +32,6 @@
   </url>
   
   <url>
-    <loc>https://rastamouse.me/tags/tikispawn/</loc>
-    <lastmod>2019-08-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://rastamouse.me/categories/blog/</loc>
     <lastmod>2019-08-20T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -51,6 +45,12 @@
   
   <url>
     <loc>https://rastamouse.me/tags/donut/</loc>
+    <lastmod>2019-08-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/tikispawn/</loc>
     <lastmod>2019-08-20T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
