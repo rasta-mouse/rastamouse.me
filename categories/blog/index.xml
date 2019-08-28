@@ -6,10 +6,19 @@
     <description>Recent content in blog on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 20 Aug 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 28 Aug 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>TikiService</title>
+      <link>https://rastamouse.me/2019/08/tikiservice/</link>
+      <pubDate>Wed, 28 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/08/tikiservice/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/master/TikiService&#34;&gt;TikiService&lt;/a&gt; is a new .NET Service Binary that allows you to run a TikiTorch payload via the Service Control Manager (à la PsExec).  &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna&#34;&gt;TikiTorch.cna&lt;/a&gt; has also been updated to create a new Cobalt Strike function: &lt;code&gt;tikiexec&lt;/code&gt;, that automates its use.  This blog post provides a brief overview and usage examples.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Covenant, Donut, TikiTorch</title>
