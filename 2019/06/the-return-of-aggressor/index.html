@@ -319,17 +319,16 @@ if (!doNotTrack) {
 <p>Aggressor has the ability to read in data from a file on disk as an array, then remove/add any index in that array.  So in the case of shellcode, we:</p>
 
 <ul>
-<li><a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L46-L48">generate</a> it based on the specified listener.</li>
-<li><a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L117-L118">open and read</a> the content of the XML template.</li>
-<li><a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L122">remove index 22</a> (which corressponds to <code>public const string shellcode = &quot;&quot;;</code>).</li>
-<li><a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L123">add</a> the line back in with our encoded shellcode.</li>
+<li>generate it based on the specified listener.</li>
+<li>open and read the content of the XML template.</li>
+<li>replace <code>public const string shellcode = &quot;&quot;;</code> with <code>public const string shellcode = &quot;THE GENERATED SHELLCODE HERE&quot;;</code>.</li>
 </ul>
 
 <p>This is an approach I personally prefer over <a href="https://github.com/FortyNorthSecurity/AggressorAssessor/blob/master/Lateral%20Movement%20%26%20Access%20Management/remote_msbuild.cna#L7-L98">embedding</a> the whole template into the Aggressor script.</p>
 
-<p>The rest of the flow is as simple as generating a random filename, uploading it to the target via a UNC path and executing it with MSBuild.</p>
+<p>The rest of the flow is as simple as uploading it to the target and executing it with MSBuild.  To handle the actual WMI execution, I&rsquo;m using <code>WMI.exe</code> from my <a href="https://github.com/rasta-mouse/MiscTools">MiscTools repo</a>.</p>
 
-<iframe width="1024" height="576" src="https://www.youtube.com/embed/fS-HXNaOpxI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="1024" height="576" src="https://www.youtube.com/embed/iR-eoN0qr1k" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               
             </div>
           </div>

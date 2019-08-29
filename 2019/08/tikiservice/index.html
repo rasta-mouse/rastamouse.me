@@ -312,7 +312,7 @@ if (!doNotTrack) {
 
 <p>The <code>tikiexec</code> command expects a listener and architecure, for which it will <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L182-L184">generate</a> base64 encoded shellcode.</p>
 
-<p>It will then read in the config and <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L212">insert</a> the <code>Binary</code> and <code>Shellcode</code> values.  <code>TikiService.exe</code> and <code>TikiService.exe.config</code> are <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L218-L219">uploaded</a> to <code>C:\Windows\Temp</code> on the target.  <code>CsExec</code> is then <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L221">executed</a> via <code>execute_assembly</code> to create, start, stop and delete a new service.</p>
+<p>It will then read in the config and[insert the <code>Binary</code> and <code>Shellcode</code> values.  <code>TikiService.exe</code> and <code>TikiService.exe.config</code> are uploaded to <code>C:\Windows\Temp</code> on the target.  <code>CsExec</code> is then executed via <code>execute_assembly</code> to create, start, stop and delete a new service.</p>
 
 <p>The service name, description and binpath etc are passed in as args, so these can be changed in the CNA to suite your preference.</p>
 
