@@ -307,7 +307,7 @@ if (!doNotTrack) {
 
 <p>Passing the binary and encoded shellcode in as arguments will allow us to specify them on-the-fly.  This is especially useful when we come to the Aggressor, since we can generate shellcode dynamically depending on which listener we choose.</p>
 
-<h2 id="dynamic-xml">Dynamic XML</h2>
+<h3 id="dynamic-xml">Dynamic XML</h3>
 
 <p>As with my previous post, I&rsquo;m working from an XML template that has placeholders for the content we want to shove into it at runtime.</p>
 
@@ -327,6 +327,8 @@ if (!doNotTrack) {
 <p>This is an approach I personally prefer over <a href="https://github.com/FortyNorthSecurity/AggressorAssessor/blob/master/Lateral%20Movement%20%26%20Access%20Management/remote_msbuild.cna#L7-L98">embedding</a> the whole template into the Aggressor script.</p>
 
 <p>The rest of the flow is as simple as uploading it to the target and executing it with MSBuild.  To handle the actual WMI execution, I&rsquo;m using <code>WMI.exe</code> from my <a href="https://github.com/rasta-mouse/MiscTools">MiscTools repo</a>.</p>
+
+<h3 id="demo">Demo</h3>
 
 <iframe width="1024" height="576" src="https://www.youtube.com/embed/iR-eoN0qr1k" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               
