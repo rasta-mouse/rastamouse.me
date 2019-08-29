@@ -303,16 +303,22 @@ if (!doNotTrack) {
 
 <h3 id="aggressor">Aggressor</h3>
 
+<p>Before importing the CNA, you must <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L5-L7">provide paths</a> to <code>CsExec.exe</code> (from my <a href="https://github.com/rasta-mouse/MiscTools">MiscTools repo</a>), <code>TikiService.exe</code> and <code>TikiService.exe.config</code>.</p>
+
 <figure>
     <img src="https://rastamouse.me/images/tikiservice/tikiexec-help.png"/> 
 </figure>
 
 
-<p>The <code>tikiexec</code> command expects a listener and architecure, for which it will <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L182-L184">generate</a> base64 encoded shellcode.  It will then read in the config <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/Templates/TikiService.exe.config#L7-L8">template</a> and insert the <code>Binary</code> and <code>Shellcode</code> values.  <code>TikiService.exe</code> and <code>TikiService.exe.config</code> are uploaded with a random filename to <code>C:\Windows\Temp</code> on the target.  A service is then created and started, we attempt to link to the new beacon, the service is stopped and deleted; and then the binary and config file are removed.</p>
+<p>The <code>tikiexec</code> command expects a listener and architecure, for which it will <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L182-L184">generate</a> base64 encoded shellcode.</p>
+
+<p>It will then read in the config and <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L83">insert</a> the <code>Binary</code> and <code>Shellcode</code> values.  <code>TikiService.exe</code> and <code>TikiService.exe.config</code> are uploaded to <code>C:\Windows\Temp</code> on the target.  <code>CsExec</code> is then executed via <code>execute_assembly</code> to create, start, stop and delete a new service.</p>
+
+<p>We attempt to link to the new beacon, and then the binary and config file are removed.</p>
 
 <h3 id="usage">Usage</h3>
 
-<iframe width="1024" height="576" src="https://www.youtube.com/embed/_0Z0OpNMa0U" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="1024" height="576" src="https://www.youtube.com/embed/MAcZM6tzqYg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               
             </div>
           </div>
