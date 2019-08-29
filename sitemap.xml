@@ -32,6 +32,12 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/tikitorch/</loc>
+    <lastmod>2019-08-28T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/tags/aggressor/</loc>
     <lastmod>2019-08-28T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -50,14 +56,14 @@
   </url>
   
   <url>
-    <loc>https://rastamouse.me/tags/tikitorch/</loc>
-    <lastmod>2019-08-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+    <loc>https://rastamouse.me/2019/08/covenant-donut-tikitorch/</loc>
+    <lastmod>2019-08-20T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/08/covenant-donut-tikitorch/</loc>
+    <loc>https://rastamouse.me/tags/tikispawn/</loc>
     <lastmod>2019-08-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
@@ -73,20 +79,14 @@
   </url>
   
   <url>
-    <loc>https://rastamouse.me/tags/tikispawn/</loc>
-    <lastmod>2019-08-20T00:00:00+00:00</lastmod>
+    <loc>https://rastamouse.me/tags/msbuild/</loc>
+    <lastmod>2019-06-26T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/2019/06/the-return-of-aggressor/</loc>
     <lastmod>2019-06-26T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/tags/msbuild/</loc>
-    <lastmod>2019-06-26T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
