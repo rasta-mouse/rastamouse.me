@@ -61,12 +61,6 @@
   </url>
   
   <url>
-    <loc>https://rastamouse.me/tags/tikispawn/</loc>
-    <lastmod>2019-08-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://rastamouse.me/tags/covenant/</loc>
     <lastmod>2019-08-20T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -79,14 +73,20 @@
   </url>
   
   <url>
-    <loc>https://rastamouse.me/tags/msbuild/</loc>
-    <lastmod>2019-06-26T00:00:00+00:00</lastmod>
+    <loc>https://rastamouse.me/tags/tikispawn/</loc>
+    <lastmod>2019-08-20T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/2019/06/the-return-of-aggressor/</loc>
     <lastmod>2019-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/msbuild/</loc>
+    <lastmod>2019-06-26T00:00:00+00:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
@@ -192,6 +192,12 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/active-directory/</loc>
+    <lastmod>2019-01-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/tags/gpo/</loc>
     <lastmod>2019-01-13T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -200,12 +206,6 @@
   <url>
     <loc>https://rastamouse.me/2019/01/gpo-abuse-part-2/</loc>
     <lastmod>2019-01-13T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/tags/active-directory/</loc>
-    <lastmod>2019-01-13T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
