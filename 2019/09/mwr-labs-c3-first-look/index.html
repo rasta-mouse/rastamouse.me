@@ -1,0 +1,1026 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.56.0">
+    <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
+    <title>MWR Labs: C3 - First Look</title>
+    <meta name="author" content="Rasta Mouse">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://rastamouse.me/favicon.ico">
+    
+
+    
+    <meta name="description" content="In this blog post I&rsquo;m going to cover my first impressions of MWR Labs C3 project, through installation and setup to usage in a basic scenario.">
+    <meta property="og:description" content="In this blog post I&rsquo;m going to cover my first impressions of MWR Labs C3 project, through installation and setup to usage in a basic scenario.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="MWR Labs: C3 - First Look">
+    <meta property="og:url" content="/2019/09/mwr-labs-c3-first-look/">
+    <meta property="og:site_name" content="Rasta Mouse">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rasta Mouse">
+    <meta name="twitter:description" content="In this blog post I&rsquo;m going to cover my first impressions of MWR Labs C3 project, through installation and setup to usage in a basic scenario.">
+    
+      <meta name="twitter:creator" content="@_RastaMouse">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=640">
+    
+
+    
+      <meta property="og:image" content="https://rastamouse.me/images/c3-first-look/thumb.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" />
+    
+    
+    <link rel="stylesheet" href="https://rastamouse.me/css/style-u6mk0ojoywresbx8iepslrmmhl4stuhrsxuwhkpwrkrx7mryjcaimasnk4pi.min.css" />
+    
+    
+
+    
+      
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-60712346-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4"> 
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://rastamouse.me/">Rasta Mouse</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="https://rastamouse.me/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://rastamouse.me/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Rasta Mouse</h4>
+        
+          <h5 class="sidebar-profile-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/#about">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://twitter.com/_RastaMouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+      
+      <span class="sidebar-button-desc">Twitter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://keybase.io/rasta_mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-lock"></i>
+      
+      <span class="sidebar-button-desc">Keybase</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://zeropointsecurity.co.uk/rastalabs/" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-shield"></i>
+      
+      <span class="sidebar-button-desc">RastaLabs</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/rasta-mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      MWR Labs: C3 - First Look
+    </h1>
+  
+  <div class="postShorten-meta post-meta">
+  
+    <time itemprop="datePublished" datetime="2019-09-03T00:00:00Z">
+      
+  
+  
+  
+  
+    3 September 2019
+  
+
+    </time>
+  
+  
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://rastamouse.me/categories/blog">blog</a>
+    
+  
+
+
+</div>
+
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p>In this blog post I&rsquo;m going to cover my first impressions of MWR Labs C3 project, through installation and setup to usage in a basic scenario.</p>
+
+<h2 id="external-c2">External C2</h2>
+
+<h3 id="what">What?</h3>
+
+<p>First, we need to cover some background information on what &ldquo;External C2&rdquo; is - if you&rsquo;re already familiar, skip ahead.</p>
+
+<p><a href="https://cobaltstrike.com/help-externalc2">External C2</a> was introduced back in Cobalt Strike 3.6, and it provides an interface for 3rd applications to act as a communication layer between Cobalt Strike and Beacon.  That is to say, provide communication methods that are not natively supported by the toolset.  In the specific case of Cobalt Strike - Beacon has the capability to (at the time of writing) egress C2 traffic over HTTP/S and DNS; and link to other Beacons over SMB named pipes and TCP sockets.</p>
+
+<p>The External C2 specification allows operators to expand how Beacon can communicate (either back to the Cobalt Strike Team Server, or to other Beacons) to practically any means desirable.  I&rsquo;ll wait a moment for that to sink in&hellip;</p>
+
+<p>By &ldquo;any means desirable&rdquo;, I mean really awesome ways like <a href="https://labs.mwrinfosecurity.com/blog/tasking-office-365-for-cobalt-strike-c2">C2 over Office 365</a>; <a href="https://outflank.nl/blog/2017/09/17/blogpost-cobalt-strike-over-external-c2-beacon-home-in-the-most-obscure-ways/">C2 over fileshares</a> and <a href="https://www.harmj0y.net/blog/powershell/command-and-control-using-active-directory/">C2 over Active Directory</a>!</p>
+
+<h3 id="why">Why?</h3>
+
+<p>This is good for all sorts of reasons.</p>
+
+<p>Egress C2 over a legitimate service such as O365, Google Drive, Dropbox, Slack, Mattermost or whatever; is going to do such a good job of blending in - particularly if your target uses those services as part of their everyday business practices.  In some cases you could even transmit C2 over their own tenants, e.g C2 over their own OneDrive.</p>
+
+<p>Internal C2 over fileshares, AD or anything that can be written to/read from are also going to be difficult to detect; but may also help get around different types of firewall restrictions and perhaps even air-gapping.  C2 wrapped to look like RDP, WinRM or WMI traffic are all exciting ideas.</p>
+
+<h3 id="how">How?</h3>
+
+<p>Implementing External C2 is no trivial task (much more so than slapping a Malleable C2 Profile together).</p>
+
+<p>The following diagram is the External C2 architecture taken from the <a href="https://www.cobaltstrike.com/downloads/externalc2spec.pdf">External C2 Spec</a>.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/ec2-arch.png"/> 
+</figure>
+
+
+<p>The boxes in yellow (Team Server &amp; SMB Beacon) are the native Cobalt Strike components, whilst those in green (Third-Party Controller &amp; Third-Party Client) are the &ldquo;3rd party applications&rdquo; that an operator must develop to leverage External C2.  As you can see, they act as a &ldquo;man-in-the-middle&rdquo; between a Beacon and Team Server, effectively relaying traffic between them over the custom C2 channel.</p>
+
+<p>So a Client must be capable of staging and talking to Beacon over a named pipe, and communicate with the Controller over whatever means you&rsquo;re trying to implement.  Similarly, the Controller must receive traffic from the Client and send that information to the Team Server in a way that it understands.</p>
+
+<p>It doesn&rsquo;t take much to realise that there are a lot of re-usable components here, and (attempted?) frameworks (<a href="https://github.com/Und3rf10w/external_c2_framework">here</a> &amp; <a href="https://github.com/ryhanson/ExternalC2">here</a>) have been around for some time.  MWR Labs <a href="https://github.com/mwrlabs/C3">C3</a> is the latest attempt at providing operaters with a stable and feature-rich framework for prototyping and integrating custom C2 channels.</p>
+
+<h2 id="lab-setup">Lab Setup</h2>
+
+<p>C3 already provides some custom C2 channels that we can use straight out of the box - so I decided to try the Slack and Fileshare channels.  I built a contrived lab to demonstrate.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/lab-arch.png"/> 
+</figure>
+
+
+<p>Client 1 and Client 2 are workstations on the same domain, but they cannot communicate with each other (so no SMB/TCP Beacons).  Client 1 will run the Slack egress C2 and Client 2 will run the Fileshare C2.  Channels can be linked - so the Client 2 Fileshare C2 will link to the Client 1 Slack C2.</p>
+
+<h2 id="c3">C3</h2>
+
+<h3 id="building-installing">Building &amp; Installing</h3>
+
+<p>For my Team Server, I&rsquo;m using an Ubuntu 18.04 VM setup as per the standard Cobalt Strike <a href="https://cobaltstrike.com/help-install">intallation instructions</a>.  My C3 Gateway server is simply a Windows Server 2016 VM with the .NET Core 2.2 runtime installed.</p>
+
+<p>To build the <code>WebController</code> release:</p>
+
+<pre><code>D:\Tools\C3&gt;cd Src\WebController\Backend
+D:\Tools\C3\Src\WebController\Backend&gt;dotnet publish -c Release
+Microsoft (R) Build Engine version 16.2.32702+c4012a063 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 57.31 ms for D:\Tools\C3\Src\WebController\Backend\WebController.csproj.
+  WebController -&gt; D:\Tools\C3\Bin\WebController\Release\netcoreapp2.2\C3WebController.dll
+  WebController -&gt; D:\Tools\C3\Bin\WebController\Release\netcoreapp2.2\publish\
+</code></pre>
+
+<p>Open Visual Studio and build the <code>GatewayConsoleExe</code>, <code>NodeRelayConsoleExe</code> and <code>NodeRelayDll</code> projects by simply right-clicking them and selecting <code>Build</code>.  These should also be written to <code>D:\Tools\C3\Bin</code>.  Now copy the whole <code>Bin</code> directory to <code>C:\C3</code> on the C3 Server.</p>
+
+<p>Your folder structure should look like this:</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/explorer.png"/> 
+</figure>
+
+
+<p>Go to <code>C:\C3\Bin\WebController\Release\netcoreapp2.2\publish</code> and open <code>appsettings.json</code>.  Change <code>payloadTemplateDir</code> to <code>../../../..</code>  (which drops it in to <code>C:\C3\Bin</code>).</p>
+
+<h3 id="start-webcontroller">Start WebController</h3>
+
+<p>Now the <code>WebController</code> should start. <code>192.168.1.147</code> is the IP address of my Gateway server.</p>
+
+<pre><code class="language-text">C:\Users\Administrator&gt;cd C:\C3\Bin\WebController\Release\netcoreapp2.2\publish
+C:\C3\Bin\WebController\Release\netcoreapp2.2\publish&gt;dotnet C3WebController.dll --urls http://192.168.1.147:8080
+Gateway API bridge starts listening on 127.0.0.1:2323
+Hosting environment: Production
+Content root path: C:\C3\Bin\WebController\Release\netcoreapp2.2\publish
+Now listening on: http://192.168.1.147:8080
+Application started. Press Ctrl+C to shut down.
+</code></pre>
+
+<p>Browsing to that IP:Port should show the C3 Dashboard.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/gateway.png"/> 
+</figure>
+
+
+<p>I had to click <code>Edit Config</code> and input <code>http://192.168.1.147</code> and <code>8080</code> in the respective boxes.  Clicking <code>Save Config</code> doesn&rsquo;t seem to update/refresh the page.  So spam-click <code>Save</code> a few times and close the window.  Then click <code>Create and Download Gateway</code> and a ZIP file should download.</p>
+
+<p>I copied this to the Desktop of my C3 Gateway server, unzipped and ran the binary.  All being well the GatewayConsole should connect to the WebController API and and C3 Dashboard should refresh.</p>
+
+<p><figure>
+    <img src="https://rastamouse.me/images/c3-first-look/gateway-console.png"/> 
+</figure>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/gateway-running.png"/> 
+</figure>
+</p>
+
+<h3 id="link-gateway-to-team-server">Link Gateway to Team Server</h3>
+
+<p>This is a very easy step :)</p>
+
+<p>External C2 is started on the Team Server via an Aggressor script.  So just save the following as <code>externalc2.cna</code> and load it into CS via the Script Manager. <code>192.168.1.140</code> is the IP of my Team Server.</p>
+
+<pre><code>externalc2_start(&quot;192.168.1.140&quot;, 2222);
+</code></pre>
+
+<p>This will bind port 2222 on the external interface of the Team Server.</p>
+
+<pre><code>root@kali ~# ss -lt
+State                     Recv-Q                    Send-Q                                                Local Address:Port                                        Peer Address:Port
+LISTEN                    0                         128                                                         0.0.0.0:ssh                                              0.0.0.0:*
+LISTEN                    0                         128                                                            [::]:ssh                                                 [::]:*
+LISTEN                    0                         32                                                                *:50050                                                  *:*
+LISTEN                    0                         128                                          [::ffff:192.168.1.140]:2222                                                   *:*
+LISTEN                    0                         50                                                                *:http                                                   *:*
+</code></pre>
+
+<p>Double-click on the Gateway icon on the C3 Dashboard and click <code>Command Center</code>.  From the <code>Select Command</code> list, choose <code>TurnOnConnectorTeamServer</code> and provide the IP (192.168.1.140) and port (2222).</p>
+
+<h2 id="channelslack">ChannelSlack</h2>
+
+<h3 id="slack-app">Slack App</h3>
+
+<p>Before you can configure the Gateway to use Slack, you need a Slack App in your Workspace.</p>
+
+<p>I tried to be smart/lazy at first and just made it a workspace admin, which didn&rsquo;t actually work.  <a href="https://twitter.com/__invictus_">invictus</a> suggested the following permissions, which worked great for me:</p>
+
+<pre><code>files:read
+files:write:user
+chat:write:bot
+chat:write:user
+channels:history
+channels:read
+channels:write
+</code></pre>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/slackapp.png"/> 
+</figure>
+
+
+<p>Once the App is added to the Workspace you can grab the OAuth Access Token (beginning with <code>xoxp</code>).</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/oauth.png"/> 
+</figure>
+
+
+<p>Back in the C3 Dashboard, double-click the Gateway &gt; <code>Command Center &gt; AddChannelSlack</code> and paste the OAuth token.  I was happy to leave the channel name as it&rsquo;s default random name.  Then click <code>Send Command</code>.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/addchannelslack.png"/> 
+</figure>
+
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/slackchanneladded.png"/> 
+</figure>
+
+
+<p>You should see the new interface appear in the C3 Dashboard.  Any error messges will display themselves in the Gateway Console running on the C3 Server - which is a good place to look for troubleshooting issues.</p>
+
+<h2 id="node-relay">Node Relay</h2>
+
+<p>Next we need to create a <code>Node Relay</code> for this C2 channel - this that &ldquo;3rd party client&rdquo; that we need to run on a compromised host.</p>
+
+<p>Double-click on the Slack Channel Interface, hover over <code>Interface Options</code> and select <code>New Relay</code>.  All the relevant information for the Slack channel is pre-populated.  We can opt to download the Relay as an <code>exe</code> or <code>dll</code> - which one you want will entirely depend (in the real world) on how you want to get this running on a compromised host.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/relaysetup.png"/> 
+</figure>
+
+
+<p>Once the Relay has been downloaded and run on the target machine, a new Relay will appear in the C3 Dashboard.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/newrelay.png"/> 
+</figure>
+
+
+<p>Double-click it to see some metadata about the machine it&rsquo;s running on.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/relaymetadata.png"/> 
+</figure>
+
+
+<h2 id="beacon">Beacon</h2>
+
+<p>To get this Relay to stage a Beacon payload, click <code>Command Center &gt; AddPeripheralBeacon &gt; Send Command</code>.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/client1-beacon.png"/> 
+</figure>
+
+
+<p>If you have Slack notifications enabled, you will see messages being written and removed from the channel, both during the staging process and every time you issue a command in CS.  The C3 Dashboard will also update to show a new Beacon node.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/beaconnode.png"/> 
+</figure>
+
+
+<h2 id="negotiationchanneluncsharefile">NegotiationChannelUncShareFile</h2>
+
+<p>Now let&rsquo;s add the Fileshare C2 channel to our existing relay.  <code>Double-click &gt; Command Center &gt; AddNegotiationChannelUncShareFile</code>.  The file share I&rsquo;ve setup is at <code>\\dc1\demo</code>.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/addnegotiationchanneluncshare.png"/> 
+</figure>
+
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/uncchannel.png"/> 
+</figure>
+
+
+<p>Now we just download the Relay for this new channel in the same way.  <code>Double-click &gt; Interface Options &gt; New Relay</code>.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/client2-metadata.png"/> 
+</figure>
+
+
+<p>Unforunately, as soon as I connected this second Relay, I started getting the following error messages on the <code>GatewayConsole</code>.  Everything afterwards just kinda broke&hellip;</p>
+
+<pre><code class="language-text">Gateway|Error&gt; [0001] Packet handling failure. Failed to parse S2G packet. Tried to add an existing Element to the container.
+</code></pre>
+
+<p>It didn&rsquo;t seem to matter if I was adding <code>Negotiation</code> or normal channel relays, I got the same result over and over again.  I&rsquo;m hoping this is just user-error and someone can point out what I&rsquo;m doing wrong.</p>
+
+<h2 id="closing-thoughts">Closing Thoughts</h2>
+
+<p>Even though I&rsquo;ve barely scrated the surface of C3, I find it to be a very exciting project.</p>
+
+<p>The UI is well thought-out and easy to use.  I think the visualisation layout should add the default labels to icons (like it does for the gateway).  A few other tweaks may be required such as the <code>Edit Config</code> boxes not updating its content.</p>
+
+<p>The Wiki has some basic installation steps that could be fleshed out (but that&rsquo;s also something that will come with time).</p>
+
+<p>I don&rsquo;t know if the UI can provide more feedback at times - e.g. if you provide an incorrect IP/port for your Cobalt Strike Team Server, it doesn&rsquo;t seem to tell you.  And being able to rename relays would be a nice feature also.</p>
+
+<p>I&rsquo;m not sure if I&rsquo;ll have a stab at creating a custom channel, since C++ is really not my forte.  But if this framework and External C2 in general is something you&rsquo;re interested in, I would highly recommend checking this project out!</p>
+
+<p>I want to keep playing with C3, so hopefully this is not the last post on the matter.</p>
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/c3/">c3</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/externalc2/">externalc2</a>
+
+                  </div>
+                
+              
+            
+            <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/08/tikiservice/" data-tooltip="TikiService">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f09%2fmwr-labs-c3-first-look%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f09%2fmwr-labs-c3-first-look%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f09%2fmwr-labs-c3-first-look%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2019 Rasta Mouse. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/08/tikiservice/" data-tooltip="TikiService">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f09%2fmwr-labs-c3-first-look%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f09%2fmwr-labs-c3-first-look%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f09%2fmwr-labs-c3-first-look%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <ul class="share-options">
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f09%2fmwr-labs-c3-first-look%2f">
+        <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f09%2fmwr-labs-c3-first-look%2f">
+        <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f09%2fmwr-labs-c3-first-look%2f">
+        <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Rasta Mouse</h4>
+    
+      <div id="about-card-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Penetration Tester
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        UK
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/09/mwr-labs-c3-first-look/">
+                <h3 class="media-heading">MWR Labs: C3 - First Look</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In this blog post I&rsquo;m going to cover my first impressions of MWR Labs C3 project, through installation and setup to usage in a basic scenario.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/post/">
+                <h3 class="media-heading">Posts</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/08/tikiservice/">
+                <h3 class="media-heading">TikiService</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p><a href="https://github.com/rasta-mouse/TikiTorch/tree/master/TikiService">TikiService</a> is a new .NET Service Binary that allows you to run a TikiTorch payload via the Service Control Manager (à la PsExec).  <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna">TikiTorch.cna</a> has also been updated to create a new Cobalt Strike function: <code>tikiexec</code>, that automates its use.  This blog post provides a brief overview and usage examples.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/08/covenant-donut-tikitorch/">
+                <h3 class="media-heading">Covenant, Donut, TikiTorch</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Covenant <a href="https://github.com/cobbr/Covenant/commit/bde0df315f26b01a4ef5c5c00679b1e150998a35">v0.1</a> was first released in February 2019 and has since received a lot of really good updates.  <a href="https://github.com/cobbr/Covenant/commit/a2df643e01aea3ad7330bdba88ddd560692e46b4">v0.2</a> was released in May which added p2p comms over SMB named pipes, and <a href="https://github.com/cobbr/Covenant/commit/abcba78006c29b687f6e1a43a1ea1793784714fd">v0.3</a> was released in August which added a brand new web interface.  Even though it&rsquo;s such a young project, it has really proven itself to be a capable tool for offensive operators.  I&rsquo;ve not taken a look at Covenant since v0.1.x but since providing some new <a href="https://github.com/cobbr/SharpSploit/blob/master/SharpSploit/Persistence/WMI.cs">additions</a> to SharpSploit, it kinda got my geek going.  One of my areas of interest is weaponising the Grunt stager.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/06/the-return-of-aggressor/">
+                <h3 class="media-heading">The Return of Aggressor</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>FortyNorth Security recently <a href="https://www.fortynorthsecurity.com/aggressive-msbuild-bypass-detection/">posted an article</a> detailing the process for leveraging MSBuild to execute unmanaged PowerShell, and automating it in Aggressor script for Cobalt Strike users.  Being a native binary in the Windows OS, the use of MSBuild is a <a href="https://lolbas-project.github.io/lolbas/Binaries/Msbuild/">common AWL bypass technique</a>, which is handy in relatively well locked down environments.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/06/tikivader/">
+                <h3 class="media-heading">TikiVader</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>I&rsquo;ve added a new experimental project to <a href="https://github.com/rasta-mouse/TikiTorch">TikiTorch</a>, called <a href="https://github.com/rasta-mouse/TikiTorch/tree/master/TikiVader">TikiVader</a>.  I originally thought of &ldquo;vader&rdquo; as a play-on for &ldquo;evade&rdquo;/&ldquo;evader&rdquo;, until I realised TikiVader was never meant to evade anything&hellip; but nevermind 😒</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/06/tikispawn-msbuild/">
+                <h3 class="media-heading">TikiSpawn &amp; MSBuild</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>The main impetus behind this post was me experimenting with ways to leverage TikiSpawn with some of the popular <a href="https://lolbas-project.github.io">lolbins</a>.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/04/weaponizing-privileged-file-writes-with-windows-collector-service/">
+                <h3 class="media-heading">Weaponizing Privileged File Writes with Windows Collector Service</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Apr 4, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In my <a href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/">previous post</a>, I described how one could leverage CVE-2019-0841 to backdoor the LAPS <code>AdmPwd.dll</code> for EoP to <code>NT AUTHORITY\SYSTEM</code>.  The obvious question is that if a machine is not using LAPS, what can you do&hellip;?  Well <a href="https://twitter.com/buffaloverflow">Rich Warren</a> provided <a href="https://twitter.com/buffaloverflow/status/1117507864824881153">one solution</a>, by using the Windows Diagnostics Hub Standard Collector Service.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/">
+                <h3 class="media-heading">Weaponizing CVE-2019-0841 with LAPS</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Apr 4, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>On April 9, <a href="https://twitter.com/rogue_kdc">Nabeel Ahmed</a> <a href="https://twitter.com/rogue_kdc/status/1115664188821639173">annouced</a> details of <a href="https://nvd.nist.gov/vuln/detail/CVE-2019-0841">CVE-2019-0841</a> - the tl;dr being that it allows low privileged users to take Full Control of files owned by <code>NT AUTHORITY\SYSTEM</code>, which can lead to EoP.  Nabeel published a comprehensive <a href="https://krbtgt.pw/dacl-permissions-overwrite-privilege-escalation-cve-2019-0841/">blog</a> describing the vulnerability, <a href="https://github.com/rogue-kdc">PoC code</a> and a <a href="https://youtu.be/vP468ZjJ3hU">video demonstration</a>.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/03/ews-installapp/">
+                <h3 class="media-heading">EWS - InstallApp</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Mar 3, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>I recently created the <a href="https://github.com/rasta-mouse/EWSToolkit">EWSToolkit</a> off the back of an assessment for Exchange Client Access Services.  I realise I committed it with basically no explanation, so this blog post will serve as a quick introduction and a look at perhaps one of its more interesting features.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         34 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('https://rastamouse.me/images/cover.jpg');"></div>
+  
+
+
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.js"></script>
+
+
+<script src="https://rastamouse.me/js/script-wl33z0n6ocaypepiqrazthtivfrliqijej4rq8ek8gvrv1awftmgjuv8k4zc.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight').each(function(i, block) {
+    var code = "";
+    hljs.highlightAuto(block.innerText).value.split(/\r\n|\r|\n/).forEach(function(line) {
+      code += "<span class=\"line\">" + line + "</span><br>";
+    });
+    if (code.length > 0) {
+      block.innerHTML = code;  
+    }
+  });
+  $('pre > code').each(function(i, block) {
+    $(this).addClass('codeblock');
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/rastamouse.me\/2019\/09\/mwr-labs-c3-first-look\/';
+          
+            this.page.identifier = '\/2019\/09\/mwr-labs-c3-first-look\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'rastamouse';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+
+
+    
+  </body>
+</html>
+
