@@ -287,7 +287,7 @@ if (!doNotTrack) {
 
 <p>First, we need to cover some background information on what &ldquo;External C2&rdquo; is - if you&rsquo;re already familiar, skip ahead.</p>
 
-<p><a href="https://cobaltstrike.com/help-externalc2">External C2</a> was introduced back in Cobalt Strike 3.6, and it provides an interface for 3rd applications to act as a communication layer between Cobalt Strike and Beacon.  That is to say, provide communication methods that are not natively supported by the toolset.  In the specific case of Cobalt Strike - Beacon has the capability to (at the time of writing) egress C2 traffic over HTTP/S and DNS; and link to other Beacons over SMB named pipes and TCP sockets.</p>
+<p><a href="https://cobaltstrike.com/help-externalc2">External C2</a> was introduced back in Cobalt Strike 3.6, and it provides an interface for 3rd party applications to act as a communication layer between Cobalt Strike and Beacon.  That is to say, provide communication methods that are not natively supported by the toolset.  In the specific case of Cobalt Strike - Beacon has the capability to (at the time of writing) egress C2 traffic over HTTP/S and DNS; and link to other Beacons over SMB named pipes and TCP sockets.</p>
 
 <p>The External C2 specification allows operators to expand how Beacon can communicate (either back to the Cobalt Strike Team Server, or to other Beacons) to practically any means desirable.  I&rsquo;ll wait a moment for that to sink in&hellip;</p>
 
@@ -465,6 +465,8 @@ channels:write
 <p>Next we need to create a <code>Node Relay</code> for this C2 channel - this is that &ldquo;3rd party client&rdquo; that we need to run on a compromised host.</p>
 
 <p>Double-click on the Slack Channel Interface, hover over <code>Interface Options</code> and select <code>New Relay</code>.  All the relevant information for the Slack channel is pre-populated.  We can opt to download the Relay as an <code>exe</code> or <code>dll</code> - which one you want will entirely depend (in the real world) on how you want to get this running on a compromised host.</p>
+
+<p>From what I&rsquo;ve seen: the exe can be run as a normal executable or as a Windows Service; and the DLL with <code>rundll32 Relay.dll,StartNodeRelay</code>.</p>
 
 <figure>
     <img src="https://rastamouse.me/images/c3-first-look/relaysetup.png"/> 
