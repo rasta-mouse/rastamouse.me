@@ -333,9 +333,9 @@ if (!doNotTrack) {
 
 <h3 id="building-installing">Building &amp; Installing</h3>
 
-<p>For my Team Server, I&rsquo;m using an Ubuntu 18.04 VM setup as per the standard Cobalt Strike <a href="https://cobaltstrike.com/help-install">intallation instructions</a>.  My C3 Gateway server is simply a Windows Server 2016 VM with the .NET Core 2.2 runtime installed.</p>
+<p>For my Team Server, I&rsquo;m using an Ubuntu 18.04 VM setup as per the standard Cobalt Strike <a href="https://cobaltstrike.com/help-install">intallation instructions</a>; and my C3 Gateway server is simply a Windows Server 2016 VM with the .NET Core 2.2 runtime installed.</p>
 
-<p>To build the <code>WebController</code> release:</p>
+<p>To build the <code>WebController</code>:</p>
 
 <pre><code>D:\Tools\C3&gt;cd Src\WebController\Backend
 D:\Tools\C3\Src\WebController\Backend&gt;dotnet publish -c Release
@@ -347,7 +347,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   WebController -&gt; D:\Tools\C3\Bin\WebController\Release\netcoreapp2.2\publish\
 </code></pre>
 
-<p>Open Visual Studio and build the <code>GatewayConsoleExe</code>, <code>NodeRelayConsoleExe</code> and <code>NodeRelayDll</code> projects by simply right-clicking them and selecting <code>Build</code>.  These should also be written to <code>D:\Tools\C3\Bin</code>.  Now copy the whole <code>Bin</code> directory to <code>C:\C3</code> on the C3 Server.</p>
+<p>Open Visual Studio and build the <code>GatewayConsoleExe</code>, <code>NodeRelayConsoleExe</code> and <code>NodeRelayDll</code> projects, by simply right-clicking and selecting <code>Build</code>.  These should also be written to <code>D:\Tools\C3\Bin</code>.  Now copy the whole <code>Bin</code> directory to <code>C:\C3</code> on the C3 Server.</p>
 
 <p>Your folder structure should look like this:</p>
 
@@ -360,7 +360,11 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 <h3 id="start-webcontroller">Start WebController</h3>
 
-<p>Now the <code>WebController</code> should start. <code>192.168.1.147</code> is the IP address of my Gateway server.</p>
+<p>The <code>WebController</code> can now be started.</p>
+
+<blockquote>
+<p>Note: <code>192.168.1.147</code> is the IP address of my Gateway server.</p>
+</blockquote>
 
 <pre><code class="language-text">C:\Users\Administrator&gt;cd C:\C3\Bin\WebController\Release\netcoreapp2.2\publish
 C:\C3\Bin\WebController\Release\netcoreapp2.2\publish&gt;dotnet C3WebController.dll --urls http://192.168.1.147:8080
@@ -380,22 +384,22 @@ Application started. Press Ctrl+C to shut down.
 
 <p>I had to click <code>Edit Config</code> and input <code>http://192.168.1.147</code> and <code>8080</code> in the respective boxes.  Clicking <code>Save Config</code> doesn&rsquo;t seem to update/refresh the page.  So spam-click <code>Save</code> a few times and close the window.  Then click <code>Create and Download Gateway</code> and a ZIP file should download.</p>
 
-<p>I copied this to the Desktop of my C3 Gateway server, unzipped and ran the binary.  All being well the GatewayConsole should connect to the WebController API and and C3 Dashboard should refresh.</p>
-
-<p><figure>
-    <img src="https://rastamouse.me/images/c3-first-look/gateway-console.png"/> 
-</figure>
+<p>Copy this to the Gateway server, unzip and run the binary.  All being well the GatewayConsole should connect to the WebController API and and C3 Dashboard should refresh.</p>
 
 <figure>
     <img src="https://rastamouse.me/images/c3-first-look/gateway-running.png"/> 
 </figure>
-</p>
+
 
 <h3 id="link-gateway-to-team-server">Link Gateway to Team Server</h3>
 
 <p>This is a very easy step :)</p>
 
-<p>External C2 is started on the Team Server via an Aggressor script.  So just save the following as <code>externalc2.cna</code> and load it into CS via the Script Manager. <code>192.168.1.140</code> is the IP of my Team Server.</p>
+<p>External C2 is started on the Team Server via an Aggressor script.  So just save the following as <code>externalc2.cna</code> and load it into CS via the Script Manager.</p>
+
+<blockquote>
+<p>Note: <code>192.168.1.140</code> is the IP of my Team Server.</p>
+</blockquote>
 
 <pre><code>externalc2_start(&quot;192.168.1.140&quot;, 2222);
 </code></pre>
@@ -458,7 +462,7 @@ channels:write
 
 <h2 id="node-relay">Node Relay</h2>
 
-<p>Next we need to create a <code>Node Relay</code> for this C2 channel - this that &ldquo;3rd party client&rdquo; that we need to run on a compromised host.</p>
+<p>Next we need to create a <code>Node Relay</code> for this C2 channel - this is that &ldquo;3rd party client&rdquo; that we need to run on a compromised host.</p>
 
 <p>Double-click on the Slack Channel Interface, hover over <code>Interface Options</code> and select <code>New Relay</code>.  All the relevant information for the Slack channel is pre-populated.  We can opt to download the Relay as an <code>exe</code> or <code>dll</code> - which one you want will entirely depend (in the real world) on how you want to get this running on a compromised host.</p>
 
@@ -499,7 +503,9 @@ channels:write
 
 <h2 id="negotiationchanneluncsharefile">NegotiationChannelUncShareFile</h2>
 
-<p>Now let&rsquo;s add the Fileshare C2 channel to our existing relay.  <code>Double-click &gt; Command Center &gt; AddNegotiationChannelUncShareFile</code>.  The file share I&rsquo;ve setup is at <code>\\dc1\demo</code>.</p>
+<p>Now add the Fileshare C2 channel to our existing relay.  Double-click the Slack relay &gt; <code>Command Center &gt; AddNegotiationChannelUncShareFile</code>.  The file share I&rsquo;ve setup is at <code>\\dc1\demo</code>.  For this to work correctly, the fileshare relay will drop files into the share; and the slack relay will read those files and &ldquo;relay&rdquo; (d&rsquo;uh) the data to the Gateway.  However, the slack relay also needs to be able to delete the files been written by the fileshare relay.  On a share with default inheritance, this can&rsquo;t work since <code>User A</code>, doesn&rsquo;t have permission to remove files created by <code>User B</code>.</p>
+
+<p>This should be fixed in a future update, by making the fileshare relay explicity set the DACL on the files its creating so other users&rsquo; can remove them.  However, a potential workaround is to create a subfolder in the share (e.g. <code>\\dc1\demo\c3</code>), disabling inheritance and opening the DACL for everyone.</p>
 
 <figure>
     <img src="https://rastamouse.me/images/c3-first-look/addnegotiationchanneluncshare.png"/> 
@@ -511,31 +517,29 @@ channels:write
 </figure>
 
 
-<p>Now we just download the Relay for this new channel in the same way.  <code>Double-click &gt; Interface Options &gt; New Relay</code>.</p>
+<p>Now just download the Relay for this new channel in the same way (Double-click &gt; <code>Interface Options &gt; New Relay</code>, and finally stage a new beacon as well.</p>
 
 <figure>
-    <img src="https://rastamouse.me/images/c3-first-look/client2-metadata.png"/> 
+    <img src="https://rastamouse.me/images/c3-first-look/uncrelay.png"/> 
 </figure>
 
 
-<p>Unforunately, as soon as I connected this second Relay, I started getting the following error messages on the <code>GatewayConsole</code>.  Everything afterwards just kinda broke&hellip;</p>
+<figure>
+    <img src="https://rastamouse.me/images/c3-first-look/client2-beacon.png"/> 
+</figure>
 
-<pre><code class="language-text">Gateway|Error&gt; [0001] Packet handling failure. Failed to parse S2G packet. Tried to add an existing Element to the container.
-</code></pre>
-
-<p>It didn&rsquo;t seem to matter if I was adding <code>Negotiation</code> or normal channel relays, I got the same result over and over again.  I&rsquo;m hoping this is just user-error and someone can point out what I&rsquo;m doing wrong.</p>
 
 <h2 id="closing-thoughts">Closing Thoughts</h2>
 
 <p>Even though I&rsquo;ve barely scrated the surface of C3, I find it to be a very exciting project.</p>
 
-<p>The UI is well thought-out and easy to use.  I think the visualisation layout should add the default labels to icons (like it does for the gateway).  A few other tweaks may be required such as the <code>Edit Config</code> boxes not updating its content.</p>
+<p>The UI is well thought-out and easy to use.  I think the visualisation layout should add the default labels to icons (like it does for the gateway).  A few other tweaks may be required such as the <code>Edit Config</code> boxes not updating its content.  I wish the UI also provided more feedback at times - e.g. if you provide an incorrect IP/port for your Cobalt Strike Team Server, it doesn&rsquo;t seem to tell you.  And being able to rename relays would be a nice feature also.</p>
 
 <p>The Wiki has some basic installation steps that could be fleshed out (but that&rsquo;s also something that will come with time).</p>
 
-<p>I don&rsquo;t know if the UI can provide more feedback at times - e.g. if you provide an incorrect IP/port for your Cobalt Strike Team Server, it doesn&rsquo;t seem to tell you.  And being able to rename relays would be a nice feature also.</p>
+<p>There are also some gotcha&rsquo;s with the Cobalt Strike interface when dealing with Beacons this way.  Particularly closing the Beacon and updating its jitter - these tasks are better done in C3.  I also found that switching to the graph view disconects you from the CS client with the following error on the TS: <code>[!] Trapped java.io.EOFException during client (192.168.1.117) read [Manage: rasta]: null</code>.</p>
 
-<p>I&rsquo;m not sure if I&rsquo;ll have a stab at creating a custom channel, since C++ is really not my forte.  But if this framework and External C2 in general is something you&rsquo;re interested in, I would highly recommend checking this project out!</p>
+<p>I&rsquo;m not sure if I&rsquo;ll have a stab at creating a custom channel, since C/C++ is really not my forte.  But if this framework and External C2 in general is something you&rsquo;re interested in, I would highly recommend checking this project out!</p>
 
 <p>I want to keep playing with C3, so hopefully this is not the last post on the matter.</p>
               
