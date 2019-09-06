@@ -507,7 +507,7 @@ channels:write
 
 <p>Now add the Fileshare C2 channel to our existing relay.  Double-click the Slack relay &gt; <code>Command Center &gt; AddNegotiationChannelUncShareFile</code>.  The file share I&rsquo;ve setup is at <code>\\dc1\demo</code>.  For this to work correctly, the fileshare relay will drop files into the share; and the slack relay will read those files and &ldquo;relay&rdquo; (d&rsquo;uh) the data to the Gateway.  However, the slack relay also needs to be able to delete the files been written by the fileshare relay.  On a share with default inheritance, this can&rsquo;t work since <code>User A</code>, doesn&rsquo;t have permission to remove files created by <code>User B</code>.</p>
 
-<p>This should be fixed in a future update, by making the fileshare relay explicity set the DACL on the files its creating so other users&rsquo; can remove them.  However, a potential workaround is to create a subfolder in the share (e.g. <code>\\dc1\demo\c3</code>), disabling inheritance and opening the DACL for everyone.</p>
+<p>This was <a href="https://github.com/mwrlabs/C3/commit/26be33078f7d447dee1065fe5643759ace37d011">fixed in an update</a>, by making the fileshare relay explicity set the DACL on the files its creating so other users&rsquo; can remove them.</p>
 
 <figure>
     <img src="https://rastamouse.me/images/c3-first-look/addnegotiationchanneluncshare.png"/> 
