@@ -6,10 +6,46 @@
     <description>Recent content in Tags on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 03 Sep 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 28 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>c2</title>
+      <link>https://rastamouse.me/tags/c2/</link>
+      <pubDate>Sat, 28 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/c2/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>covenant</title>
+      <link>https://rastamouse.me/tags/covenant/</link>
+      <pubDate>Sat, 28 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/covenant/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>post-ex</title>
+      <link>https://rastamouse.me/tags/post-ex/</link>
+      <pubDate>Sat, 28 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/post-ex/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tasks</title>
+      <link>https://rastamouse.me/tags/tasks/</link>
+      <pubDate>Sat, 28 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/tasks/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>c3</title>
@@ -57,11 +93,11 @@
     </item>
     
     <item>
-      <title>covenant</title>
-      <link>https://rastamouse.me/tags/covenant/</link>
+      <title>TikiSpawn</title>
+      <link>https://rastamouse.me/tags/tikispawn/</link>
       <pubDate>Tue, 20 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/tags/covenant/</guid>
+      <guid>https://rastamouse.me/tags/tikispawn/</guid>
       <description></description>
     </item>
     
@@ -71,15 +107,6 @@
       <pubDate>Tue, 20 Aug 2019 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/donut/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>tikispawn</title>
-      <link>https://rastamouse.me/tags/tikispawn/</link>
-      <pubDate>Tue, 20 Aug 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/tikispawn/</guid>
       <description></description>
     </item>
     
@@ -201,20 +228,20 @@
     </item>
     
     <item>
-      <title>Active Directory</title>
-      <link>https://rastamouse.me/tags/active-directory/</link>
-      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/active-directory/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>GPO</title>
       <link>https://rastamouse.me/tags/gpo/</link>
       <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/gpo/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>active directory</title>
+      <link>https://rastamouse.me/tags/active-directory/</link>
+      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/active-directory/</guid>
       <description></description>
     </item>
     

@@ -1,0 +1,1026 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.56.0">
+    <meta name="theme" content="Tranquilpeak 0.3.1-BETA">
+    <title>Covenant Tasks 101</title>
+    <meta name="author" content="Rasta Mouse">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://rastamouse.me/favicon.ico">
+    
+
+    
+    <meta name="description" content="Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation &ldquo;tasks&rdquo; on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really grown from contributions from the Covenant community.
+
+Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.
+
+This post will provide an introduction for those wishing to create and contribute new Tasks.">
+    <meta property="og:description" content="Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation &ldquo;tasks&rdquo; on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really grown from contributions from the Covenant community.
+
+Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.
+
+This post will provide an introduction for those wishing to create and contribute new Tasks.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Covenant Tasks 101">
+    <meta property="og:url" content="/2019/12/covenant-tasks-101/">
+    <meta property="og:site_name" content="Rasta Mouse">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rasta Mouse">
+    <meta name="twitter:description" content="Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation &ldquo;tasks&rdquo; on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really grown from contributions from the Covenant community.
+
+Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.
+
+This post will provide an introduction for those wishing to create and contribute new Tasks.">
+    
+      <meta name="twitter:creator" content="@_RastaMouse">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=640">
+    
+
+    
+      <meta property="og:image" content="https://rastamouse.me/images/cov-tasks-101/thumb.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" />
+    
+    
+    <link rel="stylesheet" href="https://rastamouse.me/css/style-u6mk0ojoywresbx8iepslrmmhl4stuhrsxuwhkpwrkrx7mryjcaimasnk4pi.min.css" />
+    
+    
+
+    
+      
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-60712346-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4"> 
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://rastamouse.me/">Rasta Mouse</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="https://rastamouse.me/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://rastamouse.me/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Rasta Mouse</h4>
+        
+          <h5 class="sidebar-profile-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/#about">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://twitter.com/_RastaMouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+      
+      <span class="sidebar-button-desc">Twitter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://keybase.io/rasta_mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-lock"></i>
+      
+      <span class="sidebar-button-desc">Keybase</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://zeropointsecurity.co.uk/rastalabs/" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-shield"></i>
+      
+      <span class="sidebar-button-desc">RastaLabs</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/rasta-mouse" target="_blank">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://rastamouse.me/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      Covenant Tasks 101
+    </h1>
+  
+  <div class="postShorten-meta post-meta">
+  
+    <time itemprop="datePublished" datetime="2019-12-28T00:00:00Z">
+      
+  
+  
+  
+  
+    28 December 2019
+  
+
+    </time>
+  
+  
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://rastamouse.me/categories/blog">blog</a>
+    
+  
+
+
+</div>
+
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p>Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation <strong>&ldquo;tasks&rdquo;</strong> on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really <a href="https://github.com/cobbr/Covenant/graphs/commit-activity">grown</a> from contributions from the Covenant community.</p>
+
+<p>Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.</p>
+
+<p>This post will provide an introduction for those wishing to create and contribute new Tasks.</p>
+
+<h3 id="hello-world">Hello World</h3>
+
+<p>To create a new Task, there are at least two changes needed within Covenant.  The first is the creation of a new <strong>*.task</strong> file within <code>Covenant\Covenant\Data\Tasks\CSharp\</code> (e.g. <code>HelloWorld.task</code>) - this contains the actual source code of the task that the Grunt will execute.  The second is within <code>Covenant\Covenant\Core\DbInitializer.cs</code> - this tells Covenant about the new Task so it will appear in the UI etc.</p>
+
+<blockquote>
+<p>Tip:  I like to create my Task file with a <strong>*.cs</strong> extension so that IntelliSense works properly.  Just remember to rename it later.</p>
+</blockquote>
+
+<p>There are a few rules for a Task:</p>
+
+<ul>
+<li>It must implement a class called <code>Task</code></li>
+<li>It must have a method called <code>Execute</code></li>
+<li>It must return a <code>string</code></li>
+</ul>
+
+<blockquote>
+<p>It&rsquo;s the responsibility of the Task author (you) to ensure input and return values are appropriately &ldquo;translated&rdquo;.</p>
+</blockquote>
+
+<p>The reason for this is apparent if we look at the source code of the Grunt.</p>
+
+<figure>
+    <img src="https://rastamouse.me/images/cov-tasks-101/gruntsource.png"/> 
+</figure>
+
+
+<p>A bare minimum example could be:</p>
+
+<pre><code class="language-c#">public static class Task
+{
+    public static string Execute()
+    {
+        return &quot;Hello World&quot;;
+    }
+}
+</code></pre>
+
+<p><code>DbInitializer.cs</code> is monstrously large, but we&rsquo;re looking for the section that starts with <code>public async static Task InitializeTasks(CovenantContext context)</code>.  Scroll down and you should see <code>var GruntTasks = new List&lt;GruntTask&gt;</code>, which is where the Task definitions start.  At the time of writing, the first <code>GruntTask</code> is the <code>Shell</code> command.  It&rsquo;s generally easier to blast to the very bottom of the GruntTasks list so we can add our new task at the bottom.</p>
+
+<p>So to wire-in our Task, we can add the following:</p>
+
+<pre><code class="language-c#">new GruntTask
+{
+    Name = &quot;HelloWorld&quot;,
+    AlternateNames = new List&lt;string&gt;{ &quot;hello&quot; },
+    Description = &quot;An example Hello World Task.&quot;,
+    Code = File.ReadAllText(Path.Combine(Common.CovenantTaskCSharpDirectory, &quot;HelloWorld&quot; + &quot;.task&quot;)),
+}
+</code></pre>
+
+<ul>
+<li><code>Name</code> is the name of the Task as it appears in the Covenant UI.</li>
+<li><code>AlternateNames</code> can be thought of as aliases or shortcuts for the full name.  E.g. the <code>ListDirectory</code> Task has an AlternateName of <code>ls</code>.</li>
+<li><code>Description</code> gives the Task a description in the UI.</li>
+<li><code>Code</code> points Covenant do the source *.task file.</li>
+</ul>
+
+<p>Finally, we need to add some <code>ReferenceAssemblies</code> for the Task - these will differ depending on the functionality of the Task.  Some Tasks use SharpSploit, others use Powerkatz (Mimikatz) and so on (we&rsquo;ll create an example of this below).  For a Task this simple, we only need basic core functionality.</p>
+
+<p>Find the section just below the GruntTask list that looks like:</p>
+
+<pre><code class="language-c#">var getcurrentdir = await context.GetGruntTaskByName(&quot;GetCurrentDirectory&quot;);
+
+await context.AddRangeAsync(
+    new GruntTaskReferenceAssembly { GruntTask = upload, ReferenceAssembly = await context.GetReferenceAssemblyByName(&quot;mscorlib.dll&quot;, Common.DotNetVersion.Net35) },
+</code></pre>
+
+<p>First define the new GruntTask:</p>
+
+<pre><code class="language-c#">var helloworld = await context.GetGruntTaskByName(&quot;HelloWorld&quot;);
+</code></pre>
+
+<p>Then add the new reference assemblies:</p>
+
+<pre><code class="language-c#">new GruntTaskReferenceAssembly { GruntTask = helloworld, ReferenceAssembly = await context.GetReferenceAssemblyByName(&quot;mscorlib.dll&quot;, Common.DotNetVersion.Net35) },
+new GruntTaskReferenceAssembly { GruntTask = helloworld, ReferenceAssembly = await context.GetReferenceAssemblyByName(&quot;mscorlib.dll&quot;, Common.DotNetVersion.Net40) },
+new GruntTaskReferenceAssembly { GruntTask = helloworld, ReferenceAssembly = await context.GetReferenceAssemblyByName(&quot;System.dll&quot;, Common.DotNetVersion.Net35) },
+new GruntTaskReferenceAssembly { GruntTask = helloworld, ReferenceAssembly = await context.GetReferenceAssemblyByName(&quot;System.dll&quot;, Common.DotNetVersion.Net40) },
+new GruntTaskReferenceAssembly { GruntTask = helloworld, ReferenceAssembly = await context.GetReferenceAssemblyByName(&quot;System.Core.dll&quot;, Common.DotNetVersion.Net35) },
+new GruntTaskReferenceAssembly { GruntTask = helloworld, ReferenceAssembly = await context.GetReferenceAssemblyByName(&quot;System.Core.dll&quot;, Common.DotNetVersion.Net40) },
+</code></pre>
+
+<p>Note how we need each reference for .NET 3.5 and 4.0.</p>
+
+<p>Now if we start Covenant, our Task should appear in the Tasks menu and be available to the Grunts.</p>
+
+<blockquote>
+<p>Tip:  When you make changes to <code>DbInitializer</code>, you should remove <code>Covenant\Covenant\Data\covenant.db</code> before starting Covenant again.</p>
+</blockquote>
+
+<p><figure>
+    <img src="https://rastamouse.me/images/cov-tasks-101/helloworld-task.png"/> 
+</figure>
+
+<figure>
+    <img src="https://rastamouse.me/images/cov-tasks-101/helloworld-grunt.png"/> 
+</figure>
+</p>
+
+<h3 id="parameters">Parameters</h3>
+
+<p>Some Tasks require additional input from the user to act as a parameter.  Some may be mandatory and others optional - here we&rsquo;ve modified our task to accept some string inputs, and conditional output depending on if that optional parameter is used.</p>
+
+<pre><code class="language-c#">public static class Task
+{
+    public static string Execute(string mandatoryInput, string optionalInput = &quot;&quot;)
+    {
+        string output = &quot;You said: &quot; + mandatoryInput;
+
+        if (!string.IsNullOrEmpty(optionalInput) || optionalInput != &quot;&quot;)
+        {
+            output += &quot; and &quot; + optionalInput;
+        }
+
+        return output;
+    }
+}
+</code></pre>
+
+<p>Generally, all inputs will be strings since that&rsquo;s all the user can type.  For example, if you need to provide an <code>int</code>:</p>
+
+<pre><code class="language-c#">public static string Execute(string ProcessID)
+{
+    var pid = int.Parse(ProcessID);
+    var handle = Process.GetProcessById(pid);
+}
+</code></pre>
+
+<p>And if your code produces something other than a string&hellip;</p>
+
+<pre><code class="language-c#">public static string Execute(string ProcessID)
+{
+    var pid = int.Parse(ProcessID);
+    var handle = Process.GetProcessById(pid);
+    var sessionId = handle.SessionId;
+
+    return sessionId.ToString();
+}
+</code></pre>
+
+<p>To make Covenant aware that this Task can accept inputs, we need to add a new <code>GruntTaskOption</code> list to the <code>GruntTask</code> definition.:</p>
+
+<pre><code class="language-c#">new GruntTask
+{
+    Name = &quot;HelloWorld&quot;,
+    AlternateNames = new List&lt;string&gt;{ &quot;hello&quot; },
+    Description = &quot;An example Hello World Task.&quot;,
+    Code = File.ReadAllText(Path.Combine(Common.CovenantTaskCSharpDirectory, &quot;HelloWorld&quot; + &quot;.task&quot;)),
+    Options = new List&lt;GruntTaskOption&gt;
+    {
+        new GruntTaskOption
+        {
+            Id = 123,
+            Name = &quot;InputOne&quot;,
+            Description = &quot;First Input&quot;,
+            SuggestedValues = new List&lt;string&gt;{ &quot;Hello World&quot; },
+            Optional = false,
+            DefaultValue = &quot;&quot;,
+            DisplayInCommand = true
+        },
+        new GruntTaskOption
+        {
+            Id = 124,
+            Name = &quot;InputTwo&quot;,
+            Description = &quot;Second Input&quot;,
+            SuggestedValues = new List&lt;string&gt;(),
+            Optional = true,
+            DefaultValue = &quot;&quot;,
+            DisplayInCommand = false
+        }
+    }
+}
+</code></pre>
+
+<ul>
+<li><code>Id</code> each Task option needs its own unique number.</li>
+<li><code>Name</code> is the name of the Task Option as it appears in the UI.</li>
+<li><code>Description</code> gives the Task Option a description in the UI.</li>
+<li><code>SuggestedValues</code> provides possible inputs for the option.  E.g. the Rubeus Task has suggested values of <code>triage</code>, <code>dump</code>, <code>kerberoast</code> and so on.</li>
+<li><code>Optional</code> obviously defines whether it can be left blank or not.</li>
+<li><code>DefaultValue</code> initialises the input with this value. It&rsquo;s particularly useful for optional parameters, to ensure it has content (albeit empty).</li>
+<li><code>DisplayInCommand</code> tells Covenant whether or not to display the input on the Interact UI.</li>
+</ul>
+
+<p>Executing this task via the Task UI, specifying both inputs produce the expected results.</p>
+
+<p><figure>
+    <img src="https://rastamouse.me/images/cov-tasks-101/helloworld-tasking.png"/> 
+</figure>
+
+<figure>
+    <img src="https://rastamouse.me/images/cov-tasks-101/helloworld-interact.png"/> 
+</figure>
+</p>
+
+<p>Notice how <code>InputTwo</code> does not appear in the Interact UI, because we set <code>DisplayInCommand</code> to <code>false</code>.  This is good for tasks that take long strings such as PowerShell Launchers, so as to not clutter the interface.</p>
+
+<h3 id="reference-libraries">Reference Libraries</h3>
+
+<p>As mentioned above, some Tasks may need to leverage the functionality from an external project.  Covenant already has a few built-in including <a href="https://github.com/cobbr/SharpSploit">SharpSploit</a>, <a href="https://github.com/GhostPack/Rubeus">Rubeus</a>, <a href="https://github.com/GhostPack/Seatbelt">Seatbelt</a> and <a href="https://github.com/GhostPack/SharpUp">SharpUp</a>.  Referencing these assemblies is relatively simple.</p>
+
+<p>First, add the appropriate using statement in your task.  As an example, let&rsquo;s execute the <code>WhoAmI</code> method in SharpSploit.</p>
+
+<pre><code class="language-c#">using SharpSploit.Credentials;
+
+public static class Task
+{
+    public static string Execute()
+    {
+        string result = string.Empty;
+
+        using (var token = new Tokens())
+        {
+            result = token.WhoAmI();
+        }
+
+        return result;
+    }
+}
+</code></pre>
+
+<p>Then in <code>DbInitializer</code>, add a new <code>GruntTaskReferenceSourceLibrary</code>:</p>
+
+<pre><code class="language-c#">new GruntTaskReferenceSourceLibrary { ReferenceSourceLibrary = ss, GruntTask = await context.GetGruntTaskByName(&quot;HelloWorld&quot;) }
+</code></pre>
+
+<figure>
+    <img src="https://rastamouse.me/images/cov-tasks-101/whoami.png"/> 
+</figure>
+
+
+<p>Adding an additional reference library to the Covenant back-end is more involved and probably doesn&rsquo;t qualify as a &ldquo;101&rdquo;, so I&rsquo;ll stop this post here. For all things Covenant, join the #Covenant channel in the <a href="https://bloodhoundgang.herokuapp.com/">BloodHound Slack</a>.</p>
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/covenant/">covenant</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/c2/">c2</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/post-ex/">post-ex</a>
+
+  <a class="tag tag--primary tag--small" href="https://rastamouse.me/tags/tasks/">tasks</a>
+
+                  </div>
+                
+              
+            
+            <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/09/mwr-labs-c3-first-look/" data-tooltip="MWR Labs: C3 - First Look">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f12%2fcovenant-tasks-101%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f12%2fcovenant-tasks-101%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f12%2fcovenant-tasks-101%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2019 Rasta Mouse. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        <div class="post-actions-wrap">
+  <nav>
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+            <i class="fa fa-angle-left"></i>
+            <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+          </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://rastamouse.me/2019/09/mwr-labs-c3-first-look/" data-tooltip="MWR Labs: C3 - First Look">
+          
+            <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+  <ul class="post-actions post-action-share">
+    
+      <li class="post-action hide-lg hide-md hide-sm">
+        <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+          <i class="fa fa-share-alt"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f12%2fcovenant-tasks-101%2f">
+          <i class="fa fa-google-plus"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f12%2fcovenant-tasks-101%2f">
+          <i class="fa fa-facebook-official"></i>
+        </a>
+      </li>
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f12%2fcovenant-tasks-101%2f">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+    
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
+    <li class="post-action">
+      
+        <a class="post-action-btn btn btn--default" href="#">
+      
+        <i class="fa fa-list"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <ul class="share-options">
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https%3a%2f%2frastamouse.me%2f2019%2f12%2fcovenant-tasks-101%2f">
+        <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2frastamouse.me%2f2019%2f12%2fcovenant-tasks-101%2f">
+        <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+      </a>
+    </li>
+    <li class="share-option">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3a%2f%2frastamouse.me%2f2019%2f12%2fcovenant-tasks-101%2f">
+        <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/2b44f5ca5458931c49e1fa57da6705c1?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Rasta Mouse</h4>
+    
+      <div id="about-card-bio">Taylor Swift fan, wannabe Red Teamer &amp; 1337 hax0r (in that order).</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Penetration Tester
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        UK
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/12/covenant-tasks-101/">
+                <h3 class="media-heading">Covenant Tasks 101</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Dec 12, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation <strong>&ldquo;tasks&rdquo;</strong> on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really <a href="https://github.com/cobbr/Covenant/graphs/commit-activity">grown</a> from contributions from the Covenant community.</p>
+
+<p>Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.</p>
+
+<p>This post will provide an introduction for those wishing to create and contribute new Tasks.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/post/">
+                <h3 class="media-heading">Posts</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Dec 12, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/09/mwr-labs-c3-first-look/">
+                <h3 class="media-heading">MWR Labs: C3 - First Look</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Sep 9, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In this blog post I&rsquo;m going to cover my first impressions of MWR Labs C3 project, through installation and setup to usage in a basic scenario.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/08/tikiservice/">
+                <h3 class="media-heading">TikiService</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p><a href="https://github.com/rasta-mouse/TikiTorch/tree/master/TikiService">TikiService</a> is a new .NET Service Binary that allows you to run a TikiTorch payload via the Service Control Manager (à la PsExec).  <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna">TikiTorch.cna</a> has also been updated to create a new Cobalt Strike function: <code>tikiexec</code>, that automates its use.  This blog post provides a brief overview and usage examples.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/08/covenant-donut-tikitorch/">
+                <h3 class="media-heading">Covenant, Donut, TikiTorch</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Covenant <a href="https://github.com/cobbr/Covenant/commit/bde0df315f26b01a4ef5c5c00679b1e150998a35">v0.1</a> was first released in February 2019 and has since received a lot of really good updates.  <a href="https://github.com/cobbr/Covenant/commit/a2df643e01aea3ad7330bdba88ddd560692e46b4">v0.2</a> was released in May which added p2p comms over SMB named pipes, and <a href="https://github.com/cobbr/Covenant/commit/abcba78006c29b687f6e1a43a1ea1793784714fd">v0.3</a> was released in August which added a brand new web interface.  Even though it&rsquo;s such a young project, it has really proven itself to be a capable tool for offensive operators.  I&rsquo;ve not taken a look at Covenant since v0.1.x but since providing some new <a href="https://github.com/cobbr/SharpSploit/blob/master/SharpSploit/Persistence/WMI.cs">additions</a> to SharpSploit, it kinda got my geek going.  One of my areas of interest is weaponising the Grunt stager.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/06/the-return-of-aggressor/">
+                <h3 class="media-heading">The Return of Aggressor</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>FortyNorth Security recently <a href="https://www.fortynorthsecurity.com/aggressive-msbuild-bypass-detection/">posted an article</a> detailing the process for leveraging MSBuild to execute unmanaged PowerShell, and automating it in Aggressor script for Cobalt Strike users.  Being a native binary in the Windows OS, the use of MSBuild is a <a href="https://lolbas-project.github.io/lolbas/Binaries/Msbuild/">common AWL bypass technique</a>, which is handy in relatively well locked down environments.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/06/tikivader/">
+                <h3 class="media-heading">TikiVader</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>I&rsquo;ve added a new experimental project to <a href="https://github.com/rasta-mouse/TikiTorch">TikiTorch</a>, called <a href="https://github.com/rasta-mouse/TikiTorch/tree/master/TikiVader">TikiVader</a>.  I originally thought of &ldquo;vader&rdquo; as a play-on for &ldquo;evade&rdquo;/&ldquo;evader&rdquo;, until I realised TikiVader was never meant to evade anything&hellip; but nevermind 😒</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/06/tikispawn-msbuild/">
+                <h3 class="media-heading">TikiSpawn &amp; MSBuild</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jun 6, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>The main impetus behind this post was me experimenting with ways to leverage TikiSpawn with some of the popular <a href="https://lolbas-project.github.io">lolbins</a>.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/04/weaponizing-privileged-file-writes-with-windows-collector-service/">
+                <h3 class="media-heading">Weaponizing Privileged File Writes with Windows Collector Service</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Apr 4, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>In my <a href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/">previous post</a>, I described how one could leverage CVE-2019-0841 to backdoor the LAPS <code>AdmPwd.dll</code> for EoP to <code>NT AUTHORITY\SYSTEM</code>.  The obvious question is that if a machine is not using LAPS, what can you do&hellip;?  Well <a href="https://twitter.com/buffaloverflow">Rich Warren</a> provided <a href="https://twitter.com/buffaloverflow/status/1117507864824881153">one solution</a>, by using the Windows Diagnostics Hub Standard Collector Service.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/">
+                <h3 class="media-heading">Weaponizing CVE-2019-0841 with LAPS</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Apr 4, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>On April 9, <a href="https://twitter.com/rogue_kdc">Nabeel Ahmed</a> <a href="https://twitter.com/rogue_kdc/status/1115664188821639173">annouced</a> details of <a href="https://nvd.nist.gov/vuln/detail/CVE-2019-0841">CVE-2019-0841</a> - the tl;dr being that it allows low privileged users to take Full Control of files owned by <code>NT AUTHORITY\SYSTEM</code>, which can lead to EoP.  Nabeel published a comprehensive <a href="https://krbtgt.pw/dacl-permissions-overwrite-privilege-escalation-cve-2019-0841/">blog</a> describing the vulnerability, <a href="https://github.com/rogue-kdc">PoC code</a> and a <a href="https://youtu.be/vP468ZjJ3hU">video demonstration</a>.</p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         35 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('https://rastamouse.me/images/cover.jpg');"></div>
+  
+
+
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.js"></script>
+
+
+<script src="https://rastamouse.me/js/script-wl33z0n6ocaypepiqrazthtivfrliqijej4rq8ek8gvrv1awftmgjuv8k4zc.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight').each(function(i, block) {
+    var code = "";
+    hljs.highlightAuto(block.innerText).value.split(/\r\n|\r|\n/).forEach(function(line) {
+      code += "<span class=\"line\">" + line + "</span><br>";
+    });
+    if (code.length > 0) {
+      block.innerHTML = code;  
+    }
+  });
+  $('pre > code').each(function(i, block) {
+    $(this).addClass('codeblock');
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/rastamouse.me\/2019\/12\/covenant-tasks-101\/';
+          
+            this.page.identifier = '\/2019\/12\/covenant-tasks-101\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'rastamouse';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+
+
+    
+  </body>
+</html>
+

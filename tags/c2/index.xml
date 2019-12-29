@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>c2 on Rasta Mouse</title>
+    <link>https://rastamouse.me/tags/c2/</link>
+    <description>Recent content in c2 on Rasta Mouse</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 28 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://rastamouse.me/tags/c2/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Covenant Tasks 101</title>
+      <link>https://rastamouse.me/2019/12/covenant-tasks-101/</link>
+      <pubDate>Sat, 28 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2019/12/covenant-tasks-101/</guid>
+      <description>&lt;p&gt;Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation &lt;strong&gt;&amp;ldquo;tasks&amp;rdquo;&lt;/strong&gt; on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really &lt;a href=&#34;https://github.com/cobbr/Covenant/graphs/commit-activity&#34;&gt;grown&lt;/a&gt; from contributions from the Covenant community.&lt;/p&gt;
+
+&lt;p&gt;Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.&lt;/p&gt;
+
+&lt;p&gt;This post will provide an introduction for those wishing to create and contribute new Tasks.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
