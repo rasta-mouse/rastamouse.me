@@ -4,37 +4,48 @@
   
   <url>
     <loc>https://rastamouse.me/categories/</loc>
-    <lastmod>2019-12-28T00:00:00+00:00</lastmod>
+    <lastmod>2020-02-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/2020/02/gadgettojscript/</loc>
+    <lastmod>2020-02-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/post/</loc>
+    <lastmod>2020-02-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/</loc>
+    <lastmod>2020-02-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/</loc>
+    <lastmod>2020-02-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/categories/blog/</loc>
+    <lastmod>2020-02-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/gadgettojscript/</loc>
+    <lastmod>2020-02-19T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/2019/12/covenant-tasks-101/</loc>
     <lastmod>2019-12-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2019-12-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/</loc>
-    <lastmod>2019-12-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/tags/</loc>
-    <lastmod>2019-12-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/categories/blog/</loc>
-    <lastmod>2019-12-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
@@ -107,26 +118,26 @@
   </url>
   
   <url>
-    <loc>https://rastamouse.me/tags/tikispawn/</loc>
-    <lastmod>2019-08-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://rastamouse.me/tags/donut/</loc>
     <lastmod>2019-08-20T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/06/the-return-of-aggressor/</loc>
-    <lastmod>2019-06-26T00:00:00+00:00</lastmod>
+    <loc>https://rastamouse.me/tags/tikispawn/</loc>
+    <lastmod>2019-08-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/msbuild/</loc>
     <lastmod>2019-06-26T00:00:00+00:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/2019/06/the-return-of-aggressor/</loc>
+    <lastmod>2019-06-26T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -164,6 +175,12 @@
   </url>
   
   <url>
+    <loc>https://rastamouse.me/tags/cve-2019-0841/</loc>
+    <lastmod>2019-04-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/tags/elevation-of-privilege/</loc>
     <lastmod>2019-04-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -178,12 +195,6 @@
   <url>
     <loc>https://rastamouse.me/2019/04/weaponizing-privileged-file-writes-with-windows-collector-service/</loc>
     <lastmod>2019-04-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/tags/cve-2019-0841/</loc>
-    <lastmod>2019-04-27T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>

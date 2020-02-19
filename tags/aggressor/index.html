@@ -373,7 +373,7 @@ if (!doNotTrack) {
         
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Rasta Mouse. All Rights Reserved
+    &copy; 2020 Rasta Mouse. All Rights Reserved
   </span>
 </footer>
 
@@ -431,19 +431,26 @@ if (!doNotTrack) {
           <div class="media">
             
             <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2019/12/covenant-tasks-101/">
-                <h3 class="media-heading">Covenant Tasks 101</h3>
+              <a class="link-unstyled" href="https://rastamouse.me/2020/02/gadgettojscript/">
+                <h3 class="media-heading">GadgetToJScript</h3>
               </a>
               <span class="media-meta">
                 <span class="media-date text-small">
-                  Dec 12, 2019
+                  Feb 2, 2020
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation <strong>&ldquo;tasks&rdquo;</strong> on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really <a href="https://github.com/cobbr/Covenant/graphs/commit-activity">grown</a> from contributions from the Covenant community.</p>
+              <div class="media-content hide-xs font-merryweather"><p>Back in April 2017, <a href="https://twitter.com/tiraniddo">James Forshaw</a> (hail) released a tool called <a href="https://github.com/tyranid/DotNetToJScript">DotNetToJScript</a> which was capable of generating JScript, VBA and VBScript that could run an arbitrary .NET assembly (mostly) from memory.  Although not its intended purpose, it was quickly picked up by tool developers, pentesters, red teamers, bad guys etc and used to deliver .NET-based payloads via methods such as <a href="https://en.wikipedia.org/wiki/HTML_Application">HTA</a>.</p>
 
-<p>Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.</p>
+<p>Microsoft and other AV vendors started writing signatures for DN2JS, and we all know how that makes James feel (Exhibits <a href="https://twitter.com/tiraniddo/status/1204970332127236097">A</a> and <a href="https://twitter.com/tiraniddo/status/951489836027990019">B</a>).  Microsoft even went as far as to make some under-the-hood changes from Windows 10 / 2K16 to mitigate the use of DN2JS payloads, as evidenced by these notes in Covenant:</p>
 
-<p>This post will provide an introduction for those wishing to create and contribute new Tasks.</p></div>
+<figure>
+    <img src="https://rastamouse.me/images/gadgettojscript/covenant.png"/> 
+</figure>
+
+
+<p>These factors seem to have resulted in a decline in prevalence for these payloads, or at least, they&rsquo;re not hyped about so much.</p>
+
+<p>Enter <a href="https://github.com/med0x2e/GadgetToJScript">GadgetToJScript</a> by <a href="https://twitter.com/med0x2e">Mohamed El Azaar</a>.  This tool generates .NET serialized gadgets that can trigger assembly load/execution when deserialized via BinaryFormatter from JScript, VBScript or VBA.  So it once again, allows for a similar tradecraft as was originally provided by DN2JS <strong>and</strong> it works on Windows 10.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -457,10 +464,31 @@ if (!doNotTrack) {
               </a>
               <span class="media-meta">
                 <span class="media-date text-small">
-                  Dec 12, 2019
+                  Feb 2, 2020
                 </span>
               </span>
               <div class="media-content hide-xs font-merryweather"></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="https://rastamouse.me/2019/12/covenant-tasks-101/">
+                <h3 class="media-heading">Covenant Tasks 101</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Dec 12, 2019
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation <strong>&ldquo;tasks&rdquo;</strong> on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really <a href="https://github.com/cobbr/Covenant/graphs/commit-activity">grown</a> from contributions from the Covenant community.</p>
+
+<p>Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.</p>
+
+<p>This post will provide an introduction for those wishing to create and contribute new Tasks.</p></div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -585,23 +613,6 @@ if (!doNotTrack) {
             <hr>
           </div>
         
-          <div class="media">
-            
-            <div class="media-body">
-              <a class="link-unstyled" href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/">
-                <h3 class="media-heading">Weaponizing CVE-2019-0841 with LAPS</h3>
-              </a>
-              <span class="media-meta">
-                <span class="media-date text-small">
-                  Apr 4, 2019
-                </span>
-              </span>
-              <div class="media-content hide-xs font-merryweather"><p>On April 9, <a href="https://twitter.com/rogue_kdc">Nabeel Ahmed</a> <a href="https://twitter.com/rogue_kdc/status/1115664188821639173">annouced</a> details of <a href="https://nvd.nist.gov/vuln/detail/CVE-2019-0841">CVE-2019-0841</a> - the tl;dr being that it allows low privileged users to take Full Control of files owned by <code>NT AUTHORITY\SYSTEM</code>, which can lead to EoP.  Nabeel published a comprehensive <a href="https://krbtgt.pw/dacl-permissions-overwrite-privilege-escalation-cve-2019-0841/">blog</a> describing the vulnerability, <a href="https://github.com/rogue-kdc">PoC code</a> and a <a href="https://youtu.be/vP468ZjJ3hU">video demonstration</a>.</p></div>
-            </div>
-            <div style="clear:both;"></div>
-            <hr>
-          </div>
-        
       </div>
     </div>
     <div class="modal-footer">
@@ -609,7 +620,7 @@ if (!doNotTrack) {
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         35 posts found
+         36 posts found
       </p>
     </div>
   </div>

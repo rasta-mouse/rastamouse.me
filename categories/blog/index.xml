@@ -6,10 +6,30 @@
     <description>Recent content in blog on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 28 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 19 Feb 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>GadgetToJScript</title>
+      <link>https://rastamouse.me/2020/02/gadgettojscript/</link>
+      <pubDate>Wed, 19 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2020/02/gadgettojscript/</guid>
+      <description>&lt;p&gt;Back in April 2017, &lt;a href=&#34;https://twitter.com/tiraniddo&#34;&gt;James Forshaw&lt;/a&gt; (hail) released a tool called &lt;a href=&#34;https://github.com/tyranid/DotNetToJScript&#34;&gt;DotNetToJScript&lt;/a&gt; which was capable of generating JScript, VBA and VBScript that could run an arbitrary .NET assembly (mostly) from memory.  Although not its intended purpose, it was quickly picked up by tool developers, pentesters, red teamers, bad guys etc and used to deliver .NET-based payloads via methods such as &lt;a href=&#34;https://en.wikipedia.org/wiki/HTML_Application&#34;&gt;HTA&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Microsoft and other AV vendors started writing signatures for DN2JS, and we all know how that makes James feel (Exhibits &lt;a href=&#34;https://twitter.com/tiraniddo/status/1204970332127236097&#34;&gt;A&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/tiraniddo/status/951489836027990019&#34;&gt;B&lt;/a&gt;).  Microsoft even went as far as to make some under-the-hood changes from Windows 10 / 2K16 to mitigate the use of DN2JS payloads, as evidenced by these notes in Covenant:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;https://rastamouse.me/images/gadgettojscript/covenant.png&#34;/&gt; 
+&lt;/figure&gt;
+
+
+&lt;p&gt;These factors seem to have resulted in a decline in prevalence for these payloads, or at least, they&amp;rsquo;re not hyped about so much.&lt;/p&gt;
+
+&lt;p&gt;Enter &lt;a href=&#34;https://github.com/med0x2e/GadgetToJScript&#34;&gt;GadgetToJScript&lt;/a&gt; by &lt;a href=&#34;https://twitter.com/med0x2e&#34;&gt;Mohamed El Azaar&lt;/a&gt;.  This tool generates .NET serialized gadgets that can trigger assembly load/execution when deserialized via BinaryFormatter from JScript, VBScript or VBA.  So it once again, allows for a similar tradecraft as was originally provided by DN2JS &lt;strong&gt;and&lt;/strong&gt; it works on Windows 10.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Covenant Tasks 101</title>
