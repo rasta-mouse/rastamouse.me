@@ -6,10 +6,23 @@
     <description>Recent content in blog on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 19 Feb 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>SharpC2</title>
+      <link>https://rastamouse.me/2020/05/sharpc2/</link>
+      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/2020/05/sharpc2/</guid>
+      <description>&lt;p&gt;Back in October 2018 (yes, 2018!), I &lt;del&gt;approached&lt;/del&gt; begged &lt;a href=&#34;https://twitter.com/_xpn_&#34;&gt;xpn&lt;/a&gt; for a collaboration on an idea I had for a .NET C2 Framework.  We worked on the project for about a month or so before real life got in the way and stalled development.  In February 2019, &lt;a href=&#34;https://twitter.com/cobbr_io&#34;&gt;cobbr&lt;/a&gt; released &lt;a href=&#34;https://github.com/cobbr/Covenant&#34;&gt;Covenant&lt;/a&gt; which is also a .NET C2 Framework.  I subsequently spent some time &lt;a href=&#34;https://github.com/cobbr/Covenant/commits?author=rasta-mouse&#34;&gt;contributing&lt;/a&gt; to, and &lt;a href=&#34;https://rastamouse.me/tags/covenant/&#34;&gt;writing about&lt;/a&gt; Covenant - but I&amp;rsquo;ve always wanted to get back to our original project.&lt;/p&gt;
+
+&lt;p&gt;I decided to re-visit SharpC2 (a very creative name on my part) over the 2019 Christmas period to try and get it into a position where we could release a proof of concept.  Yet somehow I&amp;rsquo;m not writing this until May 2020!  We can blame my &lt;a href=&#34;https://www.zeropointsecurity.co.uk/annoucements/2020/4/13/red-team-ops-is-back&#34;&gt;RTO course&lt;/a&gt; for that.&lt;/p&gt;
+
+&lt;p&gt;This post is intended to provide an overview of SharpC2&amp;rsquo;s design concepts and some showcase examples of how it can be used.  Code can be found on &lt;a href=&#34;https://github.com/SharpC2/SharpC2/tree/dev&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>GadgetToJScript</title>
@@ -183,15 +196,6 @@
 &lt;p&gt;In this post, we&amp;rsquo;ll explore a delivery method to help stage a Cobalt Strike / Empire / &amp;lt;insert framework here&amp;gt; agent.  As with Part 1, this is not about some 1337 code drop - it&amp;rsquo;s a demonstration of how I walked through engineering the final result.&lt;/p&gt;
 
 &lt;p&gt;So, let&amp;rsquo;s get cracking.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>AmsiScanBuffer Bypass - Part 1</title>
-      <link>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/</link>
-      <pubDate>Mon, 29 Oct 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/_zc00l&#34;&gt;Andre Marques&lt;/a&gt; recently &lt;a href=&#34;https://twitter.com/_zc00l/status/1056523259246718976&#34;&gt;posted&lt;/a&gt; a pretty nice &lt;a href=&#34;https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html&#34;&gt;write-up&lt;/a&gt; for circumventing AMSI, based on previous work by &lt;a href=&#34;https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/&#34;&gt;CyberArk&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
