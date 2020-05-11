@@ -42,14 +42,5 @@
 &lt;p&gt;So, let&amp;rsquo;s get cracking.&lt;/p&gt;</description>
     </item>
     
-    <item>
-      <title>AmsiScanBuffer Bypass - Part 1</title>
-      <link>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/</link>
-      <pubDate>Mon, 29 Oct 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-1/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/_zc00l&#34;&gt;Andre Marques&lt;/a&gt; recently &lt;a href=&#34;https://twitter.com/_zc00l/status/1056523259246718976&#34;&gt;posted&lt;/a&gt; a pretty nice &lt;a href=&#34;https://0x00-0x00.github.io/research/2018/10/28/How-to-bypass-AMSI-and-Execute-ANY-malicious-powershell-code.html&#34;&gt;write-up&lt;/a&gt; for circumventing AMSI, based on previous work by &lt;a href=&#34;https://www.cyberark.com/threat-research-blog/amsi-bypass-redux/&#34;&gt;CyberArk&lt;/a&gt;.&lt;/p&gt;</description>
-    </item>
-    
   </channel>
 </rss>

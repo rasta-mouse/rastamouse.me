@@ -6,10 +6,46 @@
     <description>Recent content in Tags on Rasta Mouse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 19 Feb 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>c#</title>
+      <link>https://rastamouse.me/tags/c#/</link>
+      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/c#/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>c2</title>
+      <link>https://rastamouse.me/tags/c2/</link>
+      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/c2/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>framework</title>
+      <link>https://rastamouse.me/tags/framework/</link>
+      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/framework/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>red team</title>
+      <link>https://rastamouse.me/tags/red-team/</link>
+      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/red-team/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>gadgettojscript</title>
@@ -17,15 +53,6 @@
       <pubDate>Wed, 19 Feb 2020 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/gadgettojscript/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>c2</title>
-      <link>https://rastamouse.me/tags/c2/</link>
-      <pubDate>Sat, 28 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/c2/</guid>
       <description></description>
     </item>
     
@@ -120,7 +147,7 @@
     </item>
     
     <item>
-      <title>MSBuild</title>
+      <title>msbuild</title>
       <link>https://rastamouse.me/tags/msbuild/</link>
       <pubDate>Wed, 26 Jun 2019 00:00:00 +0000</pubDate>
       
@@ -165,15 +192,6 @@
     </item>
     
     <item>
-      <title>CVE-2019-0841</title>
-      <link>https://rastamouse.me/tags/cve-2019-0841/</link>
-      <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/cve-2019-0841/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Elevation of Privilege</title>
       <link>https://rastamouse.me/tags/elevation-of-privilege/</link>
       <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
@@ -188,6 +206,15 @@
       <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/standard-collector/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cve-2019-0841</title>
+      <link>https://rastamouse.me/tags/cve-2019-0841/</link>
+      <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/cve-2019-0841/</guid>
       <description></description>
     </item>
     
@@ -237,20 +264,20 @@
     </item>
     
     <item>
+      <title>Active Directory</title>
+      <link>https://rastamouse.me/tags/active-directory/</link>
+      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/active-directory/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>GPO</title>
       <link>https://rastamouse.me/tags/gpo/</link>
       <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/gpo/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>active directory</title>
-      <link>https://rastamouse.me/tags/active-directory/</link>
-      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/active-directory/</guid>
       <description></description>
     </item>
     
@@ -278,15 +305,6 @@
       <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/.net/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>c#</title>
-      <link>https://rastamouse.me/tags/c#/</link>
-      <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/c#/</guid>
       <description></description>
     </item>
     
@@ -386,15 +404,6 @@
       <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/infrastructure/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>red team</title>
-      <link>https://rastamouse.me/tags/red-team/</link>
-      <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/red-team/</guid>
       <description></description>
     </item>
     
