@@ -569,9 +569,44 @@ True
 Hello from .NET assembly
 </code></pre>
 
+<p>There is also an experimental module for reverse port forwarding.</p>
+
+<pre><code class="language-text">[+] 11/05/2020 08:26:49 : AgentModuleRegistered
+
+rportfwd
+
+[+] 11/05/2020 08:28:14 : AgentHelpRequest
+
+Module    Command     Description                                       HelpText
+------    -------     -----------                                       --------
+rportfwd  list        Returns a list of current reverse port forwards.  list
+rportfwd  start       Starts a new reverse port forward.                start [bind port] [forward host] [forward port]
+rportfwd  stop        Stops an existing reverse port forward.           stop [bind port]
+rportfwd  flush       Flush all reverse port forwards on an Agent.      flush
+
+[+] 11/05/2020 08:29:20 : AgentCommandRequest
+
+rportfwd start 8888 172.217.20.131 80
+
+[+] 11/05/2020 08:29:20 : AgentCommandResponse
+
+Bind Address  Bind Port  Forward Address  Forward Port
+------------  ---------  ---------------  ------------
+0.0.0.0       8888       172.217.20.131   80
+</code></pre>
+
+<pre><code class="language-text">daniel@DESKTOP-S2KEMCS:~$ curl http://127.0.0.1:8888/
+&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html;charset=utf-8&quot;&gt;
+&lt;TITLE&gt;301 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;
+&lt;H1&gt;301 Moved&lt;/H1&gt;
+The document has moved
+&lt;A HREF=&quot;http://www.google.com:8888/&quot;&gt;here&lt;/A&gt;.
+&lt;/BODY&gt;&lt;/HTML&gt;
+</code></pre>
+
 <h4 id="conclusion">Conclusion</h4>
 
-<p>This was a quick demo of SharpC2 -  I hope you can see its potential.  I find the idea an open source framework that can provide capabilities such as PPID spoofing, process mitigation policies and ETW patching very exciting.</p>
+<p>This was a quick demo of SharpC2 -  I hope you can see its potential.  I find the idea an open source framework that can provide capabilities such as PPID spoofing, process mitigation policies, ETW patching, port forwarding and more, very exciting.</p>
 
 <p>There&rsquo;s a lot more development work to do before this can be used for anything useful in the real world - the focus will be on adding stable post-ex primitives.  My primary use case for this as a learning and training tool, not for carrying out actual engagements and the priority for development will reflect that.</p>
 
