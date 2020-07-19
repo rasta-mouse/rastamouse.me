@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>c2 on Rasta Mouse</title>
+    <title>c2 on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/c2/</link>
-    <description>Recent content in c2 on Rasta Mouse</description>
+    <description>Recent content in c2 on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/c2/index.xml" rel="self" type="application/rss+xml" />
@@ -13,27 +14,23 @@
     
     <item>
       <title>SharpC2</title>
-      <link>https://rastamouse.me/2020/05/sharpc2/</link>
+      <link>https://rastamouse.me/blog/sharpc2/</link>
       <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2020/05/sharpc2/</guid>
+      <guid>https://rastamouse.me/blog/sharpc2/</guid>
       <description>&lt;p&gt;Back in October 2018 (yes, 2018!), I &lt;del&gt;approached&lt;/del&gt; begged &lt;a href=&#34;https://twitter.com/_xpn_&#34;&gt;xpn&lt;/a&gt; for a collaboration on an idea I had for a .NET C2 Framework.  We worked on the project for about a month or so before real life got in the way and stalled development.  In February 2019, &lt;a href=&#34;https://twitter.com/cobbr_io&#34;&gt;cobbr&lt;/a&gt; released &lt;a href=&#34;https://github.com/cobbr/Covenant&#34;&gt;Covenant&lt;/a&gt; which is also a .NET C2 Framework.  I subsequently spent some time &lt;a href=&#34;https://github.com/cobbr/Covenant/commits?author=rasta-mouse&#34;&gt;contributing&lt;/a&gt; to, and &lt;a href=&#34;https://rastamouse.me/tags/covenant/&#34;&gt;writing about&lt;/a&gt; Covenant - but I&amp;rsquo;ve always wanted to get back to our original project.&lt;/p&gt;
-
 &lt;p&gt;I decided to re-visit SharpC2 (a very creative name on my part) over the 2019 Christmas period to try and get it into a position where we could release a proof of concept.  Yet somehow I&amp;rsquo;m not writing this until May 2020!  We can blame my &lt;a href=&#34;https://www.zeropointsecurity.co.uk/annoucements/2020/4/13/red-team-ops-is-back&#34;&gt;RTO course&lt;/a&gt; for that.&lt;/p&gt;
-
 &lt;p&gt;This post is intended to provide an overview of SharpC2&amp;rsquo;s design concepts and some showcase examples of how it can be used.  Code can be found on &lt;a href=&#34;https://github.com/SharpC2/SharpC2/tree/dev&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Covenant Tasks 101</title>
-      <link>https://rastamouse.me/2019/12/covenant-tasks-101/</link>
+      <link>https://rastamouse.me/blog/covenant-tasks-101/</link>
       <pubDate>Sat, 28 Dec 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/12/covenant-tasks-101/</guid>
+      <guid>https://rastamouse.me/blog/covenant-tasks-101/</guid>
       <description>&lt;p&gt;Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation &lt;strong&gt;&amp;ldquo;tasks&amp;rdquo;&lt;/strong&gt; on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really &lt;a href=&#34;https://github.com/cobbr/Covenant/graphs/commit-activity&#34;&gt;grown&lt;/a&gt; from contributions from the Covenant community.&lt;/p&gt;
-
 &lt;p&gt;Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.&lt;/p&gt;
-
 &lt;p&gt;This post will provide an introduction for those wishing to create and contribute new Tasks.&lt;/p&gt;</description>
     </item>
     

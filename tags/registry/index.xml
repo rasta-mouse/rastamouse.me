@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>registry on Rasta Mouse</title>
+    <title>registry on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/registry/</link>
-    <description>Recent content in registry on Rasta Mouse</description>
+    <description>Recent content in registry on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sat, 08 Sep 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/registry/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>Enumerating AppLocker Config</title>
-      <link>https://rastamouse.me/2018/09/enumerating-applocker-config/</link>
+      <link>https://rastamouse.me/blog/applocker/</link>
       <pubDate>Sat, 08 Sep 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/09/enumerating-applocker-config/</guid>
+      <guid>https://rastamouse.me/blog/applocker/</guid>
       <description>&lt;p&gt;Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.&lt;/p&gt;</description>
     </item>
     

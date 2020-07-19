@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>cuckoo on Rasta Mouse</title>
+    <title>cuckoo on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/cuckoo/</link>
-    <description>Recent content in cuckoo on Rasta Mouse</description>
+    <description>Recent content in cuckoo on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Thu, 18 May 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/cuckoo/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>Playing with Cuckoo</title>
-      <link>https://rastamouse.me/2017/05/playing-with-cuckoo/</link>
+      <link>https://rastamouse.me/blog/playing-with-cuckoo/</link>
       <pubDate>Thu, 18 May 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/05/playing-with-cuckoo/</guid>
+      <guid>https://rastamouse.me/blog/playing-with-cuckoo/</guid>
       <description>&lt;p&gt;After the release and complete hubbub that &lt;a href=&#34;https://en.wikipedia.org/wiki/WannaCry_ransomware_attack&#34;&gt;WannaCry&lt;/a&gt; caused, I thought it would be fun to play with &lt;a href=&#34;https://cuckoosandbox.org/&#34;&gt;Cuckoo Sandbox&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     

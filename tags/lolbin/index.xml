@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>LOLBin on Rasta Mouse</title>
+    <title>LOLBin on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/lolbin/</link>
-    <description>Recent content in LOLBin on Rasta Mouse</description>
+    <description>Recent content in LOLBin on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Thu, 13 Jun 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/lolbin/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>TikiSpawn &amp; MSBuild</title>
-      <link>https://rastamouse.me/2019/06/tikispawn-msbuild/</link>
+      <link>https://rastamouse.me/blog/tikispawn-msbuild/</link>
       <pubDate>Thu, 13 Jun 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/06/tikispawn-msbuild/</guid>
+      <guid>https://rastamouse.me/blog/tikispawn-msbuild/</guid>
       <description>&lt;p&gt;The main impetus behind this post was me experimenting with ways to leverage TikiSpawn with some of the popular &lt;a href=&#34;https://lolbas-project.github.io&#34;&gt;lolbins&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     

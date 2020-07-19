@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>red team on Rasta Mouse</title>
+    <title>red team on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/red-team/</link>
-    <description>Recent content in red team on Rasta Mouse</description>
+    <description>Recent content in red team on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/red-team/index.xml" rel="self" type="application/rss+xml" />
@@ -13,67 +14,61 @@
     
     <item>
       <title>SharpC2</title>
-      <link>https://rastamouse.me/2020/05/sharpc2/</link>
+      <link>https://rastamouse.me/blog/sharpc2/</link>
       <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2020/05/sharpc2/</guid>
+      <guid>https://rastamouse.me/blog/sharpc2/</guid>
       <description>&lt;p&gt;Back in October 2018 (yes, 2018!), I &lt;del&gt;approached&lt;/del&gt; begged &lt;a href=&#34;https://twitter.com/_xpn_&#34;&gt;xpn&lt;/a&gt; for a collaboration on an idea I had for a .NET C2 Framework.  We worked on the project for about a month or so before real life got in the way and stalled development.  In February 2019, &lt;a href=&#34;https://twitter.com/cobbr_io&#34;&gt;cobbr&lt;/a&gt; released &lt;a href=&#34;https://github.com/cobbr/Covenant&#34;&gt;Covenant&lt;/a&gt; which is also a .NET C2 Framework.  I subsequently spent some time &lt;a href=&#34;https://github.com/cobbr/Covenant/commits?author=rasta-mouse&#34;&gt;contributing&lt;/a&gt; to, and &lt;a href=&#34;https://rastamouse.me/tags/covenant/&#34;&gt;writing about&lt;/a&gt; Covenant - but I&amp;rsquo;ve always wanted to get back to our original project.&lt;/p&gt;
-
 &lt;p&gt;I decided to re-visit SharpC2 (a very creative name on my part) over the 2019 Christmas period to try and get it into a position where we could release a proof of concept.  Yet somehow I&amp;rsquo;m not writing this until May 2020!  We can blame my &lt;a href=&#34;https://www.zeropointsecurity.co.uk/annoucements/2020/4/13/red-team-ops-is-back&#34;&gt;RTO course&lt;/a&gt; for that.&lt;/p&gt;
-
 &lt;p&gt;This post is intended to provide an overview of SharpC2&amp;rsquo;s design concepts and some showcase examples of how it can be used.  Code can be found on &lt;a href=&#34;https://github.com/SharpC2/SharpC2/tree/dev&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Red Team Infrastructure - AWS Encrypted EBS</title>
-      <link>https://rastamouse.me/2018/02/red-team-infrastructure-aws-encrypted-ebs/</link>
+      <link>https://rastamouse.me/blog/encrypted-ebs/</link>
       <pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/02/red-team-infrastructure-aws-encrypted-ebs/</guid>
+      <guid>https://rastamouse.me/blog/encrypted-ebs/</guid>
       <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/malcomvetter&#34;&gt;Tim MalcomVetter&lt;/a&gt; caused a bit of stir over his &lt;a href=&#34;https://medium.com/@malcomvetter/responsible-red-teams-1c6209fd43cc&#34;&gt;Responsible Red Teams&lt;/a&gt; post last week, which is not surprising since he was pretty fucking rude about the whole thing.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>VHD to DA</title>
-      <link>https://rastamouse.me/2018/02/vhd-to-da/</link>
+      <link>https://rastamouse.me/blog/vhd-backup/</link>
       <pubDate>Fri, 16 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/02/vhd-to-da/</guid>
+      <guid>https://rastamouse.me/blog/vhd-backup/</guid>
       <description>&lt;p&gt;Where a 10-year old backup can fcuk you in the ass&amp;hellip;&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Automated Red Team Infrastructure Deployment with Terraform - Part 2</title>
-      <link>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform-part-2/</link>
+      <link>https://rastamouse.me/blog/terraform-pt2/</link>
       <pubDate>Sat, 23 Sep 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform-part-2/</guid>
+      <guid>https://rastamouse.me/blog/terraform-pt2/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-
-&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/&#34;&gt;&lt;b&gt;Part 1&lt;/b&gt;&lt;/a&gt;, we looked at using &lt;a href=&#34;https://www.terraform.io/&#34;&gt;Terraform&lt;/a&gt; to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&amp;rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.&lt;/p&gt;</description>
+&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/&#34;&gt;&lt;!-- raw HTML omitted --&gt;Part 1&lt;!-- raw HTML omitted --&gt;&lt;/a&gt;, we looked at using &lt;a href=&#34;https://www.terraform.io/&#34;&gt;Terraform&lt;/a&gt; to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&amp;rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Jumping Network Segregation with RDP</title>
-      <link>https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/</link>
+      <link>https://rastamouse.me/blog/rdp-jump-boxes/</link>
       <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/</guid>
+      <guid>https://rastamouse.me/blog/rdp-jump-boxes/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-
 &lt;p&gt;This short post demonstrates how it may be possible to pivot into a segregated/protected network, via an RDP Jump Box.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Automated Red Team Infrastructure Deployment with Terraform - Part 1</title>
-      <link>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/</link>
+      <link>https://rastamouse.me/blog/terraform-pt1/</link>
       <pubDate>Tue, 22 Aug 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/</guid>
+      <guid>https://rastamouse.me/blog/terraform-pt1/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-
 &lt;p&gt;Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This &lt;a href=&#34;https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki&#34;&gt;wiki&lt;/a&gt; maintained by &lt;a href=&#34;https://twitter.com/424f424f&#34;&gt;Steve Borosh&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/bluscreenofjeff&#34;&gt;Jeff Dimmock&lt;/a&gt; is probably the best public resource I&amp;rsquo;ve seen in regards to design considerations and hardening tips.&lt;/p&gt;
-
 &lt;p&gt;For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.&lt;/p&gt;</description>
     </item>
     

@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>aggressor on Rasta Mouse</title>
+    <title>aggressor on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/aggressor/</link>
-    <description>Recent content in aggressor on Rasta Mouse</description>
+    <description>Recent content in aggressor on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Wed, 28 Aug 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/aggressor/index.xml" rel="self" type="application/rss+xml" />
@@ -13,19 +14,19 @@
     
     <item>
       <title>TikiService</title>
-      <link>https://rastamouse.me/2019/08/tikiservice/</link>
+      <link>https://rastamouse.me/blog/tikiservice/</link>
       <pubDate>Wed, 28 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/08/tikiservice/</guid>
+      <guid>https://rastamouse.me/blog/tikiservice/</guid>
       <description>&lt;p&gt;&lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/master/TikiService&#34;&gt;TikiService&lt;/a&gt; is a new .NET Service Binary that allows you to run a TikiTorch payload via the Service Control Manager (à la PsExec).  &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna&#34;&gt;TikiTorch.cna&lt;/a&gt; has also been updated to create a new Cobalt Strike function: &lt;code&gt;tikiexec&lt;/code&gt;, that automates its use.  This blog post provides a brief overview and usage examples.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>The Return of Aggressor</title>
-      <link>https://rastamouse.me/2019/06/the-return-of-aggressor/</link>
+      <link>https://rastamouse.me/blog/tikigressor/</link>
       <pubDate>Wed, 26 Jun 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/06/the-return-of-aggressor/</guid>
+      <guid>https://rastamouse.me/blog/tikigressor/</guid>
       <description>&lt;p&gt;FortyNorth Security recently &lt;a href=&#34;https://www.fortynorthsecurity.com/aggressive-msbuild-bypass-detection/&#34;&gt;posted an article&lt;/a&gt; detailing the process for leveraging MSBuild to execute unmanaged PowerShell, and automating it in Aggressor script for Cobalt Strike users.  Being a native binary in the Windows OS, the use of MSBuild is a &lt;a href=&#34;https://lolbas-project.github.io/lolbas/Binaries/Msbuild/&#34;&gt;common AWL bypass technique&lt;/a&gt;, which is handy in relatively well locked down environments.&lt;/p&gt;</description>
     </item>
     

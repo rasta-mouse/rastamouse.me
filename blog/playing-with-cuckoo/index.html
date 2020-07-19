@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Playing with Cuckoo</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#foreword">Foreword</a></li>
+    <li><a href="#configuring-the-cuckoo-host">Configuring the Cuckoo Host</a>
+      <ul>
+        <li><a href="#software">Software</a></li>
+      </ul>
+    </li>
+    <li><a href="#configuring-the-guest-vms">Configuring the Guest VMs</a></li>
+    <li><a href="#configuring-cuckoo">Configuring Cuckoo</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <p>After the release and complete hubbub that <a href="https://en.wikipedia.org/wiki/WannaCry_ransomware_attack">WannaCry</a> caused, I thought it would be fun to play with <a href="https://cuckoosandbox.org/">Cuckoo Sandbox</a>.</p>
+<p>It&rsquo;s something I&rsquo;ve always had an interest in, but have never taken the time to indulge.</p>
+<p>The <a href="https://cuckoo.sh/docs/">Cuckoo Documentation</a> is very well written and will honestly get someone 95% towards getting a working instance setup.  I had a few niggling issues that I don&rsquo;t think are covered within the docs (I could be wrong, correct me if so).  This post is a quick whistle-stop tour of how I went about getting it working.</p>
+<blockquote>
+<p>Note: I didn&rsquo;t follow all the best practices and this is not a guide to setting up a complete, proper and scalable solution.  It assumes you don&rsquo;t have a dedicated server and are just looking to experiment with Cuckoo on an existing desktop/laptop.</p>
+</blockquote>
+<h2 id="foreword">Foreword</h2>
+<p>There are lots of virtualisation technologies that Cuckoo is compatible with - from VirtualBox, ESXi, KVM and so on.  I&rsquo;m running Windows 10 on my desktop, so I initially wanted to run Cuckoo in a VM within VirtualBox and have futher VirtualBox VMs inside that Cuckoo VM.  Nested hypervisors doesn&rsquo;t sound very efficient but with relatively mature VT-x and AMD-V technology, the performance impact seems rather negligible.</p>
+<p>I ran into my first frustration with VirtualBox, as it doesn&rsquo;t pass VT-x/AMD-V through to its guest VMs.  The upshot of this is that if you run Cuckoo inside VirtualBox on your host, you then can&rsquo;t have 64-bit VMs for the malware sandboxes.  VMware Workstation Player doesn&rsquo;t have this restriction, so I opted to use this instead of VirtualBox on my host.</p>
+<p>You will obviously need to decide if this is an issue for you based on your planned usage.</p>
+<p>The architecture that we are going to setup, looks as follows:</p>
+<p><figure>
+    <img src="/images/cuckoo/arch.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/cuckoo/network.png"/> 
+</figure>
+</p>
+<p>So that&rsquo;s a bunch of VirtualBox VMs running inside a VMware VM :)</p>
+<h2 id="configuring-the-cuckoo-host">Configuring the Cuckoo Host</h2>
+<p>I&rsquo;m using Ubuntu Server 16.04.2 64-bit.  You will need enough resources for it to run itself and at least 1 concurrent VM inside; and a sh*t tonne of storage if you want to do full memory dumps.</p>
+<p>I gave mine:</p>
+<ul>
+<li>8 CPU Cores
+<ul>
+<li>Tick <code>Enable Virtualize Intel VT-x/EPT or AMD-V/RVI</code></li>
+</ul>
+</li>
+<li>4GB RAM</li>
+<li>100GB Hard Disk</li>
+<li>NIC 1: NAT</li>
+<li>NIC 2: Host-Only</li>
+</ul>
+<h3 id="software">Software</h3>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">cuckoo@cuckoo:~$ <span class="nb">echo</span> deb http://download.virtualbox.org/virtualbox/debian xenial contrib <span class="p">|</span> sudo tee -a /etc/apt/sources.list.d/virtualbox.list
+cuckoo@cuckoo:~$ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- <span class="p">|</span> sudo apt-key add -
+cuckoo@cuckoo:~$ sudo apt-get update
+cuckoo@cuckoo:~$ sudo apt-get install python python-pip python-dev libffi-dev libssl-dev python-virtualenv python-setuptools libjpeg-dev zlib1g-dev swig mongodb xfce4 virtualbox-5.1 tcpdump apparmor-utils
+
+cuckoo@cuckoo:~$ sudo aa-disable /usr/sbin/tcpdump
+cuckoo@cuckoo:~$ sudo setcap cap_net_raw,cap_net_admin<span class="o">=</span>eip /usr/sbin/tcpdump
+
+cuckoo@cuckoo:~$ git clone https://github.com/volatilityfoundation/volatility.git
+cuckoo@cuckoo:~$ pip install -U pip pycrypto distorm3
+cuckoo@cuckoo:~$ <span class="nb">cd</span> volatility/
+cuckoo@cuckoo:~/volatility$ sudo python setup.py install
+
+cuckoo@cuckoo:~$ virtualenv cuckoo
+cuckoo@cuckoo:~$ . cuckoo/bin/activate
+<span class="o">(</span>cuckoo<span class="o">)</span> cuckoo@cuckoo:~$ pip install -U yara-python cuckoo
+
+<span class="o">(</span>cuckoo<span class="o">)</span> cuckoo@cuckoo:~$ cuckoo
+
+            _       _                   _             _              _            _
+          /<span class="se">\ \ </span>    /<span class="se">\_\ </span>              /<span class="se">\ \ </span>          /<span class="se">\_\ </span>          /<span class="se">\ \ </span>        /<span class="se">\ \
+</span><span class="se"></span>         /  <span class="se">\ \ </span>  / / /         _    /  <span class="se">\ \ </span>        / / /  _       /  <span class="se">\ \ </span>      /  <span class="se">\ \
+</span><span class="se"></span>        / /<span class="se">\ \ \ </span> <span class="se">\ \ \_</span>_      /<span class="se">\_\ </span>/ /<span class="se">\ \ \ </span>      / / /  /<span class="se">\_\ </span>   / /<span class="se">\ \ \ </span>    / /<span class="se">\ \ \
+</span><span class="se"></span>       / / /<span class="se">\ \ \ </span> <span class="se">\ \_</span>__<span class="se">\ </span>   / / // / /<span class="se">\ \ \ </span>    / / /__/ / /   / / /<span class="se">\ \ \ </span>  / / /<span class="se">\ \ \
+</span><span class="se"></span>      / / /  <span class="se">\ \_\ </span> <span class="se">\_</span>_  /   / / // / /  <span class="se">\ \_\ </span>  / /<span class="se">\_</span>____/ /   / / /  <span class="se">\ \_\ </span>/ / /  <span class="se">\ \_\
+</span><span class="se"></span>     / / /    <span class="se">\/</span>_/  / / /   / / // / /    <span class="se">\/</span>_/  / /<span class="se">\_</span>______/   / / /   / / // / /   / / /
+    / / /          / / /   / / // / /          / / /<span class="se">\ \ \ </span>    / / /   / / // / /   / / /
+   / / /________  / / /___/ / // / /________  / / /  <span class="se">\ \ \ </span>  / / /___/ / // / /___/ / /
+  / / /_________<span class="se">\/</span> / /____<span class="se">\/</span> // / /_________<span class="se">\/</span> / /    <span class="se">\ \ \ </span>/ / /____<span class="se">\/</span> // / /____<span class="se">\/</span> /
+  <span class="se">\/</span>____________/<span class="se">\/</span>_________/ <span class="se">\/</span>____________/<span class="se">\/</span>_/      <span class="se">\_\_\\</span>/_________/ <span class="se">\/</span>_________/
+
+ Cuckoo Sandbox 2.0.2
+ www.cuckoosandbox.org
+ Copyright <span class="o">(</span>c<span class="o">)</span> 2010-2017
+
+<span class="o">=======================================================================</span>
+    Welcome to Cuckoo Sandbox, this appears to be your first run!
+    We will now <span class="nb">set</span> you up with our default configuration.
+    You will be able to see and modify the Cuckoo configuration,
+    Yara rules, Cuckoo Signatures, and much more to your likings
+    by exploring the /home/cuckoo/.cuckoo directory.
+
+    Among other configurable items of most interest is the
+    new location <span class="k">for</span> your Cuckoo configuration:
+              /home/cuckoo/.cuckoo/conf
+<span class="o">=======================================================================</span>
+
+Cuckoo has finished setting up the default configuration.
+Please modify the default settings where required and
+start Cuckoo again <span class="o">(</span>by running <span class="sb">`</span>cuckoo<span class="sb">`</span> or <span class="sb">`</span>cuckoo -d<span class="sb">`</span><span class="o">)</span>.
+</code></pre></div><h2 id="configuring-the-guest-vms">Configuring the Guest VMs</h2>
+<p>Hop into the GUI by running <code>startx</code>. Open VirtualBox and create your base VMs - I&rsquo;m just going to create Windows 7 32-bit &amp; 64-bit VMs called <code>Win7x86</code> and <code>Win7x64</code> respectively.  They small VMs with 1 CPU, 512MB RAM, 10GB HDD and 1 NIC attached to <code>vboxnet0</code>.</p>
+<figure>
+    <img src="/images/cuckoo/vbox.png"/> 
+</figure>
+
+<p>Set a static IP in each VM.</p>
+<ul>
+<li>Win7x86 - 192.168.56.10</li>
+<li>Win7x64 - 192.168.56.15</li>
+</ul>
+<p>You will also want to:</p>
+<ul>
+<li>Disable the Windows Firewall</li>
+<li>Disable UAC (Never Notify)</li>
+<li>Disable Windows Updates</li>
+</ul>
+<p>Download the latest <a href="https://www.python.org/downloads/windows/">Python 2.7.x for Windows</a> and place them in a convenient location on the Cuckoo VM (I got both the 32 and 64-bit versions).  You should also grab any additional software you may want, depending on the samples you want to submit (e.g. Office, Adobe Reader etc).</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">cuckoo@cuckoo:~/Downloads$ ll
+-rw-rw-r--  <span class="m">1</span> cuckoo cuckoo <span class="m">20082688</span> May <span class="m">18</span> 19:22 python-2.7.13.amd64.msi
+-rw-rw-r--  <span class="m">1</span> cuckoo cuckoo <span class="m">19161088</span> May <span class="m">18</span> 19:22 python-2.7.13.msi
+
+cuckoo@cuckoo:~/Downloads$ python -m SimpleHTTPServer
+Serving HTTP on 0.0.0.0 port <span class="m">8000</span> ...
+</code></pre></div><p>On each VM, open <code>Internet Explorer</code> and navigate to <code>http://192.168.56.1:8000</code>, download the relevant Python package then install it.</p>
+<p>Use the same method to transfer the Cuckoo Agent (to somewhere easy like the Desktop).</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">cuckoo@cuckoo:~/Downloads$ <span class="nb">cd</span> ../.cuckoo/agent/
+cuckoo@cuckoo:~/.cuckoo/agent$ ll
+
+-rw-rw-r--  <span class="m">1</span> cuckoo cuckoo <span class="m">12307</span> May <span class="m">18</span> 18:15 agent.py
+-rwxrwxr-x  <span class="m">1</span> cuckoo cuckoo   <span class="m">386</span> May <span class="m">18</span> 18:15 agent.sh*
+
+cuckoo@cuckoo:~/.cuckoo/agent$ python -m SimpleHTTPServer
+Serving HTTP on 0.0.0.0 port <span class="m">8000</span> ...
+</code></pre></div><p>Start the agent by opening a <code>Command Prompt as Administrator</code>.</p>
+<figure>
+    <img src="/images/cuckoo/agent.png"/> 
+</figure>
+
+<p>You won&rsquo;t see any output, just minimise the window and leave it running.</p>
+<p>Whilst the VMs are running, follow these steps to snapshot them (repeat for each VM):</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">cuckoo@cuckoo:~$ VBoxManage snapshot <span class="s2">&#34;Win7x86&#34;</span> take <span class="s2">&#34;Win7x86_snap&#34;</span> --pause
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+Snapshot taken. UUID: 4ef19a21-25c8-4ddf-81b2-4a65ce2b5278
+
+cuckoo@cuckoo:~$ VBoxManage controlvm <span class="s2">&#34;Win7x86&#34;</span> poweroff
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+
+cuckoo@cuckoo:~$ VBoxManage snapshot <span class="s2">&#34;Win7x86&#34;</span> restorecurrent
+Restoring snapshot 4ef19a21-25c8-4ddf-81b2-4a65ce2b5278
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+</code></pre></div><p>In the GUI, they should appear as <code>Saved</code>.</p>
+<figure>
+    <img src="/images/cuckoo/vbox-saved.png"/> 
+</figure>
+
+<h2 id="configuring-cuckoo">Configuring Cuckoo</h2>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="o">(</span>cuckoo<span class="o">)</span> cuckoo@cuckoo:~$ vim .cuckoo/conf/virtualbox.conf
+</code></pre></div><ul>
+<li><code>mode = headless</code> -&gt; <code>mode = gui</code> is useful for testing.</li>
+<li><code>machines = cuckoo1</code> -&gt; <code>machines = Win7x86,Win7x64</code> plus any others you&rsquo;ve made.</li>
+</ul>
+<p><code>cuckoo1</code> is the default example.  Each VM needs its own little block.</p>
+<pre><code>[Win7x86]
+label = Win7x86
+platform = windows
+ip = 192.168.56.10
+snapshot = Win7x86_snap
+
+[Win7x64]
+label = Win7x64
+platform = windows
+ip = 192.168.56.15
+snapshot = Win7x64_snap
+</code></pre><p>Now you should be able to run <code>cuckoo</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="o">(</span>cuckoo<span class="o">)</span> cuckoo@cuckoo:~$ cuckoo
+
+                          .:
+                          ::
+    .-.     ,  :   .-.    <span class="p">;;</span>.-.  .-.   .-.
+   <span class="p">;</span>       <span class="p">;</span>   <span class="p">;</span>  <span class="p">;</span>       <span class="p">;;</span> .<span class="s1">&#39; ;   ;&#39;</span><span class="p">;</span>   <span class="p">;</span><span class="s1">&#39;
+</span><span class="s1">   `;;;;&#39;</span>.<span class="s1">&#39;`..:;._`;;;;&#39;</span>_.<span class="s1">&#39;`  `.`;;&#39;</span>  <span class="sb">`</span><span class="p">;;</span><span class="s1">&#39;
+</span><span class="s1">
+</span><span class="s1"> Cuckoo Sandbox 2.0.2
+</span><span class="s1"> www.cuckoosandbox.org
+</span><span class="s1"> Copyright (c) 2010-2017
+</span><span class="s1">
+</span><span class="s1"> Checking for updates...
+</span><span class="s1"> You&#39;</span>re good to go!
+2017-05-18 19:56:34,318 <span class="o">[</span>cuckoo.core.scheduler<span class="o">]</span> INFO: Using <span class="s2">&#34;virtualbox&#34;</span> as machine manager
+2017-05-18 19:56:34,928 <span class="o">[</span>cuckoo.core.scheduler<span class="o">]</span> INFO: Loaded <span class="m">2</span> machine/s
+2017-05-18 19:56:34,933 <span class="o">[</span>cuckoo.core.scheduler<span class="o">]</span> WARNING: As you<span class="err">&#39;</span>ve configured Cuckoo to execute parallel analyses, we recommend you to switch to a MySQL ora PostgreSQL database as SQLite might cause some issues.
+2017-05-18 19:56:34,941 <span class="o">[</span>cuckoo.core.scheduler<span class="o">]</span> INFO: Waiting <span class="k">for</span> analysis tasks.
+</code></pre></div><p>To start the web GUI:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="o">(</span>cuckoo<span class="o">)</span> cuckoo@cuckoo:~$ vim .cuckoo/conf/reporting.conf
+</code></pre></div><p>Under <code>[mongodb]</code> : <code>enabled = no</code> -&gt; <code>enabled = yes</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="o">(</span>cuckoo<span class="o">)</span> cuckoo@cuckoo:~$ cuckoo web runserver 192.168.45.128:8080
+Performing system checks...
+
+System check identified no issues <span class="o">(</span><span class="m">0</span> silenced<span class="o">)</span>.
+May 18, <span class="m">2017</span> - 20:00:31
+Django version 1.8.4, using settings <span class="s1">&#39;cuckoo.web.web.settings&#39;</span>
+Starting development server at http://192.168.45.128:8080/
+Quit the server with CONTROL-C.
+</code></pre></div><figure>
+    <img src="/images/cuckoo/web-gui.png"/> 
+</figure>
+
+<p>You can then submit a sample and enjoy the results  :)</p>
+<figure>
+    <img src="/images/cuckoo/wannacry.png"/> 
+</figure>
+
+<h4 id="shoutout">Shoutout</h4>
+<p><a href="https://twitter.com/recrudesce">recrudesce</a> for his helpful tips.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/a-citrix-story/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/psexec-much/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

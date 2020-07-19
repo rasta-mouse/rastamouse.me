@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>GPO on Rasta Mouse</title>
+    <title>GPO on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/gpo/</link>
-    <description>Recent content in GPO on Rasta Mouse</description>
+    <description>Recent content in GPO on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sun, 13 Jan 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/gpo/index.xml" rel="self" type="application/rss+xml" />
@@ -13,19 +14,19 @@
     
     <item>
       <title>GPO Abuse - Part 2</title>
-      <link>https://rastamouse.me/2019/01/gpo-abuse-part-2/</link>
+      <link>https://rastamouse.me/blog/gpo-abuse-pt2/</link>
       <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/01/gpo-abuse-part-2/</guid>
+      <guid>https://rastamouse.me/blog/gpo-abuse-pt2/</guid>
       <description>&lt;p&gt;Before we can really dive into modifying GPOs, we need to try and understand some of the intricacies of how they&amp;rsquo;re updated normally in GPMC and AD.  Because believe me, it aint as simple as it appears.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>GPO Abuse - Part 1</title>
-      <link>https://rastamouse.me/2019/01/gpo-abuse-part-1/</link>
+      <link>https://rastamouse.me/blog/gpo-abuse-pt1/</link>
       <pubDate>Sun, 06 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/01/gpo-abuse-part-1/</guid>
+      <guid>https://rastamouse.me/blog/gpo-abuse-pt1/</guid>
       <description>&lt;p&gt;Group Policy Objects (GPOs) is a subject I&amp;rsquo;ve wanted to write about for a long time and I&amp;rsquo;m happy to have &lt;em&gt;finally&lt;/em&gt; started.&lt;/p&gt;</description>
     </item>
     

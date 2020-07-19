@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">A Lesson in .NET Framework Versions</h1>
+    
+      
+    <nav id="TableOfContents"></nav>
+    <p>With the emergence of more C# and .NET tooling, I occasionally see people tripping up over this.  It&rsquo;s not a huge issue, just something to be aware of.</p>
+<p><a href="https://github.com/GhostPack/Seatbelt">Seatbelt</a> is one such project written in C# that performs various host-based enumeration.  The project does not distribute pre-complied binaries, so you have to build it yourself.  I suspect most people will therefore clone the repo, open the solution in Visual Studio and build with the default settings.</p>
+<p>Let&rsquo;s say we have a foothold on a client machine and we want to run Seatbelt for priv esc opportunities - we may choose to upload the exe to disk and run it via a shell command.</p>
+<blockquote>
+<p>I know Cobalt Strike has <code>execute-assembly</code>, but most frameworks don&rsquo;t have this functionality. I&rsquo;m just using this as an example.</p>
+</blockquote>
+<p>We upload and run <code>Seatbelt.exe</code> but never get any output :(  Maybe we even run it a few times just to make sure&hellip;</p>
+<figure>
+    <img src="/images/dotnet/run-seatbelt.png"/> 
+</figure>
+
+<p>What we&rsquo;ve not realised is that the following windows have been popping up on the users&rsquo; desktop!</p>
+<figure>
+    <img src="/images/dotnet/dotnet-35.png"/> 
+</figure>
+
+<p>This is obviously a bit of an opsec fail, so how do we fix it?</p>
+<p>The problem is that we&rsquo;ve compiled Seatbelt with a target framework that is not available on the host.  So all we really need to do it retarget the solution and re-compile.  In Visual Studio, go to <code>Project &gt; Seatbelt Properties</code> and in the <code>Application</code> tab, we&rsquo;ll see the default <code>Target framework</code> set to <code>.NET Framework 3.5</code>.</p>
+<figure>
+    <img src="/images/dotnet/seatbelt-default-dotnet-version.png"/> 
+</figure>
+
+<p>There are numerous ways to check which .NET Framework versions are installed.  Here&rsquo;s one method:</p>
+<figure>
+    <img src="/images/dotnet/dotnet-version.png"/> 
+</figure>
+
+<p>After re-targetting the solution to <code>.NET Framework 4.6</code>, everything runs as expected and the user gets no prompts.</p>
+<figure>
+    <img src="/images/dotnet/dotnet-46.png"/> 
+</figure>
+
+<p>Moral of the story is to always check which .NET version is installed before running tools that leverage the framework.  <a href="https://en.wikipedia.org/wiki/.NET_Framework_version_history#Overview">This</a> is also handy as a quick reference to see which versions are default on different versions of Windows.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/applocker/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/asb-bypass-pt2/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

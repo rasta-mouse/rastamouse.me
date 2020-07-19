@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Enumerating AppLocker Config</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#remote-enumeration">Remote Enumeration</a></li>
+    <li><a href="#local-enumeration">Local Enumeration</a></li>
+  </ul>
+</nav>
+    <p>Very quick post to explore some different ways to enumerate the AppLocker configuration being applied to a host, both remotely and locally.  Understanding these rules, particularly deny rules, are useful for engineering bypasses.</p>
+<h2 id="remote-enumeration">Remote Enumeration</h2>
+<p>If the AppLocker configuration is being applied via GPO, which is probably the most likely scenario, it&rsquo;s really easy to pull the configuration from SYSVOL if you have read access to the share.  I already talked about how to find GPO&rsquo;s and which machines they apply to in my <a href="/2018/03/laps---part-1/">LAPS - Part 1 post</a>; and pulling the relevant <code>Registry.pol</code> is exactly the same process as described there.</p>
+<p>Once you&rsquo;ve parsed the file, it will look something like this:</p>
+<figure>
+    <img src="/images/applocker/default-allow.png"/> 
+</figure>
+
+<p>Happily, it&rsquo;s all rather self-explanitory - we can see that this particular configuration is part of the default rule set that allows everyone to run executables from <code>%PROGRAMFILES%</code>.</p>
+<p>A deny rule looks like this:</p>
+<figure>
+    <img src="/images/applocker/powershell-deny.png"/> 
+</figure>
+
+<p>There are three methods for applying a deny rule - <code>Publisher</code>, <code>Path</code> and <code>File Hash</code>.  This is an example of a <code>Publisher</code> rule, as shown by the <code>FilePublisherRule Id</code> and <code>FilePublisherCondition</code> blocks.</p>
+<h2 id="local-enumeration">Local Enumeration</h2>
+<p>If you can find a method of accessing the registry, you can also pull these values directly from there.  Granted, that could be a chicken and egg problem.  Maybe you will find that <code>cmd.exe</code> is blocked, but <code>regedit.exe</code> is not; or some other workaround.</p>
+<p>Even without prior knowledge from the GPO, we know that they will appear in <code>HKLM\SOFTWARE\Policies\Microsoft\Windows\SrpV2</code>.  There are keys for <code>Appx</code>, <code>Dll</code>, <code>Exe</code>, <code>Msi</code> and <code>Script</code>.</p>
+<figure>
+    <img src="/images/applocker/regedit.png"/> 
+</figure>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/rdpclip/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/dot-net/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

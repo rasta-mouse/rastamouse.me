@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">SharpC2</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#project-outcomes">Project Outcomes</a></li>
+        <li><a href="#solution">Solution</a></li>
+        <li><a href="#demo">Demo</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <p>Back in October 2018 (yes, 2018!), I <del>approached</del> begged <a href="https://twitter.com/_xpn_">xpn</a> for a collaboration on an idea I had for a .NET C2 Framework.  We worked on the project for about a month or so before real life got in the way and stalled development.  In February 2019, <a href="https://twitter.com/cobbr_io">cobbr</a> released <a href="https://github.com/cobbr/Covenant">Covenant</a> which is also a .NET C2 Framework.  I subsequently spent some time <a href="https://github.com/cobbr/Covenant/commits?author=rasta-mouse">contributing</a> to, and <a href="https://rastamouse.me/tags/covenant/">writing about</a> Covenant - but I&rsquo;ve always wanted to get back to our original project.</p>
+<p>I decided to re-visit SharpC2 (a very creative name on my part) over the 2019 Christmas period to try and get it into a position where we could release a proof of concept.  Yet somehow I&rsquo;m not writing this until May 2020!  We can blame my <a href="https://www.zeropointsecurity.co.uk/annoucements/2020/4/13/red-team-ops-is-back">RTO course</a> for that.</p>
+<p>This post is intended to provide an overview of SharpC2&rsquo;s design concepts and some showcase examples of how it can be used.  Code can be found on <a href="https://github.com/SharpC2/SharpC2/tree/dev">GitHub</a>.</p>
+<h3 id="project-outcomes">Project Outcomes</h3>
+<p>Before diving into any code, like any good software dev team 🤪 we had a discussion regarding what the tooling should, could and won&rsquo;t do.  The MoSCoW method is a good typical business example, which is short for &ldquo;must have&rdquo;, &ldquo;should have&rdquo;, &ldquo;could have&rdquo; and &ldquo;won&rsquo;t have&rdquo;.</p>
+<p>We decided very early on that the main priorities for the framework were:</p>
+<ol>
+<li>
+<p>Transparency - the framework, the Agent in particular, <strong>must not</strong> abstract anything (important) away from the visibility or control of the operator.</p>
+</li>
+<li>
+<p>Modularity - the operator <strong>must have</strong> free reign to add, subtract or override the default behaviour and capabilities of both the Agents and Team Server.  I tried to coin this term &ldquo;Bring your own Pwnage&rdquo; (or maybe I heard this somewhere else&hellip;).</p>
+</li>
+<li>
+<p>Base Primitives - as the lead devs, we <strong>won&rsquo;t</strong> provide a plethora of post-ex functionality (persistence, priv esc, lateral movement etc).  We <strong>should</strong> instead focus on providing a stable set of core / base primitives, which an operator can leverage to carry out their own tradecraft.</p>
+</li>
+</ol>
+<h3 id="solution">Solution</h3>
+<p>Right now, the SharpC2 Visual Studio Solution is made of 7 projects.</p>
+<figure>
+    <img src="/images/sharpc2/vs-solution.png"/> 
+</figure>
+
+<ul>
+<li>HTTPAgent / TCPAgent - .NET Framework Console Applications</li>
+<li>Team Server - an ASP.NET Core 3.1 Web Application</li>
+<li>Agent Modules - .NET Standard Class Libraries</li>
+<li>Agent / C2 Shared Projects</li>
+</ul>
+<h4 id="the-agents">The Agents</h4>
+<p>SharpC2 has an HTTP Agent for egress and a TCP Agent for peer-to-peer.</p>
+<p>The core components are found in the shared Agent project - this allows rapid code-reuse between the different agent flavors (HTTP, TCP, etc) without copy/paste-style duplication.  A shared project is more useful for our use-case compared to a class library, since class libraries compile to a DLL that would be required alongside an agent executable to run.  With shared projects, the agent will compile to a standalone exe.</p>
+<p>The Agents (as well as the Team Server) has 3 main internal components:</p>
+<ul>
+<li>Controllers</li>
+<li>Interfaces</li>
+<li>Modules</li>
+</ul>
+<figure>
+    <img src="/images/sharpc2/vs-agent.png"/> 
+</figure>
+
+<p>In most cases, an operator should not need to modify the Controllers or Interfaces unless they want to make significant changes to the internals.  The <code>AgentController</code> provides public methods such as <code>SendCommandOutput</code> that are used by other Modules (more on those in a bit), which simply queues up command and control data to be sent by the <code>CommModule</code>.  The <code>ConfigurationController</code> allows an operator to set options within the Agent, such as its sleep and jitter.</p>
+<p>The three interfaces provided are <code>IAgentModule</code>, <code>ICommModule</code> and <code>ICommRelay</code>.  An AgentModule is responsible for providing command functionality for the Agent. A CommModule is responsible for sending and receiving C2 data to/from the Team Server. A CommRelay simply takes the input from one CommModule and puts it into the output of another CommModule.</p>
+<p>An AgentModule only requires two methods - <code>GetModuleInfo</code> which returns a class of <code>AgentModuleInfo</code> and <code>Initialise</code>.  <code>AgentModuleInfo</code> contains all the information required for an agent module including a Name and a List of AgentCommand.  An AgentCommand also contains a Name, Description, HelpText and a Callback.  When an Agent Module is initialised, this information is sent back to the Team Server so it may become available to the operators.  This is in contrast to Covenant where all Grunt Task definitions are stored ahead of time on the server.  An advantage of our approach is that no server-side changes are required to provide new Agent functionality, at the cost of some additional C2 traffic.  <code>Initialise</code> registers the AgentModule with the Agent itself and any other steps may be required for the module (such as setting some default configuration options).</p>
+<p>Here&rsquo;s an example from the CoreAgentModule:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="n">AgentModuleInfo</span> <span class="n">GetModuleInfo</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">AgentModuleInfo</span>
+    <span class="p">{</span>
+        <span class="n">Name</span> <span class="p">=</span> <span class="s">&#34;Core&#34;</span><span class="p">,</span>
+        <span class="n">Developer</span> <span class="p">=</span> <span class="s">&#34;Daniel Duggan, Adam Chester&#34;</span><span class="p">,</span>
+        <span class="n">Commands</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">AgentModuleInfo</span><span class="p">.</span><span class="n">AgentCommand</span><span class="p">&gt;</span>
+        <span class="p">{</span>
+            <span class="k">new</span> <span class="n">AgentModuleInfo</span><span class="p">.</span><span class="n">AgentCommand</span>
+            <span class="p">{</span>
+                <span class="n">Name</span> <span class="p">=</span> <span class="s">&#34;ls&#34;</span><span class="p">,</span>
+                <span class="n">Description</span> <span class="p">=</span> <span class="s">&#34;List a Directory&#34;</span><span class="p">,</span>
+                <span class="n">HelpText</span> <span class="p">=</span> <span class="s">&#34;ls [path]&#34;</span><span class="p">,</span>
+                <span class="n">Callback</span> <span class="p">=</span> <span class="n">ListDirectory</span>
+            <span class="p">},</span>
+            <span class="k">new</span> <span class="n">AgentModuleInfo</span><span class="p">.</span><span class="n">AgentCommand</span><span class="p">(...),</span>
+            <span class="k">new</span> <span class="n">AgentModuleInfo</span><span class="p">.</span><span class="n">AgentCommand</span><span class="p">(...),</span>
+            <span class="k">new</span> <span class="n">AgentModuleInfo</span><span class="p">.</span><span class="n">AgentCommand</span><span class="p">(...),</span>
+            <span class="k">new</span> <span class="n">AgentModuleInfo</span><span class="p">.</span><span class="n">AgentCommand</span><span class="p">(...),</span>
+            <span class="k">new</span> <span class="n">AgentModuleInfo</span><span class="p">.</span><span class="n">AgentCommand</span><span class="p">(...),</span>
+            <span class="k">new</span> <span class="n">AgentModuleInfo</span><span class="p">.</span><span class="n">AgentCommand</span><span class="p">(...)</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">void</span> <span class="n">Initialise</span><span class="p">(</span><span class="n">AgentController</span> <span class="n">agent</span><span class="p">,</span> <span class="n">ConfigController</span> <span class="n">config</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">moduleInfo</span> <span class="p">=</span> <span class="n">GetModuleInfo</span><span class="p">();</span>
+    <span class="n">agent</span><span class="p">.</span><span class="n">RegisterAgentModule</span><span class="p">(</span><span class="n">moduleInfo</span><span class="p">);</span>
+    <span class="n">agent</span><span class="p">.</span><span class="n">SendModuleRegistered</span><span class="p">(</span><span class="n">moduleInfo</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">private</span> <span class="k">void</span> <span class="n">ListDirectory</span><span class="p">(</span><span class="kt">string</span> <span class="n">data</span><span class="p">,</span> <span class="n">AgentController</span> <span class="n">agent</span><span class="p">,</span> <span class="n">ConfigurationController</span> <span class="n">config</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">string</span> <span class="n">results</span> <span class="p">=</span> <span class="c1">// do some stuff
+</span><span class="c1"></span>    <span class="n">agent</span><span class="p">.</span><span class="n">SendCommandOutput</span><span class="p">(</span><span class="n">results</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><p>The Callback comes from a delegate within the AgentController.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">delegate</span> <span class="k">void</span> <span class="n">OnAgentCommand</span><span class="p">(</span><span class="kt">string</span> <span class="n">data</span><span class="p">,</span> <span class="n">AgentController</span> <span class="n">agentController</span><span class="p">,</span> <span class="n">ConfigurationController</span> <span class="n">configController</span><span class="p">);</span>
+</code></pre></div><p>A CommModule requires <code>Initialise</code>, <code>Run</code>, <code>SendData</code>, <code>RecvData</code> and <code>Stop</code>.  Within our example HTTPCommModule, <code>Initialise</code> simply brings in an instance of the ConfigurationController so that it can retrieve those sleep / jitter values. <code>Run</code> puts the module into a loop for as long as the Agent is running.  It checks into the Team Server over HTTP GET, retrieves any jobs and places them into an inbound queue. <code>RecvData</code> dequeue&rsquo;s the inbound queue - the jobs are processed by the AgentController and (providing the job matches a &ldquo;known&rdquo; command within the AgentModuleInfo) the appropriate callback is executed.  When an Agent Module calls <code>SendCommandOutput</code>, the C2 data is placed in an outbound queue. The <code>SendData</code> method will enqueue and send the results back to the Team Server on next check-in.</p>
+<p>Obviously an operator can implement any communication method within an ICommModule - it&rsquo;s not limited to HTTP.  This opens the door for other exoteric C2 channels without requiring an external solution like <a href="https://github.com/FSecureLABS/C3">C3</a>, as well as peer-to-peer comms such as TCP or SMB.</p>
+<p>The <code>ICommRelay</code> requires two methods: <code>GarbageIn</code> and <code>GarbageOut</code>.  A relay does not do any reading or processing on the data.  The HTTP Agent has its HTTPCommModule to talk to the Team Server and a TCPModule to connect to TCP Agents.  The CommRelay will take incoming data from the TCPModule and passes it to the outbound queue of HTTPCommModule.  No more, no less.</p>
+<h4 id="team-server">Team Server</h4>
+<p>The architecture of the Team Sever is very similar, in that the core components are also Controllers, Interfaces and Modules.</p>
+<figure>
+    <img src="/images/sharpc2/vs-teamserver.png"/> 
+</figure>
+
+<p>The <code>ClientController</code> handles client authentication and returns information requested about authenticated users.  The <code>AgentController</code> handles the session data from agents currently checking into the Team Server and the <code>ServerController</code> acts as a bridge between the different components that need to talk to each other.</p>
+<p>The <code>ICommModule</code> and <code>HTTPCommModule</code> behaves as expected, by binding a port and receiving/sending data to Agents.  The same in/out queue system is used here.  The <code>CoreServerModule</code> is responsible for handling output from agents, such as when new agents check-in or when command output is received.</p>
+<p>The <code>PortFwdModule</code> is an example of how new server-side functionality can be added, which works in conjunction with the external <code>PortFwd</code> Agent Module.</p>
+<h4 id="external-agent-modules">External Agent Modules</h4>
+<p>An Agent Module may be compiled into the agent (like the CoreAgentModule), or they can be external and loaded at runtime.</p>
+<p>Like <a href="https://github.com/cobbr/SharpSploit">SharpSploit</a>, external agent modules are .NET Standard DLLs.  To maximize compatibility, SharpSploit is .NET Framework 3.5 and 4.0 compliant so it can run on CLR versions 2.0 and 4.  However, if you&rsquo;ve developed anything in .NET you&rsquo;ll appreciate how much of a pain backwards-compatibility can be.  I mean, no LINQ, really&hellip;?  For this reason and the EoL of platforms such as Windows 7, I&rsquo;m not personally interested in maintaining this level compatibility.  So even though agent modules are .NET Standard, they are only built for CLR 4 and we&rsquo;ll see what happens with .NET 5.</p>
+<p>The default CoreAgentModule only provides very basic functionality such as <code>ls</code>, <code>pwd</code>, <code>cd</code>, <code>sleep</code>, <code>loadmodule</code>, <code>link</code> and <code>exit</code>.  It doesn&rsquo;t even include any type of shell command.  This functionality can be added via external agent modules and the <code>loadmodule</code> command.  This will take the provided assembly and call:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="kt">var</span> <span class="n">assembly</span> <span class="p">=</span> <span class="n">Assembly</span><span class="p">.</span><span class="n">Load</span><span class="p">(</span><span class="n">Helpers</span><span class="p">.</span><span class="n">Base64Decode</span><span class="p">(</span><span class="n">data</span><span class="p">));</span>
+<span class="kt">var</span> <span class="n">module</span> <span class="p">=</span> <span class="n">assembly</span><span class="p">.</span><span class="n">CreateInstance</span><span class="p">(</span><span class="s">&#34;Agent.AgentModule&#34;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">agentModule</span> <span class="p">=</span> <span class="n">module</span> <span class="k">as</span> <span class="n">IAgentModule</span><span class="p">;</span>
+<span class="n">agentModule</span><span class="p">.</span><span class="n">Initialise</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">config</span><span class="p">);</span>
+</code></pre></div><p>Therefore, an agent module must implement the IAgentModule interface, share the same <code>Agent</code> namespace and a class of <code>AgentModule</code>.</p>
+<p>This approach allows an operator to implement <em>any</em> post-ex capability in <em>any</em> way they see fit and keeps the core agent executable relatively small and benign.  The obvious downsides are the development overhead and having to push DLLs down the C2 channel.</p>
+<p>Covenant is similar in that post-ex tasks are compiled dynamically server-side, retrieved by the Grunt and invoked:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="n">Assembly</span> <span class="n">gruntTask</span> <span class="p">=</span> <span class="n">Assembly</span><span class="p">.</span><span class="n">Load</span><span class="p">(</span><span class="n">decompressedBytes</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">results</span> <span class="p">=</span> <span class="n">gruntTask</span><span class="p">.</span><span class="n">GetType</span><span class="p">(</span><span class="s">&#34;Task&#34;</span><span class="p">).</span><span class="n">GetMethod</span><span class="p">(</span><span class="s">&#34;Execute&#34;</span><span class="p">).</span><span class="n">Invoke</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="n">parameters</span><span class="p">);</span>
+</code></pre></div><p>An advantage of <code>CreateInstance</code> over <code>Load</code> is that it allows easier access to the defined methods and variables after the event.  In the current Covenant world, consider if we had an assembly like:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">Example</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Start</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// start something
+</span><span class="c1"></span>    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Stop</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// stop something
+</span><span class="c1"></span>    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>We could do <code>Assembly.Load(); GetType(&quot;Example&quot;).GetMethod(&quot;Start&quot;).Invoke(null, parameters);</code> but we wouldn&rsquo;t have subsequent access to the <code>Stop()</code> method.  We can&rsquo;t do <code>Assembly.Load(); GetType(&quot;Example&quot;).GetMethod(&quot;Stop&quot;).Invoke(null, parameters);</code> because we&rsquo;d have loaded a completely new instance of the assembly.</p>
+<p>That&rsquo;s not a problem with <code>CreateInstance</code> - the disadvantage being that the assembly hangs around whilst the agent is running.</p>
+<figure>
+    <img src="/images/sharpc2/stageone-loaded.png"/> 
+</figure>
+
+<h3 id="demo">Demo</h3>
+<p>The TeamServer has a very basic Blazor interface to demo the functionality of the framework. The 3 elements to this view are the agent grid (top), command output (middle), command box (bottom).</p>
+<figure>
+    <img src="/images/sharpc2/agent-basic.png"/> 
+</figure>
+
+<p>To interact with an agent, simply click on it in the grid.  The command output region will show any output from that agent and the placeholder in the command box will update to reflect the selected agent&rsquo;s ID.</p>
+<p>Commands are issued in the format <code>[module] [command] [data]</code>.  For example <code>core pwd</code> or <code>core ls C:\</code>.  Typing <code>help</code> will show the commands available.  This is contextual to each agent, depending on the modules that are loaded.</p>
+<p>To load an external module, we must encode to a base64 string.</p>
+<figure>
+    <img src="/images/sharpc2/agent-loadmodule.png"/> 
+</figure>
+
+<p>Chain multiple TCP Agents using the <code>link</code> command.</p>
+<figure>
+    <img src="/images/sharpc2/agent-tcpchain.png"/> 
+</figure>
+
+<p>The StageOne module extends the agent by providing fork-and-run-style capabilities.  That is, to spawn a sacrificial process to house post-ex functionality.</p>
+<p>By default, processes with PPID themselves to the agent.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[+] 10/05/2020 15:50:11 : AgentCommandRequest
+
+stageone run ping 127.0.0.1 -n 30
+
+[+] 10/05/2020 15:50:40 : AgentCommandResponse
+
+Pinging 127.0.0.1 with 32 bytes of data:
+Reply from 127.0.0.1: bytes=32 time&lt;1ms TTL=128
+Reply from 127.0.0.1: bytes=32 time&lt;1ms TTL=128
+Reply from 127.0.0.1: bytes=32 time&lt;1ms TTL=128
+Reply from 127.0.0.1: bytes=32 time&lt;1ms TTL=128
+</code></pre></div><figure>
+    <img src="/images/sharpc2/ping-default.png"/> 
+</figure>
+
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[+] 10/05/2020 15:53:46 : AgentCommandRequest
+
+stageone ppid 10992
+
+[+] 10/05/2020 15:53:46 : AgentCommandResponse
+
+Process Id  Process Name
+----------  ------------
+10992       Explorer.EXE
+</code></pre></div><figure>
+    <img src="/images/sharpc2/ping-ppid.png"/> 
+</figure>
+
+<p>I have a demo .NET assembly that can be turned into shellcode (with <a href="https://github.com/TheWover/donut">donut</a>), injected into a sacrificial process and the output collected.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Threading</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="m">30000</span><span class="p">);</span> <span class="c1">// time to take a screenshot :)
+</span><span class="c1"></span>        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Hello from .NET assembly&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[+] 10/05/2020 16:03:37 : AgentCommandRequest
+
+stageone disableetw  true
+
+[+] 10/05/2020 16:03:37 : AgentCommandResponse
+
+Disabled
+--------
+True
+</code></pre></div><figure>
+    <img src="/images/sharpc2/notepad-clr.png"/> 
+</figure>
+
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[+] 10/05/2020 17:32:56 : AgentCommandResponse
+
+Hello from .NET assembly
+</code></pre></div><p>There is also an experimental module for reverse port forwarding.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[+] 11/05/2020 08:26:49 : AgentModuleRegistered
+
+rportfwd
+
+[+] 11/05/2020 08:28:14 : AgentHelpRequest
+
+Module    Command     Description                                       HelpText
+------    -------     -----------                                       --------
+rportfwd  list        Returns a list of current reverse port forwards.  list
+rportfwd  start       Starts a new reverse port forward.                start [bind port] [forward host] [forward port]
+rportfwd  stop        Stops an existing reverse port forward.           stop [bind port]
+rportfwd  flush       Flush all reverse port forwards on an Agent.      flush
+
+[+] 11/05/2020 08:29:20 : AgentCommandRequest
+
+rportfwd start 8888 172.217.20.131 80
+
+[+] 11/05/2020 08:29:20 : AgentCommandResponse
+
+Bind Address  Bind Port  Forward Address  Forward Port
+------------  ---------  ---------------  ------------
+0.0.0.0       8888       172.217.20.131   80
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">daniel@DESKTOP-S2KEMCS:~$ curl http://127.0.0.1:8888/
+&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv=&#34;content-type&#34; content=&#34;text/html;charset=utf-8&#34;&gt;
+&lt;TITLE&gt;301 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;
+&lt;H1&gt;301 Moved&lt;/H1&gt;
+The document has moved
+&lt;A HREF=&#34;http://www.google.com:8888/&#34;&gt;here&lt;/A&gt;.
+&lt;/BODY&gt;&lt;/HTML&gt;
+</code></pre></div><h4 id="conclusion">Conclusion</h4>
+<p>This was a quick demo of SharpC2 -  I hope you can see its potential.  I find the idea an open source framework that can provide capabilities such as PPID spoofing, process mitigation policies, ETW patching, port forwarding and more, very exciting.</p>
+<p>There&rsquo;s a lot more development work to do before this can be used for anything useful in the real world - the focus will be on adding stable post-ex primitives.  My primary use case for this as a learning and training tool, not for carrying out actual engagements and the priority for development will reflect that.</p>
+<p>I&rsquo;m also not convinced Blazor is a good long-term UI solution for this type of tool.  There&rsquo;s a heavy emphasis on leveraging files from your local machine and an ideal UI would allow command line tab completion to grab assemblies directly from disk.  E.g. <code>stageone spawn C:\Path\To\Assembly.exe</code>.  Although cross-platform GUI solutions are thin on the ground <em>cough-Electron-cough</em>&hellip;</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/gadgettojscript/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/process-injection-dinvoke/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

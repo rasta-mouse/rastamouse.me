@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Automated Red Team Infrastructure Deployment with Terraform - Part 2</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#provisioners">Provisioners</a>
+      <ul>
+        <li><a href="#connection">Connection</a></li>
+        <li><a href="#local-exec">Local Exec</a></li>
+        <li><a href="#remote-exec">Remote Exec</a></li>
+        <li><a href="#file">File</a></li>
+      </ul>
+    </li>
+    <li><a href="#closing">Closing</a></li>
+  </ul>
+</nav>
+    <h2 id="introduction">Introduction</h2>
+<p>In <a href="/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/"><!-- raw HTML omitted -->Part 1<!-- raw HTML omitted --></a>, we looked at using <a href="https://www.terraform.io/">Terraform</a> to deploy cloud infrastructure (VMs, firewalls, DNS records etc).  In this post, we&rsquo;ll look at some examples for automating the installation of tools/software on the VM resources.</p>
+<h2 id="provisioners">Provisioners</h2>
+<p>Terraform has a number of <a href="https://www.terraform.io/docs/provisioners/index.html">provisioners</a> that can be used for this purpose - we&rsquo;ll explore <code>file</code>, <code>local-exec</code>, <code>remote-exec</code> and some of the cool things you can do with them.</p>
+<h3 id="connection">Connection</h3>
+<p>Some of the provisioners require remote access to the VM resources, which, for Linux, can be done via SSH.  You will see a <code>connection {}</code> block in some of the examples below.  SSH connections support both <code>password</code> and <code>publickey</code> authentication methods.</p>
+<h3 id="local-exec">Local Exec</h3>
+<p>The <code>local-exec</code> provisioner allow you to run shell commands on your local machine.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">provisioner &#34;local-exec&#34; {
+	command = &#34;something&#34;
+}
+</code></pre></div><h4 id="example">Example</h4>
+<p>This is quite useful for writing information about your infrastructure to file.  It also has a method for running a different command when an instance is destroyed.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;digitalocean_droplet&#34; &#34;paydel&#34; {
+	image = &#34;ubuntu-14-04-x64&#34;
+	name = &#34;payload-delivery&#34;
+	region = &#34;lon1&#34;
+	size = &#34;512mb&#34;
+	ssh_keys = [&#34;${digitalocean_ssh_key.rasta.id}&#34;]
+
+	provisioner &#34;local-exec&#34; {
+		command = &#34;echo ${digitalocean_droplet.paydel.ipv4_address}&gt;&gt;paydel-ip.txt&#34;
+	}
+
+	provisioner &#34;local-exec&#34; {
+		when = &#34;destroy&#34;
+		command = &#34;del paydel-ip.txt&#34;
+	}
+}
+</code></pre></div><h4 id="verification">Verification</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">digitalocean_droplet.paydel: Creation complete (ID: 63586802)
+
+Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+paydel-ip = 138.68.180.21
+
+PS C:\Users\Rasta\Desktop\terraform&gt; gc .\paydel-ip.txt
+138.68.180.21
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Destroy complete! Resources: 7 destroyed.
+
+PS C:\Users\Rasta\Desktop\terraform&gt; gc .\paydel-ip.txt
+gc : Cannot find path &#39;C:\Users\Rasta\Desktop\terraform\paydel-ip.txt&#39; because it does not exist.
+</code></pre></div><h3 id="remote-exec">Remote Exec</h3>
+<p>The <code>remote-exec</code> provisioner allows you to run shell commands on the VM, but be aware that some environment variables may not be available.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">provisioner &#34;remote-exec&#34; {
+	inline = [
+		&#34;touch /root/test.txt&#34;
+	]
+}
+</code></pre></div><h4 id="example-1">Example</h4>
+<p>The DNS redirector VM was designed to receive incoming DNS requests and redirect them to the DNS C2 server.  To do that, we need to:</p>
+<ul>
+<li>Install Socat</li>
+<li>Configure the VM to start socat on boot</li>
+<li>Reboot the VM</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;aws_instance&#34; &#34;dns-rdir&#34; {
+	ami = &#34;ami-489f8e2c&#34; # Amazon Linux AMI 2017.03.1
+	instance_type = &#34;t2.micro&#34;
+	key_name = &#34;${aws_key_pair.rasta.key_name}&#34;
+	vpc_security_group_ids = [&#34;${aws_security_group.dns-rdir.id}&#34;]
+	subnet_id = &#34;${aws_subnet.default.id}&#34;
+	associate_public_ip_address = true
+
+	provisioner &#34;remote-exec&#34; {
+		inline = [
+			&#34;sudo yum -y update&#34;,
+			&#34;sudo yum -y install socat&#34;,
+			&#34;echo \&#34;socat udp4-listen:53,reuseaddr,fork udp:${digitalocean_droplet.dns-c2.ipv4_address}; echo -ne \\n &amp;\&#34; | sudo tee -a /etc/rc.local&#34;,
+			&#34;sudo reboot&#34;
+		]
+
+		connection {
+			type = &#34;ssh&#34;
+			user = &#34;ec2-user&#34;
+			private_key = &#34;${file(&#34;${var.private-key}&#34;)}&#34;
+		}
+	}
+}
+</code></pre></div><p>Because these are relatively simple tasks - we can just do them on the command line.  The other advantage you can see, is that we don&rsquo;t need to know what the IP address of the DNS C2 server will be up front - we can just reference it through Terraform and it will take care of the rest :)</p>
+<h4 id="verification-1">Verification</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[root@ip-10-0-0-163 ~]# cat /etc/rc.local
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don&#39;t
+# want to do the full Sys V style init stuff.
+
+touch /var/lock/subsys/local
+socat udp4-listen:53,reuseaddr,fork udp:178.62.42.201; echo -ne \n &amp;
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[root@ip-10-0-0-163 ~]# ps aux | grep [s]ocat
+root      2527  0.0  0.3  42408  3972 ?        S    Sep23   0:00 socat udp4-listen:53,reuseaddr,fork udp:178.62.42.201
+</code></pre></div><h3 id="file">File</h3>
+<p>The <code>file</code> provisioner is simply used to copy files or directories from your local machine to the VM.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">provisioner &#34;file&#34; {
+	source      = &#34;test.txt&#34;
+	destination = &#34;/root/test.txt&#34;
+}
+</code></pre></div><h4 id="example-2">Example</h4>
+<p>The HTTP C2 VM was designed to be an HTTP/S Cobalt Strike server.  To do that, we need to:</p>
+<ul>
+<li>Install Oracle Java</li>
+<li>Install git</li>
+<li>Download &amp; extract Cobalt Strike</li>
+<li>Clone Raphael&rsquo;s Malleable C2 repo</li>
+</ul>
+<p>This is a little more complicated, so we could write a bash script to do all the work:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="cp">#!/bin/bash
+</span><span class="cp"></span>
+apt -y update
+apt -y install git
+
+mkdir /usr/local/java
+curl -s -j -L -H <span class="s2">&#34;Cookie: oraclelicense=accept-securebackup-cookie&#34;</span> http://download.oracle.com/otn-pub/java/jdk/8u144-b01/090f390dda5b47b9b721c7dfaa008135/jdk-8u144-linux-x64.tar.gz -o /usr/local/java/jdk-8u144-linux-x64.tar.gz
+<span class="nb">cd</span> /usr/local/java
+tar zxf jdk-8u144-linux-x64.tar.gz
+<span class="nb">echo</span> <span class="s2">&#34;JAVA_HOME=/usr/local/java/jdk1.8.0_144&#34;</span> &gt;&gt; /etc/profile
+<span class="nb">echo</span> <span class="s2">&#34;JRE_HOME=/usr/local/java/jdk1.8.0_144/jre&#34;</span> &gt;&gt; /etc/profile
+<span class="nb">echo</span> <span class="s2">&#34;PATH=</span><span class="nv">$PATH</span><span class="s2">:/usr/local/java/jdk1.8.0_144/bin:/usr/local/java/jdk1.8.0_144/jre/bin&#34;</span> &gt;&gt; /etc/profile
+<span class="nb">echo</span> <span class="s2">&#34;export JAVA_HOME&#34;</span> &gt;&gt; /etc/profile
+<span class="nb">echo</span> <span class="s2">&#34;export JRE_HOME&#34;</span> &gt;&gt; /etc/profile
+<span class="nb">echo</span> <span class="s2">&#34;export PATH&#34;</span> &gt;&gt; /etc/profile
+update-alternatives --install <span class="s2">&#34;/usr/bin/java&#34;</span> <span class="s2">&#34;java&#34;</span> <span class="s2">&#34;/usr/local/java/jdk1.8.0_144/bin/java&#34;</span> <span class="m">1</span>
+update-alternatives --install <span class="s2">&#34;/usr/bin/javaws&#34;</span> <span class="s2">&#34;javaws&#34;</span> <span class="s2">&#34;/usr/local/java/jdk1.8.0_144/bin/javaws&#34;</span> <span class="m">1</span>
+update-alternatives --set java /usr/local/java/jdk1.8.0_144/bin/java
+update-alternatives --set javaws /usr/local/java/jdk1.8.0_144/bin/javaws
+rm /usr/local/java/jdk-8u144-linux-x64.tar.gz
+
+<span class="nv">key</span><span class="o">=</span><span class="s1">&#39;xxxx-xxxx-xxxx-xxxx&#39;</span>
+<span class="nv">token</span><span class="o">=</span><span class="sb">`</span>curl -s https://www.cobaltstrike.com/download -d <span class="s2">&#34;dlkey=</span><span class="si">${</span><span class="nv">key</span><span class="si">}</span><span class="s2">&#34;</span> <span class="p">|</span> grep <span class="s1">&#39;href=&#34;/downloads/&#39;</span> <span class="p">|</span> cut -d <span class="s1">&#39;/&#39;</span> -f3<span class="sb">`</span>
+curl -s https://www.cobaltstrike.com/downloads/<span class="si">${</span><span class="nv">token</span><span class="si">}</span>/cobaltstrike-trial.tgz -o /tmp/cobaltstrike.tgz
+mkdir /opt/cobaltstrike
+tar zxf /tmp/cobaltstrike.tgz -C /opt
+<span class="nb">echo</span> <span class="si">${</span><span class="nv">key</span><span class="si">}</span> &gt; /root/.cobaltstrike.license
+rm /tmp/cobaltstrike.tgz
+
+git clone https://github.com/rsmudge/Malleable-C2-Profiles.git /opt/cobaltstrike/c2
+</code></pre></div><p>We can then combine provisioners, i.e. use <code>file</code> to upload the script and <code>remote-exec</code> to execute it.  They are executed in the order placed (from top to bottom).</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;digitalocean_droplet&#34; &#34;http-c2&#34; {
+	image = &#34;ubuntu-14-04-x64&#34;
+	name = &#34;http-c2&#34;
+	region = &#34;lon1&#34;
+	size = &#34;2gb&#34;
+	ssh_keys = [&#34;${digitalocean_ssh_key.rasta.id}&#34;]
+
+	provisioner &#34;file&#34; {
+		source = &#34;scripts\\install-c2.txt&#34;
+		destination = &#34;/tmp/install-c2.sh&#34;
+
+		connection {
+			type = &#34;ssh&#34;
+			user = &#34;ec2-user&#34;
+			private_key = &#34;${file(&#34;${var.private-key}&#34;)}&#34;
+		}
+	}
+
+	provisioner &#34;remote-exec&#34; {
+		inline = [
+			&#34;chmod +x /tmp/install-c2.sh&#34;,
+			&#34;/tmp/install-c2.sh&#34;,
+			&#34;rm -rf /tmp/*&#34;
+		]
+
+		connection {
+			type = &#34;ssh&#34;
+			user = &#34;ec2-user&#34;
+			private_key = &#34;${file(&#34;${var.private-key}&#34;)}&#34;
+		}
+	}
+}
+</code></pre></div><h4 id="verification-2">Verification</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">root@http-c2:~# java -version
+java version &#34;1.8.0_144&#34;
+Java(TM) SE Runtime Environment (build 1.8.0_144-b01)
+Java HotSpot(TM) 64-Bit Server VM (build 25.144-b01, mixed mode)
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">root@http-c2:~# ll /opt/cobaltstrike/
+total 21748
+drwxr-xr-x 4  501 dialout     4096 Sep 24 10:22 ./
+drwxr-xr-x 3 root root        4096 Sep 24 10:22 ../
+-rwxr-xr-x 1  501 dialout      126 Sep 21 02:49 agscript*
+drwxr-xr-x 6 root root        4096 Sep 24 10:22 c2/
+-rwxr-xr-x 1  501 dialout      144 Sep 21 02:49 c2lint*
+-rwxr-xr-x 1  501 dialout       93 Sep 21 02:49 cobaltstrike*
+-rw-r--r-- 1  501 dialout 21638284 Sep 21 02:49 cobaltstrike.jar
+-rw-r--r-- 1  501 dialout    96104 Sep 21 02:49 icon.jpg
+-rw-r--r-- 1  501 dialout    87101 Sep 21 02:49 license.pdf
+-rw-r--r-- 1  501 dialout    25388 Sep 21 02:49 readme.txt
+-rw-r--r-- 1  501 dialout   103682 Sep 21 02:49 releasenotes.txt
+-rwxr-xr-x 1  501 dialout     1865 Sep 21 02:49 teamserver*
+drwxr-xr-x 2  501 dialout     4096 Sep 21 02:49 third-party/
+-rwxr-xr-x 1  501 dialout       87 Sep 21 02:49 update*
+-rw-r--r-- 1  501 dialout   266484 Sep 21 02:49 update.jar
+</code></pre></div><h2 id="closing">Closing</h2>
+<p>These were just 3 examples of ways to use Terraform Provisioners to execute post-build tasks - hopefully they will give you ideas about how you can automate your own complete builds.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/rdp-jump-boxes/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/vhd-backup/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

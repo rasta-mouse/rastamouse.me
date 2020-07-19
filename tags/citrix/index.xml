@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>citrix on Rasta Mouse</title>
+    <title>citrix on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/citrix/</link>
-    <description>Recent content in citrix on Rasta Mouse</description>
+    <description>Recent content in citrix on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sat, 13 May 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/citrix/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>A Citrix Story</title>
-      <link>https://rastamouse.me/2017/05/a-citrix-story/</link>
+      <link>https://rastamouse.me/blog/a-citrix-story/</link>
       <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/05/a-citrix-story/</guid>
+      <guid>https://rastamouse.me/blog/a-citrix-story/</guid>
       <description>&lt;p&gt;I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.&lt;/p&gt;</description>
     </item>
     

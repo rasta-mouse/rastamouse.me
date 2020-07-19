@@ -1,551 +1,538 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://rastamouse.me/categories/</loc>
-    <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/post/</loc>
-    <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://rastamouse.me/</loc>
-    <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2020/05/sharpc2/</loc>
-    <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/tags/</loc>
-    <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/categories/blog/</loc>
-    <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/c#/</loc>
-    <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/categories/</loc>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/dinvoke/</loc>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/edr/</loc>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/injection/</loc>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/</loc>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/process-injection-dinvoke/</loc>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/</loc>
+    <lastmod>2020-07-19T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/c2/</loc>
     <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/framework/</loc>
     <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/red-team/</loc>
     <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2020/02/gadgettojscript/</loc>
+    <loc>https://rastamouse.me/blog/sharpc2/</loc>
+    <lastmod>2020-05-10T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/posts/post1/</loc>
+    <lastmod>2020-04-11T18:49:01+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/posts/post2/</loc>
+    <lastmod>2020-04-11T18:49:01+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/posts/</loc>
+    <lastmod>2020-04-11T18:49:01+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/gadgettojscript/</loc>
     <lastmod>2020-02-19T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/gadgettojscript/</loc>
     <lastmod>2020-02-19T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2019/12/covenant-tasks-101/</loc>
-    <lastmod>2019-12-28T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/covenant/</loc>
     <lastmod>2019-12-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/covenant-tasks-101/</loc>
+    <lastmod>2019-12-28T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/post-ex/</loc>
     <lastmod>2019-12-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/tasks/</loc>
     <lastmod>2019-12-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2019/09/mwr-labs-c3-first-look/</loc>
-    <lastmod>2019-09-03T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/c3/</loc>
     <lastmod>2019-09-03T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/externalc2/</loc>
     <lastmod>2019-09-03T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/08/tikiservice/</loc>
-    <lastmod>2019-08-28T00:00:00+00:00</lastmod>
+    <loc>https://rastamouse.me/blog/c3-first-look/</loc>
+    <lastmod>2019-09-03T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/aggressor/</loc>
     <lastmod>2019-08-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/psexec/</loc>
     <lastmod>2019-08-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/tikiservice/</loc>
+    <lastmod>2019-08-28T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/tikitorch/</loc>
     <lastmod>2019-08-28T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/08/covenant-donut-tikitorch/</loc>
+    <loc>https://rastamouse.me/blog/covenant-payloads/</loc>
     <lastmod>2019-08-20T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/donut/</loc>
     <lastmod>2019-08-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/tikispawn/</loc>
     <lastmod>2019-08-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2019/06/the-return-of-aggressor/</loc>
-    <lastmod>2019-06-26T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/msbuild/</loc>
     <lastmod>2019-06-26T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/06/tikivader/</loc>
-    <lastmod>2019-06-15T00:00:00+00:00</lastmod>
+    <loc>https://rastamouse.me/blog/tikigressor/</loc>
+    <lastmod>2019-06-26T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/keying/</loc>
     <lastmod>2019-06-15T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/tikivader/</loc>
+    <lastmod>2019-06-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/tikivader/</loc>
     <lastmod>2019-06-15T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/lolbin/</loc>
     <lastmod>2019-06-13T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/06/tikispawn-msbuild/</loc>
+    <loc>https://rastamouse.me/blog/tikispawn-msbuild/</loc>
     <lastmod>2019-06-13T00:00:00+00:00</lastmod>
   </url>
   
   <url>
+    <loc>https://rastamouse.me/archives/</loc>
+    <lastmod>2019-05-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rastamouse.me/tags/arbitrary-file-write/</loc>
-    <lastmod>2019-04-27T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/tags/elevation-of-privilege/</loc>
-    <lastmod>2019-04-27T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/tags/standard-collector/</loc>
-    <lastmod>2019-04-27T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2019/04/weaponizing-privileged-file-writes-with-windows-collector-service/</loc>
     <lastmod>2019-04-27T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/cve-2019-0841/</loc>
     <lastmod>2019-04-27T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/</loc>
-    <lastmod>2019-04-13T00:00:00+00:00</lastmod>
+    <loc>https://rastamouse.me/tags/elevation-of-privilege/</loc>
+    <lastmod>2019-04-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/standard-collector/</loc>
+    <lastmod>2019-04-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/collector-service/</loc>
+    <lastmod>2019-04-27T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/dacl/</loc>
     <lastmod>2019-04-13T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/laps/</loc>
     <lastmod>2019-04-13T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/03/ews-installapp/</loc>
-    <lastmod>2019-03-21T00:00:00+00:00</lastmod>
+    <loc>https://rastamouse.me/blog/weaponizing-cve-2019-0841/</loc>
+    <lastmod>2019-04-13T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/ews/</loc>
     <lastmod>2019-03-21T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/ews/</loc>
+    <lastmod>2019-03-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/payloads/</loc>
     <lastmod>2019-03-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/process-hollowing/</loc>
     <lastmod>2019-03-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/03/tikitorch/</loc>
+    <loc>https://rastamouse.me/blog/tikitorch/</loc>
     <lastmod>2019-03-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/about/</loc>
+    <lastmod>2019-02-28T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/active-directory/</loc>
     <lastmod>2019-01-13T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/gpo/</loc>
     <lastmod>2019-01-13T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/01/gpo-abuse-part-2/</loc>
+    <loc>https://rastamouse.me/blog/gpo-abuse-pt2/</loc>
     <lastmod>2019-01-13T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2019/01/gpo-abuse-part-1/</loc>
+    <loc>https://rastamouse.me/blog/gpo-abuse-pt1/</loc>
     <lastmod>2019-01-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/amsi/</loc>
     <lastmod>2018-12-31T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/12/amsiscanbuffer-bypass-part-4/</loc>
+    <loc>https://rastamouse.me/blog/asb-bypass-pt4/</loc>
     <lastmod>2018-12-31T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/bypass/</loc>
     <lastmod>2018-12-31T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/11/amsiscanbuffer-bypass-part-3/</loc>
+    <loc>https://rastamouse.me/blog/asb-bypass-pt3/</loc>
     <lastmod>2018-11-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/10/amsiscanbuffer-bypass-part-2/</loc>
+    <loc>https://rastamouse.me/blog/asb-bypass-pt2/</loc>
     <lastmod>2018-10-31T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/.net/</loc>
     <lastmod>2018-09-19T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/09/a-lesson-in-.net-framework-versions/</loc>
+    <loc>https://rastamouse.me/blog/dot-net/</loc>
     <lastmod>2018-09-19T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2018/09/enumerating-applocker-config/</loc>
-    <lastmod>2018-09-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/applocker/</loc>
     <lastmod>2018-09-08T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/applocker/</loc>
+    <lastmod>2018-09-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/registry/</loc>
     <lastmod>2018-09-08T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/sysvol/</loc>
     <lastmod>2018-09-08T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2018/06/rdpclip/</loc>
-    <lastmod>2018-06-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/clipboard/</loc>
     <lastmod>2018-06-09T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/rdp/</loc>
     <lastmod>2018-06-09T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/05/csharp-dotnettojscript-xsl/</loc>
-    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
+    <loc>https://rastamouse.me/blog/rdpclip/</loc>
+    <lastmod>2018-06-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/csharp/</loc>
     <lastmod>2018-05-15T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/xsl/</loc>
+    <lastmod>2018-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/dotnettojscript/</loc>
     <lastmod>2018-05-15T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/xsl/</loc>
     <lastmod>2018-05-15T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/05/review-active-directory-attacks-for-red-and-blue-teams/</loc>
+    <loc>https://rastamouse.me/blog/brucon-18/</loc>
     <lastmod>2018-05-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/03/a-view-of-persistence/</loc>
+    <loc>https://rastamouse.me/blog/view-of-persistence/</loc>
     <lastmod>2018-03-22T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/persistence/</loc>
     <lastmod>2018-03-22T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/03/laps-part-2/</loc>
+    <loc>https://rastamouse.me/blog/laps-pt2/</loc>
     <lastmod>2018-03-17T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/privilege-escalation/</loc>
     <lastmod>2018-03-17T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/03/laps-part-1/</loc>
+    <loc>https://rastamouse.me/blog/laps-pt1/</loc>
     <lastmod>2018-03-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2018/02/red-team-infrastructure-aws-encrypted-ebs/</loc>
-    <lastmod>2018-02-25T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/infrastructure/</loc>
     <lastmod>2018-02-25T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2018/02/vhd-to-da/</loc>
+    <loc>https://rastamouse.me/blog/encrypted-ebs/</loc>
+    <lastmod>2018-02-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/vhd-backup/</loc>
     <lastmod>2018-02-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2017/09/automated-red-team-infrastructure-deployment-with-terraform-part-2/</loc>
+    <loc>https://rastamouse.me/blog/terraform-pt2/</loc>
     <lastmod>2017-09-23T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/terraform/</loc>
     <lastmod>2017-09-23T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/</loc>
-    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/dpapi/</loc>
     <lastmod>2017-08-31T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/rdp-jump-boxes/</loc>
+    <lastmod>2017-08-31T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/mimikatz/</loc>
     <lastmod>2017-08-31T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/</loc>
+    <loc>https://rastamouse.me/blog/terraform-pt1/</loc>
     <lastmod>2017-08-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2017/07/how-to-accidently-win-against-av/</loc>
-    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/antivirus/</loc>
     <lastmod>2017-07-05T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/anti-virus/</loc>
+    <lastmod>2017-07-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/office/</loc>
     <lastmod>2017-07-05T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/ole/</loc>
     <lastmod>2017-07-05T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://rastamouse.me/2017/06/psexec-much/</loc>
-    <lastmod>2017-06-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/cobalt-strike/</loc>
     <lastmod>2017-06-18T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2017/05/playing-with-cuckoo/</loc>
-    <lastmod>2017-05-18T00:00:00+00:00</lastmod>
+    <loc>https://rastamouse.me/blog/psexec-much/</loc>
+    <lastmod>2017-06-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/cuckoo/</loc>
     <lastmod>2017-05-18T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/malware/</loc>
     <lastmod>2017-05-18T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/2017/05/a-citrix-story/</loc>
+    <loc>https://rastamouse.me/blog/playing-with-cuckoo/</loc>
+    <lastmod>2017-05-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/blog/a-citrix-story/</loc>
     <lastmod>2017-05-13T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/citrix/</loc>
     <lastmod>2017-05-13T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/pass-the-ticket/</loc>
     <lastmod>2017-05-13T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rastamouse.me/tags/silver-tickets/</loc>
     <lastmod>2017-05-13T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://rastamouse.me/archives/</loc>
-    <priority>0</priority>
+    <loc>https://rastamouse.me/contact/</loc>
+  </url>
+  
+  <url>
+    <loc>https://rastamouse.me/tags/index/</loc>
   </url>
   
 </urlset>

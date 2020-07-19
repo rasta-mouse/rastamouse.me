@@ -1,35 +1,44 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>c# on Rasta Mouse</title>
+    <title>c# on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/c#/</link>
-    <description>Recent content in c# on Rasta Mouse</description>
+    <description>Recent content in c# on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
+    <lastBuildDate>Sun, 19 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/c#/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Process Injection using DInvoke</title>
+      <link>https://rastamouse.me/blog/process-injection-dinvoke/</link>
+      <pubDate>Sun, 19 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/blog/process-injection-dinvoke/</guid>
+      <description>Introduction Back in June, I posted a short update on my shared blog regarding the SharpSploit v1.6 release. Within that post I mentioned Dynamic Invocation, which is a new feature introduced by TheWover and b33f. It wasn&amp;rsquo;t the focus of my post so I didn&amp;rsquo;t go into any details, but TheWover already published some information about what DInvoke is and how to use it.
+I obviously won&amp;rsquo;t reiterate everything written there, but here&amp;rsquo;s a quick recap:</description>
+    </item>
+    
+    <item>
       <title>SharpC2</title>
-      <link>https://rastamouse.me/2020/05/sharpc2/</link>
+      <link>https://rastamouse.me/blog/sharpc2/</link>
       <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2020/05/sharpc2/</guid>
+      <guid>https://rastamouse.me/blog/sharpc2/</guid>
       <description>&lt;p&gt;Back in October 2018 (yes, 2018!), I &lt;del&gt;approached&lt;/del&gt; begged &lt;a href=&#34;https://twitter.com/_xpn_&#34;&gt;xpn&lt;/a&gt; for a collaboration on an idea I had for a .NET C2 Framework.  We worked on the project for about a month or so before real life got in the way and stalled development.  In February 2019, &lt;a href=&#34;https://twitter.com/cobbr_io&#34;&gt;cobbr&lt;/a&gt; released &lt;a href=&#34;https://github.com/cobbr/Covenant&#34;&gt;Covenant&lt;/a&gt; which is also a .NET C2 Framework.  I subsequently spent some time &lt;a href=&#34;https://github.com/cobbr/Covenant/commits?author=rasta-mouse&#34;&gt;contributing&lt;/a&gt; to, and &lt;a href=&#34;https://rastamouse.me/tags/covenant/&#34;&gt;writing about&lt;/a&gt; Covenant - but I&amp;rsquo;ve always wanted to get back to our original project.&lt;/p&gt;
-
 &lt;p&gt;I decided to re-visit SharpC2 (a very creative name on my part) over the 2019 Christmas period to try and get it into a position where we could release a proof of concept.  Yet somehow I&amp;rsquo;m not writing this until May 2020!  We can blame my &lt;a href=&#34;https://www.zeropointsecurity.co.uk/annoucements/2020/4/13/red-team-ops-is-back&#34;&gt;RTO course&lt;/a&gt; for that.&lt;/p&gt;
-
 &lt;p&gt;This post is intended to provide an overview of SharpC2&amp;rsquo;s design concepts and some showcase examples of how it can be used.  Code can be found on &lt;a href=&#34;https://github.com/SharpC2/SharpC2/tree/dev&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>A Lesson in .NET Framework Versions</title>
-      <link>https://rastamouse.me/2018/09/a-lesson-in-.net-framework-versions/</link>
+      <link>https://rastamouse.me/blog/dot-net/</link>
       <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/09/a-lesson-in-.net-framework-versions/</guid>
+      <guid>https://rastamouse.me/blog/dot-net/</guid>
       <description>&lt;p&gt;With the emergence of more C# and .NET tooling, I occasionally see people tripping up over this.  It&amp;rsquo;s not a huge issue, just something to be aware of.&lt;/p&gt;</description>
     </item>
     

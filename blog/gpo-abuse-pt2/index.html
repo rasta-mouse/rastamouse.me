@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">GPO Abuse - Part 2</h1>
+    
+      
+    <nav id="TableOfContents"></nav>
+    <p>Before we can really dive into modifying GPOs, we need to try and understand some of the intricacies of how they&rsquo;re updated normally in GPMC and AD.  Because believe me, it aint as simple as it appears.</p>
+<p>When you first create and name a GPO and then look at it the Details tab, you&rsquo;ll see it has these <code>User</code> and <code>Computer</code> version fields, with <code># (AD), # (SYSVOL)</code>.</p>
+<figure>
+    <img src="/images/gpo-abuse-pt2/test-gpo.png"/> 
+</figure>
+
+<p>For every GPO, there is also a corresponding path on disk (which I believe is called the Group Policy Template) at <code>C:\Windows\SYSVOL\domain\Policies\&lt;guid&gt;</code>.  For this GPO, it would be <code>C:\Windows\SYSVOL\domain\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}</code>.  From a domain member, you can also access SYSVOL over its network share e.g. <code>\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}</code>.</p>
+<p>Inside the GPT, you have a <code>Machine</code> and <code>User</code> directory and a <code>GPT.INI</code> file.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; ls &#34;\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}&#34;
+
+
+    Directory: \\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       13/01/2019     11:13                Machine
+d-----       13/01/2019     11:13                User
+-a----       13/01/2019     11:13             59 GPT.INI
+</code></pre></div><p>No points for guessing that <code>Computer</code> policies are dropped into <code>Machine</code> and <code>User</code> policies into <code>User</code>.</p>
+<p><code>GPT.INI</code> is a really simple file that contains:</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; cat &#34;\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}\GPT.INI&#34;
+[General]
+Version=0
+displayName=New Group Policy Object
+</code></pre></div><blockquote>
+<p>Note that the <code>displayName</code> parameter never changes <code>¯\_(ツ)_/¯</code>.</p>
+</blockquote>
+<p>If we make some changes to the GPO and refresh GPMC, we can see that the <code>AD</code> and <code>SYSVOL</code> numbers for <code>Computer</code> have been pushed up.</p>
+<figure>
+    <img src="/images/gpo-abuse-pt2/gpo-change-1.png"/> 
+</figure>
+
+<p>They seem to increase for every individual change that happens, but since GPMC does all sorts in the background that you can&rsquo;t see unless you&rsquo;re monitoring with something like Process Monitor, seemingly small changes can result in a large increase.</p>
+<p>The <code>AD</code> and <code>SYSVOL</code> values are stored in different places, but are pretty important to understand.</p>
+<p><code>SYSVOL</code> is stored in that <code>GPT.INI</code> file. If we read it again, we&rsquo;ll see that the version has changed.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; cat &#34;\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}\GPT.INI&#34;
+[General]
+Version=12
+displayName=New Group Policy Object
+</code></pre></div><p>It gets a bit more complicated if you have a GPO that applies both <code>Computer</code> and <code>User</code> policies, since the number format of <code>GPT.INI</code> changes.</p>
+<figure>
+    <img src="/images/gpo-abuse-pt2/gpo-change-2.png"/> 
+</figure>
+
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; cat &#34;\\testlab.local\SYSVOL\testlab.local\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}\GPT.INI&#34;
+[General]
+Version=65548
+displayName=New Group Policy Object
+</code></pre></div><p><code>version = [user verion][computer version]</code> where each value is <code>16 bits</code>.</p>
+<p>To &ldquo;translate&rdquo;, we first convert the <code>decimal</code> to <code>hex</code>.  With a calculator in scientific mode, this comes out to be <code>1000C</code>.  But to make up for the fact these are 16 bit, it&rsquo;s actually <code>0001000C</code>, because a calculator won&rsquo;t display the leading zeros.</p>
+<p>So <code>0001</code> is <code>1</code> and <code>000C</code> is <code>12</code>.</p>
+<p>The <code>AD</code> number is stored as an attribute on the Group Policy object in AD.  You can query it with PowerView like:</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainGPO -Identity &#34;Test GPO&#34; -Properties VersionNumber
+
+versionnumber
+-------------
+       65548
+</code></pre></div><p>And it uses exactly the same format.</p>
+<p>When you modify a GPO in GPMC it will update the corresponding files in SYSVOL, update the value in <code>GPT.INI</code> and then update its <code>versionnumber</code> attribute in AD.</p>
+<p>To modify the GPO without GPMC, you have to go into SYSVOL and modify the files manually. E.g. if we wanted to deploy some new local admins using Restricted Groups, we&rsquo;d have to modify <code>C:\Windows\SYSVOL\domain\Policies\{F3003ADC-17E3-4FBE-A11E-6A41779ADD6E}\Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf</code>.</p>
+<p>The limitation of updating the file without incrementing the <code>AD</code> or <code>SYSVOL</code> version numbers is that:</p>
+<ol>
+<li>Clients will not automatically pull the changes because they think they already have the latest configuration
+(unless you have code exec on a box and can issue a <code>gpupdate /force</code>)</li>
+<li>The changes will not be replicated across domain controllers</li>
+</ol>
+<p>To enable all clients to pull the changes as part of their regular group policy update schedule, you must increment both <code>AD</code> and <code>SYSVOL</code> version numbers manually.</p>
+<p><code>GPT.INI</code> is straight forward as it&rsquo;s just a text file.  The <code>versionnumber</code> attribute can be updated with PowerView:</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainGPO -Identity &#34;Test GPO&#34; | Set-DomainObject -Set @{&#39;versionnumber&#39;=&#39;1337&#39;}
+PS &gt; Get-DomainGPO -Identity &#34;Test GPO&#34; -Properties VersionNumber
+
+versionnumber
+-------------
+         1337
+</code></pre></div><p>You must always keep the two values identical, otherwise you will cause <code>AD / SYSVOL Version Mismatch</code> errors.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/gpo-abuse-pt1/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/tikitorch/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

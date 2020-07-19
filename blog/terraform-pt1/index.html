@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Automated Red Team Infrastructure Deployment with Terraform - Part 1</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#design">Design</a>
+      <ul>
+        <li><a href="#network-access">Network Access</a></li>
+        <li><a href="#cloud-segregation">Cloud Segregation</a></li>
+        <li><a href="#domains">Domains</a></li>
+        <li><a href="#dontgethackedsite">dontgethacked.site</a></li>
+      </ul>
+    </li>
+    <li><a href="#terraform">Terraform</a>
+      <ul>
+        <li><a href="#custom-variables">Custom Variables</a></li>
+        <li><a href="#providers">Providers</a></li>
+        <li><a href="#ssh-keys">SSH Keys</a></li>
+        <li><a href="#aws-vpc">AWS VPC</a></li>
+        <li><a href="#aws-security-groups">AWS Security Groups</a></li>
+        <li><a href="#aws-instances">AWS Instances</a></li>
+        <li><a href="#aws-cloudfront">AWS CloudFront</a></li>
+        <li><a href="#digital-ocean-droplets">Digital Ocean Droplets</a></li>
+        <li><a href="#digital-ocean-firewalls">Digital Ocean Firewalls</a></li>
+        <li><a href="#cloudfront">Cloudfront</a></li>
+        <li><a href="#outputs">Outputs</a></li>
+      </ul>
+    </li>
+    <li><a href="#deploy--test">Deploy &amp; Test</a>
+      <ul>
+        <li><a href="#payload-delivery">Payload Delivery</a></li>
+        <li><a href="#dns-beacon">DNS Beacon</a></li>
+        <li><a href="#domain-front">Domain Front</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <h2 id="introduction">Introduction</h2>
+<p>Deploying resiliant Red Team infrastructure can be quite a time consuming process.  This <a href="https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki">wiki</a> maintained by <a href="https://twitter.com/424f424f">Steve Borosh</a> and <a href="https://twitter.com/bluscreenofjeff">Jeff Dimmock</a> is probably the best public resource I&rsquo;ve seen in regards to design considerations and hardening tips.</p>
+<p>For someone like myself, who destroys and stands fresh infrastructure up for each engagement, building everything by hand is a long, laborious process.  Anything that can be automated is a good thing.</p>
+<h2 id="design">Design</h2>
+<p>For the purpose of this post, this is what we&rsquo;re going to build:</p>
+<figure>
+    <img src="/images/terraform/diagram.jpg"/> 
+</figure>
+
+<h3 id="network-access">Network Access</h3>
+<h4 id="inbound">Inbound</h4>
+<ul>
+<li>Inbound 22<!-- raw HTML omitted -->1<!-- raw HTML omitted --> on every VM &amp; 50050 on the C2 servers, only from the attackers IP.</li>
+<li>Inbound 53, 80 &amp; 443 on the redirectors, from any source<!-- raw HTML omitted -->2<!-- raw HTML omitted -->.</li>
+<li>Inbound 80 &amp; 443 on the payload delivery server, only from the HTTP/S redirector IP.</li>
+<li>Inbound 53 on the DNS C2 server, only from the redirector IPs.</li>
+<li>Inbound 80 &amp; 443 on the HTTP/S C2 server, from any source<!-- raw HTML omitted -->2<!-- raw HTML omitted -->.</li>
+</ul>
+<p><!-- raw HTML omitted -->1<!-- raw HTML omitted --> I&rsquo;m using the same SSH key across all instances for this post - separate them out as much as you like.<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->2<!-- raw HTML omitted --> Again, I&rsquo;m leaving things loosey-goosey.  You may want to restrict these to something more sensible (e.g. the CIDR range of your victim).</p>
+<h4 id="outbound">Outbound</h4>
+<ul>
+<li>Outbound 53, 80, 443 on each VM to any destination for installing stuff<!-- raw HTML omitted -->3<!-- raw HTML omitted -->.</li>
+</ul>
+<p><!-- raw HTML omitted -->3<!-- raw HTML omitted --> You can leave these open for initial installations, then close them afterwards.</p>
+<h3 id="cloud-segregation">Cloud Segregation</h3>
+<ul>
+<li>The redirectors will be hosted in AWS EC2.</li>
+<li>The C2 &amp; payload delivery servers will be hosted in Digital Ocean.</li>
+</ul>
+<h3 id="domains">Domains</h3>
+<p><code>dontgethacked.site</code> &amp; <code>rekt.site</code> are already configured to use Cloudflare DNS, but are currently without records.</p>
+<h4 id="rektsite">rekt.site</h4>
+<ul>
+<li><code>rekt.site</code> will be used for DNS Beacons, for which we&rsquo;ll need an A &amp; NS record.</li>
+<li><code>NS</code> record -&gt; DNS redirector IP.</li>
+<li><code>A</code> record for <code>webdisk</code> -&gt; <code>ns1.rekt.site</code>.</li>
+</ul>
+<h3 id="dontgethackedsite">dontgethacked.site</h3>
+<ul>
+<li><code>{support, cpanel}.dontgethacked.site</code> -&gt; HTTP/S redirector.</li>
+<li><code>static.dontgethacked.site</code> -&gt; HTTP/S C2 server.</li>
+<li>CloudFront Web Distribution for <code>static.dontgethacked.site</code>.</li>
+</ul>
+<h2 id="terraform">Terraform</h2>
+<p>To accomplish this, we&rsquo;ll be using <a href="https://www.terraform.io/">Terraform</a> - an open source tool that codifies APIs into declarative configuration files.  It supports many different <a href="https://www.terraform.io/docs/providers/index.html">providers</a>, including AWS, Azure, Bitbucket, Cloudflare, DigitalOcean, Docker, GitHub, Google Cloud, OpenStack, OVH and vSphere to name a few.</p>
+<h3 id="custom-variables">Custom Variables</h3>
+<p>First, we define custom variables for the things we&rsquo;ll need to refer to in the upcoming configurations.  These include API tokens, IP address, SSH keys and so on.</p>
+<h4 id="variablestf">variables.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">variable &#34;aws-akey&#34; {}
+variable &#34;aws-skey&#34; {}
+variable &#34;do-token&#34; {}
+variable &#34;cf-email&#34; {}
+variable &#34;cf-token&#34; {}
+variable &#34;rasta-key&#34; {}
+variable &#34;attacker-ip&#34; {}
+variable &#34;dom1&#34; {}
+variable &#34;sub1&#34; {}
+variable &#34;sub2&#34; {}
+variable &#34;sub3&#34; {}
+variable &#34;dom2&#34; {}
+variable &#34;sub4&#34; {}
+</code></pre></div><h4 id="terraformtfvars">terraform.tfvars</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">aws-akey = &#34;[removed]&#34;
+aws-skey = &#34;[removed]&#34;
+
+do-token = &#34;[removed]&#34;
+
+cf-email = &#34;[removed]&#34;
+cf-token = &#34;[removed]&#34;
+
+rasta-key = &#34;rasta.pub&#34;
+
+attacker-ip = &#34;2.31.13.109/32&#34;
+
+dom1 = &#34;dontgethacked.site&#34;
+sub1 = &#34;support&#34;
+sub2 = &#34;cpanel&#34;
+sub3 = &#34;static&#34;
+
+dom2 = &#34;rekt.site&#34;
+sub4 = &#34;webdisk&#34;
+</code></pre></div><h3 id="providers">Providers</h3>
+<p>Here we define the provider parameters that we&rsquo;re going to use.  Each provider is structured slightly differently - Digital Ocean, for instance, allows you to specify a region in the Droplet configuration, whereas AWS requires it here.</p>
+<h4 id="providerstf">providers.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">provider &#34;aws&#34; {
+	access_key = &#34;${var.aws-akey}&#34;
+	secret_key = &#34;${var.aws-skey}&#34;
+	region = &#34;eu-west-2&#34;
+}
+
+provider &#34;digitalocean&#34; {
+	token = &#34;${var.do-token}&#34;
+}
+
+provider &#34;cloudflare&#34; {
+	email = &#34;${var.cf-email}&#34;
+	token = &#34;${var.cf-token}&#34;
+}
+</code></pre></div><h3 id="ssh-keys">SSH Keys</h3>
+<h4 id="ssh-keystf">ssh-keys.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;aws_key_pair&#34; &#34;rasta&#34; {
+	key_name   = &#34;rasta&#34;
+	public_key = &#34;${file(&#34;${var.rasta-key}&#34;)}&#34;
+}
+
+resource &#34;digitalocean_ssh_key&#34; &#34;rasta&#34; {
+	name = &#34;rasta&#34;
+	public_key = &#34;${file(&#34;${var.rasta-key}&#34;)}&#34;
+}
+</code></pre></div><p>I&rsquo;m storing <code>rasta.pub</code> on disk, but you could also place the entire key within the variable, e.g. <code>rasta-key = &quot;ssh-rsa blahblahblah&quot;</code>.</p>
+<h3 id="aws-vpc">AWS VPC</h3>
+<p>In AWS, we must create a Virtual Private Cloud, Subnet, Internet Gateway and Routing Table.  We&rsquo;re not using private networking, so the ranges are quite inconsequential.</p>
+<h4 id="aws-vpctf">aws-vpc.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;aws_vpc&#34; &#34;default&#34; {
+	cidr_block = &#34;10.0.0.0/16&#34;
+	enable_dns_hostnames = true
+}
+
+resource &#34;aws_subnet&#34; &#34;default&#34; {
+	vpc_id = &#34;${aws_vpc.default.id}&#34;
+	cidr_block = &#34;10.0.0.0/24&#34;
+}
+
+resource &#34;aws_internet_gateway&#34; &#34;default&#34; {
+	vpc_id = &#34;${aws_vpc.default.id}&#34;
+}
+
+resource &#34;aws_route_table&#34; &#34;default&#34; {
+	vpc_id = &#34;${aws_vpc.default.id}&#34;
+
+	route {
+		cidr_block = &#34;0.0.0.0/0&#34;
+		gateway_id = &#34;${aws_internet_gateway.default.id}&#34;
+	}
+}
+
+resource &#34;aws_route_table_association&#34; &#34;default&#34; {
+	subnet_id = &#34;${aws_subnet.default.id}&#34;
+	route_table_id = &#34;${aws_route_table.default.id}&#34;
+}
+</code></pre></div><h3 id="aws-security-groups">AWS Security Groups</h3>
+<p>Security Groups define the inbound/output firewall rules for AWS Instances.  Notice how we can reference IP variables.</p>
+<h4 id="aws-security-groupstf">aws-security-groups.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;aws_security_group&#34; &#34;dns-rdir&#34; {
+    name = &#34;dns-redirector&#34;
+    vpc_id = &#34;${aws_vpc.default.id}&#34;
+
+    ingress {
+        from_port = 22
+        to_port = 22
+        protocol = &#34;tcp&#34;
+        cidr_blocks = [&#34;${var.attacker-ip}&#34;]
+    }
+    ingress {
+        from_port = 53
+        to_port = 53
+        protocol = &#34;udp&#34;
+        cidr_blocks = [&#34;0.0.0.0/0&#34;]
+    }
+
+    egress {
+        from_port = 53
+        to_port = 53
+        protocol = &#34;udp&#34;
+        cidr_blocks = [&#34;0.0.0.0/0&#34;]
+    }
+    egress {
+        from_port = 80
+        to_port = 80
+        protocol = &#34;tcp&#34;
+        cidr_blocks = [&#34;0.0.0.0/0&#34;]
+    }
+    egress {
+        from_port = 443
+        to_port = 443
+        protocol = &#34;tcp&#34;
+        cidr_blocks = [&#34;0.0.0.0/0&#34;]
+    }
+}
+
+resource &#34;aws_security_group&#34; &#34;http-rdir&#34; {
+    name = &#34;http-redirector&#34;
+    vpc_id = &#34;${aws_vpc.default.id}&#34;
+
+    ingress {
+        from_port = 22
+        to_port = 22
+        protocol = &#34;tcp&#34;
+        cidr_blocks = [&#34;${var.attacker-ip}&#34;]
+    }
+    ingress {
+        from_port = 80
+        to_port = 80
+        protocol = &#34;tcp&#34;
+        cidr_blocks = [&#34;0.0.0.0/0&#34;]
+    }
+	ingress {
+        from_port = 443
+        to_port = 443
+        protocol = &#34;tcp&#34;
+        cidr_blocks = [&#34;0.0.0.0/0&#34;]
+    }
+
+    egress {
+        from_port = 53
+        to_port = 53
+        protocol = &#34;udp&#34;
+        cidr_blocks = [&#34;0.0.0.0/0&#34;]
+    }
+    egress {
+        from_port = 80
+        to_port = 80
+        protocol = &#34;tcp&#34;
+        cidr_blocks = [&#34;0.0.0.0/0&#34;]
+    }
+    egress {
+        from_port = 443
+        to_port = 443
+        protocol = &#34;tcp&#34;
+        cidr_blocks = [&#34;0.0.0.0/0&#34;]
+    }
+}
+</code></pre></div><h3 id="aws-instances">AWS Instances</h3>
+<p>Here we create the redirector instances.</p>
+<h4 id="aws-instancestf">aws-instances.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;aws_instance&#34; &#34;dns-rdir&#34; {
+	ami = &#34;ami-489f8e2c&#34; # Amazon Linux AMI 2017.03.1
+	instance_type = &#34;t2.micro&#34;
+	key_name = &#34;${aws_key_pair.rasta.key_name}&#34;
+	vpc_security_group_ids = [&#34;${aws_security_group.dns-rdir.id}&#34;]
+	subnet_id = &#34;${aws_subnet.default.id}&#34;
+	associate_public_ip_address = true
+}
+
+resource &#34;aws_instance&#34; &#34;http-rdir&#34; {
+	ami = &#34;ami-489f8e2c&#34; # Amazon Linux AMI 2017.03.1
+	instance_type = &#34;t2.micro&#34;
+	key_name = &#34;${aws_key_pair.rasta.key_name}&#34;
+	vpc_security_group_ids = [&#34;${aws_security_group.http-rdir.id}&#34;]
+	subnet_id = &#34;${aws_subnet.default.id}&#34;
+	associate_public_ip_address = true
+}
+</code></pre></div><h3 id="aws-cloudfront">AWS CloudFront</h3>
+<p>I replicated most of the settings here from <a href="https://twitter.com/armitagehacker">Raffi&rsquo;s</a> <a href="https://www.youtube.com/watch?v=IKO1ovl7Ky4">demo video</a>.</p>
+<h4 id="aws-cloudfronttf">aws-cloudfront.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;aws_cloudfront_distribution&#34; &#34;http-c2&#34; {
+	enabled = true
+	is_ipv6_enabled = false
+
+	origin {
+		domain_name = &#34;${var.sub3}.${var.dom1}&#34;
+		origin_id = &#34;domain-front&#34;
+
+		custom_origin_config {
+			http_port = 80
+			https_port = 443
+			origin_protocol_policy = &#34;match-viewer&#34;
+			origin_ssl_protocols = [&#34;TLSv1&#34;, &#34;TLSv1.1&#34;, &#34;TLSv1.2&#34;]
+		}
+	}
+
+	default_cache_behavior {
+		target_origin_id = &#34;domain-front&#34;
+		allowed_methods = [&#34;GET&#34;, &#34;HEAD&#34;, &#34;OPTIONS&#34;, &#34;PUT&#34;, &#34;POST&#34;, &#34;PATCH&#34;, &#34;DELETE&#34;]
+		cached_methods = [&#34;GET&#34;, &#34;HEAD&#34;]
+		viewer_protocol_policy = &#34;allow-all&#34;
+		min_ttl = 0
+		default_ttl = 86400
+		max_ttl = 31536000
+
+		forwarded_values {
+			query_string = true
+			headers = [&#34;*&#34;]
+
+			cookies {
+				forward = &#34;all&#34;
+			}
+		}
+
+	}
+
+	restrictions {
+		geo_restriction {
+			restriction_type = &#34;whitelist&#34;
+			locations = [&#34;GB&#34;]
+		}
+	}
+
+	viewer_certificate {
+		cloudfront_default_certificate = true
+	}
+}
+</code></pre></div><h3 id="digital-ocean-droplets">Digital Ocean Droplets</h3>
+<h4 id="do-dropletstf">do-droplets.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;digitalocean_droplet&#34; &#34;http-c2&#34; {
+	image = &#34;ubuntu-14-04-x64&#34;
+	name = &#34;http-c2&#34;
+	region = &#34;lon1&#34;
+	size = &#34;2gb&#34;
+	ssh_keys = [&#34;${digitalocean_ssh_key.rasta.id}&#34;]
+}
+
+resource &#34;digitalocean_droplet&#34; &#34;dns-c2&#34; {
+	image = &#34;ubuntu-14-04-x64&#34;
+	name = &#34;dns-c2&#34;
+	region = &#34;lon1&#34;
+	size = &#34;2gb&#34;
+	ssh_keys = [&#34;${digitalocean_ssh_key.rasta.id}&#34;]
+}
+
+resource &#34;digitalocean_droplet&#34; &#34;paydel&#34; {
+	image = &#34;ubuntu-14-04-x64&#34;
+	name = &#34;payload-delivery&#34;
+	region = &#34;lon1&#34;
+	size = &#34;512mb&#34;
+	ssh_keys = [&#34;${digitalocean_ssh_key.rasta.id}&#34;]
+}
+</code></pre></div><h3 id="digital-ocean-firewalls">Digital Ocean Firewalls</h3>
+<p>Cross-provider configuration is one of my favourite aspects to Terraform.  Notice that we refer to the public IP of our AWS redirector instances within this Digital Ocean configuration.</p>
+<h4 id="do-firewallstf">do-firewalls.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;digitalocean_firewall&#34; &#34;http-c2&#34; {
+	name = &#34;http-c2&#34;
+
+	droplet_ids = [&#34;${digitalocean_droplet.http-c2.id}&#34;]
+
+	inbound_rule = [
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;22&#34;
+		source_addresses = [&#34;${var.attacker-ip}&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;80&#34;
+		source_addresses = [&#34;0.0.0.0/0&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;443&#34;
+		source_addresses = [&#34;0.0.0.0/0&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;50050&#34;
+		source_addresses = [&#34;${var.attacker-ip}&#34;]
+	}
+	]
+
+	outbound_rule = [
+	{
+		protocol = &#34;udp&#34;
+		port_range = &#34;53&#34;
+		destination_addresses = [&#34;0.0.0.0/0&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;80&#34;
+		destination_addresses = [&#34;0.0.0.0/0&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;443&#34;
+		destination_addresses = [&#34;0.0.0.0/0&#34;]
+	}
+	]
+}
+
+resource &#34;digitalocean_firewall&#34; &#34;c2-dns&#34; {
+	name = &#34;c2-dns&#34;
+
+	droplet_ids = [&#34;${digitalocean_droplet.dns-c2.id}&#34;]
+
+	inbound_rule = [
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;22&#34;
+		source_addresses = [&#34;${var.attacker-ip}&#34;]
+	},
+	{
+		protocol = &#34;udp&#34;
+		port_range = &#34;53&#34;
+		source_addresses = [&#34;${aws_instance.dns-rdir.public_ip}&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;50050&#34;
+		source_addresses = [&#34;${var.attacker-ip}&#34;]
+	}
+	]
+
+	outbound_rule = [
+	{
+		protocol = &#34;udp&#34;
+		port_range = &#34;53&#34;
+		destination_addresses = [&#34;0.0.0.0/0&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;80&#34;
+		destination_addresses = [&#34;0.0.0.0/0&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;443&#34;
+		destination_addresses = [&#34;0.0.0.0/0&#34;]
+	}
+	]
+}
+
+resource &#34;digitalocean_firewall&#34; &#34;paydel&#34; {
+	name = &#34;paydel&#34;
+
+	droplet_ids = [&#34;${digitalocean_droplet.paydel.id}&#34;]
+
+	inbound_rule = [
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;22&#34;
+		source_addresses = [&#34;${var.attacker-ip}&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;80&#34;
+		source_addresses = [&#34;${aws_instance.http-rdir.public_ip}&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;443&#34;
+		source_addresses = [&#34;${aws_instance.http-rdir.public_ip}&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;50050&#34;
+		source_addresses = [&#34;${var.attacker-ip}&#34;]
+	}
+	]
+
+	outbound_rule = [
+	{
+		protocol = &#34;udp&#34;
+		port_range = &#34;53&#34;
+		destination_addresses = [&#34;0.0.0.0/0&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;80&#34;
+		destination_addresses = [&#34;0.0.0.0/0&#34;]
+	},
+	{
+		protocol = &#34;tcp&#34;
+		port_range = &#34;443&#34;
+		destination_addresses = [&#34;0.0.0.0/0&#34;]
+	}
+	]
+}
+</code></pre></div><h3 id="cloudfront">Cloudfront</h3>
+<h4 id="cf-recordstf">cf-records.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;cloudflare_record&#34; &#34;http-rdir1&#34; {
+	domain = &#34;${var.dom1}&#34;
+	name   = &#34;${var.sub1}&#34;
+	value  = &#34;${aws_instance.http-rdir.public_ip}&#34;
+	type   = &#34;A&#34;
+	ttl    = 300
+}
+
+resource &#34;cloudflare_record&#34; &#34;http-rdir2&#34; {
+	domain = &#34;${var.dom1}&#34;
+	name   = &#34;${var.sub2}&#34;
+	value  = &#34;${aws_instance.http-rdir.public_ip}&#34;
+	type   = &#34;A&#34;
+	ttl    = 300
+}
+
+resource &#34;cloudflare_record&#34; &#34;http-df&#34; {
+	domain = &#34;${var.dom1}&#34;
+	name   = &#34;${var.sub3}&#34;
+	value  = &#34;${digitalocean_droplet.http-c2.ipv4_address}&#34;
+	type   = &#34;A&#34;
+	ttl    = 300
+}
+
+resource &#34;cloudflare_record&#34; &#34;dns-c2-ns1&#34; {
+	domain = &#34;${var.dom2}&#34;
+	name   = &#34;ns1&#34;
+	value  = &#34;${aws_instance.dns-rdir.public_ip}&#34;
+	type   = &#34;A&#34;
+	ttl    = 300
+}
+
+resource &#34;cloudflare_record&#34; &#34;dns-c2-a&#34; {
+	domain = &#34;${var.dom2}&#34;
+	name   = &#34;${var.sub4}&#34;
+	value  = &#34;ns1.${var.dom2}&#34;
+	type   = &#34;NS&#34;
+	ttl    = 300
+}
+</code></pre></div><h3 id="outputs">Outputs</h3>
+<p>Outputs are printed at the end of deployment, so we can print all the IPs etc as they get assigned.  You can also print them on-demand after deployment with <code>&gt; terraform.exe output dns-rdir-ip</code> for example.</p>
+<h4 id="outputstf">outputs.tf</h4>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">output &#34;dns-rdir-ip&#34; {
+	value = &#34;${aws_instance.dns-rdir.public_ip}&#34;
+}
+
+output &#34;http-rdir-ip&#34; {
+	value = &#34;${aws_instance.http-rdir.public_ip}&#34;
+}
+
+output &#34;paydel-ip&#34; {
+	value = &#34;${digitalocean_droplet.paydel.ipv4_address}&#34;
+}
+
+output &#34;http-c2-ip&#34; {
+	value = &#34;${digitalocean_droplet.http-c2.ipv4_address}&#34;
+}
+
+output &#34;dns-c2-ip&#34; {
+	value = &#34;${digitalocean_droplet.dns-c2.ipv4_address}&#34;
+}
+
+output &#34;cf-domain&#34; {
+	value = &#34;${aws_cloudfront_distribution.http-c2.domain_name}&#34;
+}
+</code></pre></div><h2 id="deploy--test">Deploy &amp; Test</h2>
+<p>We can finally deploy our infrastrucutre and test it out.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">&gt; terraform.exe plan -out plan
+&gt; terraform.exe apply plan
+
+Apply complete! Resources: 23 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+cf-domain = d2x0m979j4p9ih.cloudfront.net
+dns-c2-ip = 138.68.188.159
+dns-rdir-ip = 35.177.246.178
+http-c2-ip = 138.68.188.160
+http-rdir-ip = 35.176.5.164
+paydel-ip = 178.62.74.205
+</code></pre></div><h3 id="payload-delivery">Payload Delivery</h3>
+<p>Verify that the DNS records were created and resolve to the expected IPs with <code>nslookup</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Name:    cpanel.dontgethacked.site
+Address:  35.176.5.164
+
+Name:    support.dontgethacked.site
+Address:  35.176.5.164
+</code></pre></div><p>Write a test file into the web root of the payload delivery server and grab it with <code>curl</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">╭─root@kali ~  
+╰─➤  curl http://cpanel.dontgethacked.site/test
+this is my payload delivery server
+
+╭─root@kali ~  
+╰─➤  curl http://support.dontgethacked.site/test
+this is my payload delivery server
+</code></pre></div><h3 id="dns-beacon">DNS Beacon</h3>
+<p>Verify that the <code>NS</code> record was create and resolves to the expected IP.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Name:    ns1.rekt.site
+Address:  35.177.246.178
+</code></pre></div><p>Create a DNS Beacon listener on the DNS C2 server and test DNS responses from it.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Name:    webdisk.rekt.site
+Address:  0.0.0.0
+
+Name:    blahblah.webdisk.rekt.site
+Address:  0.0.0.0
+</code></pre></div><h3 id="domain-front">Domain Front</h3>
+<p>Again, verify the DNS record.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Name:    static.dontgethacked.site
+Address:  138.68.188.160
+</code></pre></div><p>Host a test file on the HTTP/S C2 server and verify that we can read it using the direct CloudFront URL.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">╭─root@kali ~  
+╰─➤  curl -A &#39;notcurl&#39; http://d2x0m979j4p9ih.cloudfront.net/test
+this is my http/s c2 server
+</code></pre></div><p>Finally, verify that we can also read it via <code>a0.awsstatic.com</code> and specifying the <code>host header</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">╭─root@kali ~  
+╰─➤  curl -A &#39;notcurl&#39; http://a0.awsstatic.com/test -H &#39;Host: d2x0m979j4p9ih.cloudfront.net&#39;
+this is my http/s c2 server
+</code></pre></div><p>Looks good to me.</p>
+<p>In <a href="/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/"><!-- raw HTML omitted -->Part 2<!-- raw HTML omitted --></a> we cover the automatic installation of software &amp; tools such as Oracle Java, CS, Apache &amp; Socat.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/anti-virus/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/rdp-jump-boxes/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

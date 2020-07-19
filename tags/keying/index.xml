@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>keying on Rasta Mouse</title>
+    <title>keying on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/keying/</link>
-    <description>Recent content in keying on Rasta Mouse</description>
+    <description>Recent content in keying on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sat, 15 Jun 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/keying/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>TikiVader</title>
-      <link>https://rastamouse.me/2019/06/tikivader/</link>
+      <link>https://rastamouse.me/blog/tikivader/</link>
       <pubDate>Sat, 15 Jun 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/06/tikivader/</guid>
+      <guid>https://rastamouse.me/blog/tikivader/</guid>
       <description>&lt;p&gt;I&amp;rsquo;ve added a new experimental project to &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch&#34;&gt;TikiTorch&lt;/a&gt;, called &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/master/TikiVader&#34;&gt;TikiVader&lt;/a&gt;.  I originally thought of &amp;ldquo;vader&amp;rdquo; as a play-on for &amp;ldquo;evade&amp;rdquo;/&amp;ldquo;evader&amp;rdquo;, until I realised TikiVader was never meant to evade anything&amp;hellip; but nevermind 😒&lt;/p&gt;</description>
     </item>
     

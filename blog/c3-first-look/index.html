@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">MWR Labs: C3 - First Look</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#external-c2">External C2</a>
+      <ul>
+        <li><a href="#what">What?</a></li>
+        <li><a href="#why">Why?</a></li>
+        <li><a href="#how">How?</a></li>
+      </ul>
+    </li>
+    <li><a href="#lab-setup">Lab Setup</a></li>
+    <li><a href="#c3">C3</a>
+      <ul>
+        <li><a href="#building--installing">Building &amp; Installing</a></li>
+        <li><a href="#start-webcontroller">Start WebController</a></li>
+        <li><a href="#link-gateway-to-team-server">Link Gateway to Team Server</a></li>
+      </ul>
+    </li>
+    <li><a href="#channelslack">ChannelSlack</a>
+      <ul>
+        <li><a href="#slack-app">Slack App</a></li>
+      </ul>
+    </li>
+    <li><a href="#node-relay">Node Relay</a></li>
+    <li><a href="#beacon">Beacon</a></li>
+    <li><a href="#negotiationchanneluncsharefile">NegotiationChannelUncShareFile</a></li>
+    <li><a href="#closing-thoughts">Closing Thoughts</a></li>
+  </ul>
+</nav>
+    <p>In this blog post I&rsquo;m going to cover my first impressions of MWR Labs C3 project, through installation and setup to usage in a basic scenario.</p>
+<h2 id="external-c2">External C2</h2>
+<h3 id="what">What?</h3>
+<p>First, we need to cover some background information on what &ldquo;External C2&rdquo; is - if you&rsquo;re already familiar, skip ahead.</p>
+<p><a href="https://cobaltstrike.com/help-externalc2">External C2</a> was introduced back in Cobalt Strike 3.6, and it provides an interface for 3rd party applications to act as a communication layer between Cobalt Strike and Beacon.  That is to say, provide communication methods that are not natively supported by the toolset.  In the specific case of Cobalt Strike - Beacon has the capability to (at the time of writing) egress C2 traffic over HTTP/S and DNS; and link to other Beacons over SMB named pipes and TCP sockets.</p>
+<p>The External C2 specification allows operators to expand how Beacon can communicate (either back to the Cobalt Strike Team Server, or to other Beacons) to practically any means desirable.  I&rsquo;ll wait a moment for that to sink in&hellip;</p>
+<p>By &ldquo;any means desirable&rdquo;, I mean really awesome ways like <a href="https://labs.mwrinfosecurity.com/blog/tasking-office-365-for-cobalt-strike-c2">C2 over Office 365</a>; <a href="https://outflank.nl/blog/2017/09/17/blogpost-cobalt-strike-over-external-c2-beacon-home-in-the-most-obscure-ways/">C2 over fileshares</a> and <a href="https://www.harmj0y.net/blog/powershell/command-and-control-using-active-directory/">C2 over Active Directory</a>!</p>
+<h3 id="why">Why?</h3>
+<p>This is good for all sorts of reasons.</p>
+<p>Egress C2 over a legitimate service such as O365, Google Drive, Dropbox, Slack, Mattermost or whatever; is going to do such a good job of blending in - particularly if your target uses those services as part of their everyday business practices.  In some cases you could even transmit C2 over their own tenants, e.g C2 over their own OneDrive.</p>
+<p>Internal C2 over fileshares, AD or anything that can be written to/read from are also going to be difficult to detect; but may also help get around different types of firewall restrictions and perhaps even air-gapping.  C2 wrapped to look like RDP, WinRM or WMI traffic are all exciting ideas.</p>
+<h3 id="how">How?</h3>
+<p>Implementing External C2 is no trivial task (much more so than slapping a Malleable C2 Profile together).</p>
+<p>The following diagram is the External C2 architecture taken from the <a href="https://www.cobaltstrike.com/downloads/externalc2spec.pdf">External C2 Spec</a>.</p>
+<figure>
+    <img src="/images/c3-first-look/ec2-arch.png"/> 
+</figure>
+
+<p>The boxes in yellow (Team Server &amp; SMB Beacon) are the native Cobalt Strike components, whilst those in green (Third-Party Controller &amp; Third-Party Client) are the &ldquo;3rd party applications&rdquo; that an operator must develop to leverage External C2.  As you can see, they act as a &ldquo;man-in-the-middle&rdquo; between a Beacon and Team Server, effectively relaying traffic between them over the custom C2 channel.</p>
+<p>So a Client must be capable of staging and talking to Beacon over a named pipe, and communicate with the Controller over whatever means you&rsquo;re trying to implement.  Similarly, the Controller must receive traffic from the Client and send that information to the Team Server in a way that it understands.</p>
+<p>It doesn&rsquo;t take much to realise that there are a lot of re-usable components here, and (attempted?) frameworks (<a href="https://github.com/Und3rf10w/external_c2_framework">here</a> &amp; <a href="https://github.com/ryhanson/ExternalC2">here</a>) have been around for some time.  MWR Labs <a href="https://github.com/mwrlabs/C3">C3</a> is the latest attempt at providing operaters with a stable and feature-rich framework for prototyping and integrating custom C2 channels.</p>
+<h2 id="lab-setup">Lab Setup</h2>
+<p>C3 already provides some custom C2 channels that we can use straight out of the box - so I decided to try the Slack and Fileshare channels.  I built a contrived lab to demonstrate.</p>
+<figure>
+    <img src="/images/c3-first-look/lab-arch.png"/> 
+</figure>
+
+<p>Client 1 and Client 2 are workstations on the same domain, but they cannot communicate with each other (so no SMB/TCP Beacons).  Client 1 will run the Slack egress C2 and Client 2 will run the Fileshare C2.  Channels can be linked - so the Client 2 Fileshare C2 will link to the Client 1 Slack C2.</p>
+<h2 id="c3">C3</h2>
+<h3 id="building--installing">Building &amp; Installing</h3>
+<p>For my Team Server, I&rsquo;m using an Ubuntu 18.04 VM setup as per the standard Cobalt Strike <a href="https://cobaltstrike.com/help-install">intallation instructions</a>; and my C3 Gateway server is simply a Windows Server 2016 VM with the .NET Core 2.2 runtime installed.</p>
+<p>To build the <code>WebController</code>:</p>
+<pre><code>D:\Tools\C3&gt;cd Src\WebController\Backend
+D:\Tools\C3\Src\WebController\Backend&gt;dotnet publish -c Release
+Microsoft (R) Build Engine version 16.2.32702+c4012a063 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 57.31 ms for D:\Tools\C3\Src\WebController\Backend\WebController.csproj.
+  WebController -&gt; D:\Tools\C3\Bin\WebController\Release\netcoreapp2.2\C3WebController.dll
+  WebController -&gt; D:\Tools\C3\Bin\WebController\Release\netcoreapp2.2\publish\
+</code></pre><p>Open Visual Studio and build the <code>GatewayConsoleExe</code>, <code>NodeRelayConsoleExe</code> and <code>NodeRelayDll</code> projects, by simply right-clicking and selecting <code>Build</code>.  These should also be written to <code>D:\Tools\C3\Bin</code>.  Now copy the whole <code>Bin</code> directory to <code>C:\C3</code> on the C3 Server.</p>
+<p>Your folder structure should look like this:</p>
+<figure>
+    <img src="/images/c3-first-look/explorer.png"/> 
+</figure>
+
+<p>Go to <code>C:\C3\Bin\WebController\Release\netcoreapp2.2\publish</code> and open <code>appsettings.json</code>.  Change <code>payloadTemplateDir</code> to <code>../../../..</code>  (which drops it in to <code>C:\C3\Bin</code>).</p>
+<h3 id="start-webcontroller">Start WebController</h3>
+<p>The <code>WebController</code> can now be started.</p>
+<blockquote>
+<p>Note: <code>192.168.1.147</code> is the IP address of my Gateway server.</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">C:\Users\Administrator&gt;cd C:\C3\Bin\WebController\Release\netcoreapp2.2\publish
+C:\C3\Bin\WebController\Release\netcoreapp2.2\publish&gt;dotnet C3WebController.dll --urls http://192.168.1.147:8080
+Gateway API bridge starts listening on 127.0.0.1:2323
+Hosting environment: Production
+Content root path: C:\C3\Bin\WebController\Release\netcoreapp2.2\publish
+Now listening on: http://192.168.1.147:8080
+Application started. Press Ctrl+C to shut down.
+</code></pre></div><p>Browsing to that IP:Port should show the C3 Dashboard.</p>
+<figure>
+    <img src="/images/c3-first-look/gateway.png"/> 
+</figure>
+
+<p>I had to click <code>Edit Config</code> and input <code>http://192.168.1.147</code> and <code>8080</code> in the respective boxes.  Clicking <code>Save Config</code> doesn&rsquo;t seem to update/refresh the page.  So spam-click <code>Save</code> a few times and close the window.  Then click <code>Create and Download Gateway</code> and a ZIP file should download.</p>
+<p>Copy this to the Gateway server, unzip and run the binary.  All being well the GatewayConsole should connect to the WebController API and and C3 Dashboard should refresh.</p>
+<figure>
+    <img src="/images/c3-first-look/gateway-running.png"/> 
+</figure>
+
+<h3 id="link-gateway-to-team-server">Link Gateway to Team Server</h3>
+<p>This is a very easy step :)</p>
+<p>External C2 is started on the Team Server via an Aggressor script.  So just save the following as <code>externalc2.cna</code> and load it into CS via the Script Manager.</p>
+<blockquote>
+<p>Note: <code>192.168.1.140</code> is the IP of my Team Server.</p>
+</blockquote>
+<pre><code>externalc2_start(&quot;192.168.1.140&quot;, 2222);
+</code></pre><p>This will bind port 2222 on the external interface of the Team Server.</p>
+<pre><code>root@kali ~# ss -lt
+State                     Recv-Q                    Send-Q                                                Local Address:Port                                        Peer Address:Port
+LISTEN                    0                         128                                                         0.0.0.0:ssh                                              0.0.0.0:*
+LISTEN                    0                         128                                                            [::]:ssh                                                 [::]:*
+LISTEN                    0                         32                                                                *:50050                                                  *:*
+LISTEN                    0                         128                                          [::ffff:192.168.1.140]:2222                                                   *:*
+LISTEN                    0                         50                                                                *:http                                                   *:*
+</code></pre><p>Double-click on the Gateway icon on the C3 Dashboard and click <code>Command Center</code>.  From the <code>Select Command</code> list, choose <code>TurnOnConnectorTeamServer</code> and provide the IP (192.168.1.140) and port (2222).</p>
+<h2 id="channelslack">ChannelSlack</h2>
+<h3 id="slack-app">Slack App</h3>
+<p>Before you can configure the Gateway to use Slack, you need a Slack App in your Workspace.</p>
+<p>I tried to be smart/lazy at first and just made it a workspace admin, which didn&rsquo;t actually work.  <a href="https://twitter.com/__invictus_">invictus</a> suggested the following permissions, which worked great for me:</p>
+<pre><code>files:read
+files:write:user
+chat:write:bot
+chat:write:user
+channels:history
+channels:read
+channels:write
+</code></pre><figure>
+    <img src="/images/c3-first-look/slackapp.png"/> 
+</figure>
+
+<p>Once the App is added to the Workspace you can grab the OAuth Access Token (beginning with <code>xoxp</code>).</p>
+<figure>
+    <img src="/images/c3-first-look/oauth.png"/> 
+</figure>
+
+<p>Back in the C3 Dashboard, double-click the Gateway &gt; <code>Command Center &gt; AddChannelSlack</code> and paste the OAuth token.  I was happy to leave the channel name as it&rsquo;s default random name.  Then click <code>Send Command</code>.</p>
+<figure>
+    <img src="/images/c3-first-look/addchannelslack.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/c3-first-look/slackchanneladded.png"/> 
+</figure>
+
+<p>You should see the new interface appear in the C3 Dashboard.  Any error messges will display themselves in the Gateway Console running on the C3 Server - which is a good place to look for troubleshooting issues.</p>
+<h2 id="node-relay">Node Relay</h2>
+<p>Next we need to create a <code>Node Relay</code> for this C2 channel - this is that &ldquo;3rd party client&rdquo; that we need to run on a compromised host.</p>
+<p>Double-click on the Slack Channel Interface, hover over <code>Interface Options</code> and select <code>New Relay</code>.  All the relevant information for the Slack channel is pre-populated.  We can opt to download the Relay as an <code>exe</code> or <code>dll</code> - which one you want will entirely depend (in the real world) on how you want to get this running on a compromised host.</p>
+<p>From what I&rsquo;ve seen: the exe can be run as a normal executable or as a Windows Service; and the DLL with <code>rundll32 Relay.dll,StartNodeRelay</code>.</p>
+<figure>
+    <img src="/images/c3-first-look/relaysetup.png"/> 
+</figure>
+
+<p>Once the Relay has been downloaded and run on the target machine, a new Relay will appear in the C3 Dashboard.</p>
+<figure>
+    <img src="/images/c3-first-look/newrelay.png"/> 
+</figure>
+
+<p>Double-click it to see some metadata about the machine it&rsquo;s running on.</p>
+<figure>
+    <img src="/images/c3-first-look/relaymetadata.png"/> 
+</figure>
+
+<h2 id="beacon">Beacon</h2>
+<p>To get this Relay to stage a Beacon payload, click <code>Command Center &gt; AddPeripheralBeacon &gt; Send Command</code>.</p>
+<figure>
+    <img src="/images/c3-first-look/client1-beacon.png"/> 
+</figure>
+
+<p>If you have Slack notifications enabled, you will see messages being written and removed from the channel, both during the staging process and every time you issue a command in CS.  The C3 Dashboard will also update to show a new Beacon node.</p>
+<figure>
+    <img src="/images/c3-first-look/beaconnode.png"/> 
+</figure>
+
+<h2 id="negotiationchanneluncsharefile">NegotiationChannelUncShareFile</h2>
+<p>Now add the Fileshare C2 channel to our existing relay.  Double-click the Slack relay &gt; <code>Command Center &gt; AddNegotiationChannelUncShareFile</code>.  The file share I&rsquo;ve setup is at <code>\\dc1\demo</code>.  For this to work correctly, the fileshare relay will drop files into the share; and the slack relay will read those files and &ldquo;relay&rdquo; (d&rsquo;uh) the data to the Gateway.  However, the slack relay also needs to be able to delete the files been written by the fileshare relay.  On a share with default inheritance, this can&rsquo;t work since <code>User A</code>, doesn&rsquo;t have permission to remove files created by <code>User B</code>.</p>
+<p>This was <a href="https://github.com/mwrlabs/C3/commit/26be33078f7d447dee1065fe5643759ace37d011">fixed in an update</a>, by making the fileshare relay explicity set the DACL on the files its creating so other users&rsquo; can remove them.</p>
+<figure>
+    <img src="/images/c3-first-look/addnegotiationchanneluncshare.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/c3-first-look/uncchannel.png"/> 
+</figure>
+
+<p>Now just download the Relay for this new channel in the same way (Double-click &gt; <code>Interface Options &gt; New Relay</code>, and finally stage a new beacon as well.</p>
+<figure>
+    <img src="/images/c3-first-look/uncrelay.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/c3-first-look/client2-beacon.png"/> 
+</figure>
+
+<h2 id="closing-thoughts">Closing Thoughts</h2>
+<p>Even though I&rsquo;ve barely scrated the surface of C3, I find it to be a very exciting project.</p>
+<p>The UI is well thought-out and easy to use.  I think the visualisation layout should add the default labels to icons (like it does for the gateway).  A few other tweaks may be required such as the <code>Edit Config</code> boxes not updating its content.  I wish the UI also provided more feedback at times - e.g. if you provide an incorrect IP/port for your Cobalt Strike Team Server, it doesn&rsquo;t seem to tell you.  And being able to rename relays would be a nice feature also.</p>
+<p>The Wiki has some basic installation steps that could be fleshed out (but that&rsquo;s also something that will come with time).</p>
+<p>There are also some gotcha&rsquo;s with the Cobalt Strike interface when dealing with Beacons this way.  Particularly closing the Beacon and updating its jitter - these tasks are better done in C3.  I also found that switching to the graph view disconects you from the CS client with the following error on the TS: <code>[!] Trapped java.io.EOFException during client (192.168.1.117) read [Manage: rasta]: null</code>.</p>
+<p>I&rsquo;m not sure if I&rsquo;ll have a stab at creating a custom channel, since C/C++ is really not my forte.  But if this framework and External C2 in general is something you&rsquo;re interested in, I would highly recommend checking this project out!</p>
+<p>I want to keep playing with C3, so hopefully this is not the last post on the matter.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/tikiservice/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/covenant-tasks-101/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

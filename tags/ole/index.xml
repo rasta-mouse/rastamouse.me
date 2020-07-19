@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>ole on Rasta Mouse</title>
+    <title>ole on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/ole/</link>
-    <description>Recent content in ole on Rasta Mouse</description>
+    <description>Recent content in ole on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Wed, 05 Jul 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/ole/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>How to Accidently Win Against AV</title>
-      <link>https://rastamouse.me/2017/07/how-to-accidently-win-against-av/</link>
+      <link>https://rastamouse.me/blog/anti-virus/</link>
       <pubDate>Wed, 05 Jul 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/07/how-to-accidently-win-against-av/</guid>
+      <guid>https://rastamouse.me/blog/anti-virus/</guid>
       <description>&lt;p&gt;Computer viruses have been around since as early as the 1970&amp;rsquo;s - the eternal battle between virus creators and antivirus solutions continues to wage over 40 years later.&lt;/p&gt;</description>
     </item>
     

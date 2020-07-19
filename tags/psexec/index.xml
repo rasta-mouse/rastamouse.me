@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>psexec on Rasta Mouse</title>
+    <title>psexec on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/psexec/</link>
-    <description>Recent content in psexec on Rasta Mouse</description>
+    <description>Recent content in psexec on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Wed, 28 Aug 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/psexec/index.xml" rel="self" type="application/rss+xml" />
@@ -13,19 +14,19 @@
     
     <item>
       <title>TikiService</title>
-      <link>https://rastamouse.me/2019/08/tikiservice/</link>
+      <link>https://rastamouse.me/blog/tikiservice/</link>
       <pubDate>Wed, 28 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/08/tikiservice/</guid>
+      <guid>https://rastamouse.me/blog/tikiservice/</guid>
       <description>&lt;p&gt;&lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/master/TikiService&#34;&gt;TikiService&lt;/a&gt; is a new .NET Service Binary that allows you to run a TikiTorch payload via the Service Control Manager (à la PsExec).  &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna&#34;&gt;TikiTorch.cna&lt;/a&gt; has also been updated to create a new Cobalt Strike function: &lt;code&gt;tikiexec&lt;/code&gt;, that automates its use.  This blog post provides a brief overview and usage examples.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>PsExec Much?</title>
-      <link>https://rastamouse.me/2017/06/psexec-much/</link>
+      <link>https://rastamouse.me/blog/psexec-much/</link>
       <pubDate>Sun, 18 Jun 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/06/psexec-much/</guid>
+      <guid>https://rastamouse.me/blog/psexec-much/</guid>
       <description>&lt;p&gt;I recently completed an adversary simulation and thought I would write a short post about some of my experiences.&lt;/p&gt;</description>
     </item>
     

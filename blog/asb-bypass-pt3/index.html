@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">AmsiScanBuffer Bypass - Part 3</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#bypass-primer">Bypass Primer</a></li>
+    <li><a href="#amsi_result_clean">AMSI_RESULT_CLEAN</a></li>
+  </ul>
+</nav>
+    <p>In <a href="/2018/10/amsiscanbuffer-bypass---part-2/">Part 2</a>, we engineered a delivery method for the AmsiScanBuffer Bypass discussed in <a href="/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>.  In this post, we&rsquo;ll make some modifications to the bypass itself.</p>
+<p>If you read <a href="/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a> and the original posts from CyberArk, you will know that the bypass works by patching the AMSI DLL in memory.  But before we make any modifications to the bypass - let&rsquo;s explore that in some additional detail, so we all have a clear baseline understanding.</p>
+<h2 id="bypass-primer">Bypass Primer</h2>
+<p>We can use API Monitor to have a peak at what&rsquo;s going on.</p>
+<figure>
+    <img src="/images/asb-bypass-pt3/apimonitor.png"/> 
+</figure>
+
+<p>To summerise what we&rsquo;re looking at:</p>
+<ol>
+<li><code>powershell.exe</code> starts and <code>amsi.dll</code> is loaded into its memory space.</li>
+<li>We type something into the console.</li>
+<li>The <code>AmsiScanBuffer</code> function is called.</li>
+<li>Where our input is passed into.</li>
+</ol>
+<p>This is the AmsiScanBuffer function as <a href="https://docs.microsoft.com/en-us/windows/desktop/api/amsi/nf-amsi-amsiscanbuffer">documented</a> by Microsoft:</p>
+<pre><code>HRESULT AmsiScanBuffer(
+  HAMSICONTEXT amsiContext,
+  PVOID        buffer,
+  ULONG        length,
+  LPCWSTR      contentName,
+  HAMSISESSION amsiSession,
+  AMSI_RESULT  *result
+);
+</code></pre><p>We won&rsquo;t worry about all of this - just the idea that we have a <code>buffer</code> of <code>length</code>, that when scanned, returns a <code>result</code>.  To help visualise the bypass, let&rsquo;s throw PowerShell into a debugger.</p>
+<p>We&rsquo;ll set a breakpoint on the <code>AmsiScanBuffer</code> function and type something into the console.</p>
+<figure>
+    <img src="/images/asb-bypass-pt3/garbage.png"/> 
+</figure>
+
+<p>We step down to the <code>mov edi, r8d</code> instruction - because we know from CyberArk that <code>r8d</code> contains the <code>length</code> of the <code>buffer</code>. We can also see that in Binary Ninja.</p>
+<figure>
+    <img src="/images/asb-bypass-pt3/binja-buffer-length.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/asb-bypass-pt3/windgb-mov.png"/> 
+</figure>
+
+<p>After the instruction, both <code>edi</code> and <code>r8d</code> contain <code>2c</code> - which in decimal is <code>44</code>.  Our string <code>&quot;this is some garbage&quot;</code> is <code>22</code> characters, so this checks out (bits and bytes, amirite).  In the context of <code>AmsiScanBuffer</code>, it&rsquo;s saying &ldquo;scan 22 bytes of this buffer&rdquo;.</p>
+<p>The bypass works by slightly patching this instruction - changing <code>mov edi, r8d</code> to <code>xor edi, edi</code>.  Because if you <code>xor</code> two identical values, i.e. the current value of <code>edi</code> (whatever it happens to be) with itself, the result is always <code>0</code>.  So if we run the bypass and look at the instructions again&hellip;</p>
+<figure>
+    <img src="/images/asb-bypass-pt3/powershell-bypass.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/asb-bypass-pt3/windgb-xor.png"/> 
+</figure>
+
+<p><code>edi</code> is now zero - i.e. &ldquo;scan 0 bytes of this buffer&rdquo;.  So if <code>AmsiScanBuffer</code> scans <code>0</code> bytes, it will not actually scan anything at all.</p>
+<h2 id="amsi_result_clean">AMSI_RESULT_CLEAN</h2>
+<p>So the whole reason for this post, is that I was talking to <a href="https://twitter.com/mrgretzky">Kuba Gretzky</a> about the bypass after I&rsquo;d posted my <a href="/2018/10/amsiscanbuffer-bypass---part-1/">Part 1</a>.  He said:</p>
+<blockquote>
+<p>the risky part with the bypass is that it uses a fixed offset from the start of the function <code>AmsiScanBufferPtr + 0x001b</code>. MS can just slightly modify the <code>AmsiScanBuffer</code> function and the bypass will result in a crash. It would be wiser to do hotpatching at the beginning of the function to return a result that would say that nothing was found.</p>
+</blockquote>
+<p>If we have have a <a href="https://docs.microsoft.com/en-us/windows/desktop/api/amsi/ne-amsi-amsi_result">look</a> at the <code>AMSI_RESULT</code> details that we glossed over previously - there are different results that can be returned.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">typedef enum AMSI_RESULT {
+  AMSI_RESULT_CLEAN,
+  AMSI_RESULT_NOT_DETECTED,
+  AMSI_RESULT_BLOCKED_BY_ADMIN_START,
+  AMSI_RESULT_BLOCKED_BY_ADMIN_END,
+  AMSI_RESULT_DETECTED
+} ;
+</code></pre></div><p>So could we just patch the function so that it always returns <code>AMSI_RESULT_CLEAN</code>?</p>
+<p>Revisiting the <code>AmsiScanBuffer</code> function in Binary Ninja, we can see there are a whole bunch of instructions followed by conditional jumps, but all to the same address: <code>0x180024f5</code>.</p>
+<figure>
+    <img src="/images/asb-bypass-pt3/jumps.png"/> 
+</figure>
+
+<p>The content of which is a <code>mov eax, 0x80070057</code> instruction, which we guessed meant <code>AMSI_RESULT_CLEAN</code>.</p>
+<figure>
+    <img src="/images/asb-bypass-pt3/amsi_result_clean.png"/> 
+</figure>
+
+<p>The original bypass was:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="n">Byte</span><span class="p">[]</span> <span class="n">Patch</span> <span class="p">=</span> <span class="p">{</span> <span class="m">0</span><span class="n">x31</span><span class="p">,</span> <span class="m">0</span><span class="n">xff</span><span class="p">,</span> <span class="m">0</span><span class="n">x90</span> <span class="p">};</span>
+<span class="n">IntPtr</span> <span class="n">unmanagedPointer</span> <span class="p">=</span> <span class="n">Marshal</span><span class="p">.</span><span class="n">AllocHGlobal</span><span class="p">(</span><span class="m">3</span><span class="p">);</span>
+<span class="n">Marshal</span><span class="p">.</span><span class="n">Copy</span><span class="p">(</span><span class="n">Patch</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">unmanagedPointer</span><span class="p">,</span> <span class="m">3</span><span class="p">);</span>
+<span class="n">MoveMemory</span><span class="p">(</span><span class="n">ASBPtr</span> <span class="p">+</span> <span class="m">0</span><span class="n">x001b</span><span class="p">,</span> <span class="n">unmanagedPointer</span><span class="p">,</span> <span class="m">3</span><span class="p">);</span>
+</code></pre></div><p>Which we modified to:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="n">Byte</span><span class="p">[]</span> <span class="n">Patch</span> <span class="p">=</span> <span class="p">{</span> <span class="m">0</span><span class="n">xB8</span><span class="p">,</span> <span class="m">0</span><span class="n">x57</span><span class="p">,</span> <span class="m">0</span><span class="n">x00</span><span class="p">,</span> <span class="m">0</span><span class="n">x07</span><span class="p">,</span> <span class="m">0</span><span class="n">x80</span><span class="p">,</span> <span class="m">0</span><span class="n">xC3</span> <span class="p">};</span>
+<span class="n">IntPtr</span> <span class="n">unmanagedPointer</span> <span class="p">=</span> <span class="n">Marshal</span><span class="p">.</span><span class="n">AllocHGlobal</span><span class="p">(</span><span class="m">6</span><span class="p">);</span>
+<span class="n">Marshal</span><span class="p">.</span><span class="n">Copy</span><span class="p">(</span><span class="n">Patch</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">unmanagedPointer</span><span class="p">,</span> <span class="m">6</span><span class="p">);</span>
+<span class="n">MoveMemory</span><span class="p">(</span><span class="n">ASBPtr</span><span class="p">,</span> <span class="n">unmanagedPointer</span><span class="p">,</span> <span class="m">6</span><span class="p">);</span>
+</code></pre></div><p>Where <code>0xB8, 0x57, 0x00, 0x07, 0x80</code> are the (hex) opcodes for <code>mov eax, 0x80070057</code>; and <code>0xC3</code> is a <code>retn</code>.  And notice there is no offset - we are patching the first two instructions in the function.</p>
+<p>Before we carry out this patch, we can verify those first two instructions at the <code>AmsiScanBuffer</code> pointer.</p>
+<figure>
+    <img src="/images/asb-bypass-pt3/asb-prepatch.png"/> 
+</figure>
+
+<p>They match what we expect from Binary Ninja.  If we implement our new patch and look again&hellip;</p>
+<figure>
+    <img src="/images/asb-bypass-pt3/asb-patched.png"/> 
+</figure>
+
+<p>The rest of the instructions become a bit munged, but that doesn&rsquo;t matter.  Hopefully we&rsquo;ll just enter <code>AmsiScanBuffer</code>, immediately set <code>eax</code> and <code>return</code>.</p>
+<figure>
+    <img src="/images/asb-bypass-pt3/bypassed.png"/> 
+</figure>
+
+<p>Which seems to work just fine.</p>
+<p>This is no &ldquo;better&rdquo; than the previous bypass, but hopefully will be a little more resilient against future modifications to <code>amsi.dll</code> by Microsoft.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/asb-bypass-pt2/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/asb-bypass-pt4/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

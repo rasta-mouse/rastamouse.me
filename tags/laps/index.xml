@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>laps on Rasta Mouse</title>
+    <title>laps on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/laps/</link>
-    <description>Recent content in laps on Rasta Mouse</description>
+    <description>Recent content in laps on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sat, 13 Apr 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/laps/index.xml" rel="self" type="application/rss+xml" />
@@ -13,28 +14,28 @@
     
     <item>
       <title>Weaponizing CVE-2019-0841 with LAPS</title>
-      <link>https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/</link>
+      <link>https://rastamouse.me/blog/weaponizing-cve-2019-0841/</link>
       <pubDate>Sat, 13 Apr 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/</guid>
+      <guid>https://rastamouse.me/blog/weaponizing-cve-2019-0841/</guid>
       <description>&lt;p&gt;On April 9, &lt;a href=&#34;https://twitter.com/rogue_kdc&#34;&gt;Nabeel Ahmed&lt;/a&gt; &lt;a href=&#34;https://twitter.com/rogue_kdc/status/1115664188821639173&#34;&gt;annouced&lt;/a&gt; details of &lt;a href=&#34;https://nvd.nist.gov/vuln/detail/CVE-2019-0841&#34;&gt;CVE-2019-0841&lt;/a&gt; - the tl;dr being that it allows low privileged users to take Full Control of files owned by &lt;code&gt;NT AUTHORITY\SYSTEM&lt;/code&gt;, which can lead to EoP.  Nabeel published a comprehensive &lt;a href=&#34;https://krbtgt.pw/dacl-permissions-overwrite-privilege-escalation-cve-2019-0841/&#34;&gt;blog&lt;/a&gt; describing the vulnerability, &lt;a href=&#34;https://github.com/rogue-kdc&#34;&gt;PoC code&lt;/a&gt; and a &lt;a href=&#34;https://youtu.be/vP468ZjJ3hU&#34;&gt;video demonstration&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>LAPS - Part 2</title>
-      <link>https://rastamouse.me/2018/03/laps-part-2/</link>
+      <link>https://rastamouse.me/blog/laps-pt2/</link>
       <pubDate>Sat, 17 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/03/laps-part-2/</guid>
+      <guid>https://rastamouse.me/blog/laps-pt2/</guid>
       <description>&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2018/03/laps---part-1/&#34;&gt;Part 1&lt;/a&gt; we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&amp;rsquo;ll look at various ways LAPS can be abused for persistence purposes.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>LAPS - Part 1</title>
-      <link>https://rastamouse.me/2018/03/laps-part-1/</link>
+      <link>https://rastamouse.me/blog/laps-pt1/</link>
       <pubDate>Sat, 10 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/03/laps-part-1/</guid>
+      <guid>https://rastamouse.me/blog/laps-pt1/</guid>
       <description></description>
     </item>
     

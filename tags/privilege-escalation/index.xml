@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>privilege escalation on Rasta Mouse</title>
+    <title>privilege escalation on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/privilege-escalation/</link>
-    <description>Recent content in privilege escalation on Rasta Mouse</description>
+    <description>Recent content in privilege escalation on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sat, 17 Mar 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/privilege-escalation/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>LAPS - Part 2</title>
-      <link>https://rastamouse.me/2018/03/laps-part-2/</link>
+      <link>https://rastamouse.me/blog/laps-pt2/</link>
       <pubDate>Sat, 17 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/03/laps-part-2/</guid>
+      <guid>https://rastamouse.me/blog/laps-pt2/</guid>
       <description>&lt;p&gt;In &lt;a href=&#34;https://rastamouse.me/2018/03/laps---part-1/&#34;&gt;Part 1&lt;/a&gt; we explored how one could go about discovering and mapping the LAPS configuration in a domain.  In this part, we&amp;rsquo;ll look at various ways LAPS can be abused for persistence purposes.&lt;/p&gt;</description>
     </item>
     

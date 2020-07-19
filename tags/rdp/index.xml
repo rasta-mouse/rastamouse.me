@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>rdp on Rasta Mouse</title>
+    <title>rdp on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/rdp/</link>
-    <description>Recent content in rdp on Rasta Mouse</description>
+    <description>Recent content in rdp on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sat, 09 Jun 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/rdp/index.xml" rel="self" type="application/rss+xml" />
@@ -13,21 +14,20 @@
     
     <item>
       <title>RDPClip</title>
-      <link>https://rastamouse.me/2018/06/rdpclip/</link>
+      <link>https://rastamouse.me/blog/rdpclip/</link>
       <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2018/06/rdpclip/</guid>
+      <guid>https://rastamouse.me/blog/rdpclip/</guid>
       <description>&lt;p&gt;This is just a quick post to demonstrate some interesting aspects of the Remote Desktop Clipboard Monitor.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Jumping Network Segregation with RDP</title>
-      <link>https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/</link>
+      <link>https://rastamouse.me/blog/rdp-jump-boxes/</link>
       <pubDate>Thu, 31 Aug 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2017/08/jumping-network-segregation-with-rdp/</guid>
+      <guid>https://rastamouse.me/blog/rdp-jump-boxes/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-
 &lt;p&gt;This short post demonstrates how it may be possible to pivot into a segregated/protected network, via an RDP Jump Box.&lt;/p&gt;</description>
     </item>
     

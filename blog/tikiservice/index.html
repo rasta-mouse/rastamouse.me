@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">TikiService</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#service-binary">Service Binary</a></li>
+        <li><a href="#aggressor">Aggressor</a></li>
+        <li><a href="#demo">Demo</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <p><a href="https://github.com/rasta-mouse/TikiTorch/tree/master/TikiService">TikiService</a> is a new .NET Service Binary that allows you to run a TikiTorch payload via the Service Control Manager (à la PsExec).  <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna">TikiTorch.cna</a> has also been updated to create a new Cobalt Strike function: <code>tikiexec</code>, that automates its use.  This blog post provides a brief overview and usage examples.</p>
+<h3 id="service-binary">Service Binary</h3>
+<p>As with all TikiTorch projects, the bulk of the process hollowing code lives within the TikiLoader - so the service binary is relatively simple.  In my the previous <a href="https://rastamouse.me/2019/06/the-return-of-aggressor/">post</a> I explained my design decision for passing in user-specified arguments as parameters, so that we can compile a &ldquo;generic&rdquo; binary and have Aggressor provide shellcode on-the-fly.</p>
+<p>Instead of trying to provide these on the command line, I opted to utilise the Configuration Manager.  This is often seen in the Solution Explorer as <code>App.config</code>.</p>
+<figure>
+    <img src="/images/tikiservice/config.png"/> 
+</figure>
+
+<p>Within this file, you can add <code>appSettings</code> options that come in the form of a <code>key</code> with an associated <code>value</code>.  Here we create &ldquo;placeholders&rdquo; for <code>Binary</code> and <code>Shellcode</code>.</p>
+<figure>
+    <img src="/images/tikiservice/service.png"/> 
+</figure>
+
+<p>Now in the binary, we can use the <code>ConfigurationManager</code> class to read these values in at runtime and just handle them as normal.</p>
+<h3 id="aggressor">Aggressor</h3>
+<p>Before importing the CNA, you must <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L5-L7">provide paths</a> to <code>CsExec.exe</code> (from my <a href="https://github.com/rasta-mouse/MiscTools">MiscTools repo</a>), <code>TikiService.exe</code> and <code>TikiService.exe.config</code>.</p>
+<figure>
+    <img src="/images/tikiservice/tikiexec-help.png"/> 
+</figure>
+
+<p>The <code>tikiexec</code> command expects a listener and architecure, for which it will <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/Aggressor/TikiTorch.cna#L182-L184">generate</a> base64 encoded shellcode.</p>
+<p>It will then read in the config and[insert the <code>Binary</code> and <code>Shellcode</code> values.  <code>TikiService.exe</code> and <code>TikiService.exe.config</code> are uploaded to <code>C:\Windows\Temp</code> on the target.  <code>CsExec</code> is then executed via <code>execute_assembly</code> to create, start, stop and delete a new service.</p>
+<p>The service name, description and binpath etc are passed in as args, so these can be changed in the CNA to suite your preference.</p>
+<p>We attempt to link to the new beacon, and then the binary and config file are removed.</p>
+<h3 id="demo">Demo</h3>
+<!-- raw HTML omitted -->
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/covenant-payloads/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/c3-first-look/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

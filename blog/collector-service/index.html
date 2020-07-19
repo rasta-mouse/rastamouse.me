@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Weaponizing Privileged File Writes with Windows Collector Service</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#design-ethos">Design Ethos</a></li>
+    <li><a href="#cve-2019-0841">CVE-2019-0841</a></li>
+    <li><a href="#systemcollector">SystemCollector</a></li>
+    <li><a href="#demo">Demo</a></li>
+  </ul>
+</nav>
+    <p>In my <a href="https://rastamouse.me/2019/04/weaponizing-cve-2019-0841-with-laps/">previous post</a>, I described how one could leverage CVE-2019-0841 to backdoor the LAPS <code>AdmPwd.dll</code> for EoP to <code>NT AUTHORITY\SYSTEM</code>.  The obvious question is that if a machine is not using LAPS, what can you do&hellip;?  Well <a href="https://twitter.com/buffaloverflow">Rich Warren</a> provided <a href="https://twitter.com/buffaloverflow/status/1117507864824881153">one solution</a>, by using the Windows Diagnostics Hub Standard Collector Service.</p>
+<h2 id="design-ethos">Design Ethos</h2>
+<p>Before we dive into any code, let&rsquo;s think about the situation more generically.</p>
+<p>CVE-2019-0841 allows low privileged users to overwrite the DACL on files that are owned by <code>NT AUTHORITY\SYSTEM</code>.  Successful exploitation results in <code>Full Control</code> over the target file for the low priv user.  This, in isolation, doesn&rsquo;t result in code exec as <code>SYSTEM</code>, pop a <code>SYSTEM</code> shell or anything like that.  But having <code>Full Control</code> over a file means that you can modify it in some way, e.g. write or delete.</p>
+<p>The great aspect of using the Collector Service to load and run DLLs, is that it&rsquo;s compatible with any similar arbitrary privileged file write vulnerability - so if you can write content into <code>System32</code>, regardless how, you&rsquo;re golden.  To that end, I decided to create a .NET Class Library to house the Collector Service code.</p>
+<p>The idea being - you write your .NET PoC for arbitrary file write, add the CollectorService DLL as a dependancy, and call a single function within it to handle the magic of:</p>
+<ol>
+<li>Backing up the target file</li>
+<li>Overwriting the target file with your malicious DLL</li>
+<li>Loading and running the malicious DLL</li>
+</ol>
+<h2 id="cve-2019-0841">CVE-2019-0841</h2>
+<p>To test the idea, I ported the original C++ PoC for CVE-2019-0841 to C#, using <a href="https://twitter.com/tiraniddo">James Forshaw&rsquo;s</a> <a href="https://github.com/googleprojectzero/sandbox-attacksurface-analysis-tools/tree/master/NtApiDotNet">NtApiDotNet</a> package.  This makes creating the required hardlink relatively simple:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="n">NtFile</span> <span class="n">ntFile</span><span class="p">;</span>
+<span class="n">ntFile</span> <span class="p">=</span> <span class="n">NtFile</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="s">$@&#34;\??\{path}&#34;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="n">FileAccessRights</span><span class="p">.</span><span class="n">MaximumAllowed</span><span class="p">);</span>
+<span class="n">ntFile</span><span class="p">.</span><span class="n">CreateHardlink</span><span class="p">(</span><span class="s">$@&#34;\??\{settings}&#34;</span><span class="p">);</span>
+</code></pre></div><p>Where <code>path</code> is the target file to take <code>Full Control</code> over (<code>C:\Windows\System32\license.rtf</code>) and <code>settings</code> is the path to the users&rsquo; MSEdge <code>settings.dat</code> file.</p>
+<p>My project is in the same Solution as SystemCollector, so I can a project reference.</p>
+<figure>
+    <img src="/images/collector-service/reference.png"/> 
+</figure>
+
+<p>After the exploit has verified that the user has taken control of the file, we simply add the following line:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="n">SystemCollector</span><span class="p">.</span><span class="n">DLL</span><span class="p">.</span><span class="n">Load</span><span class="p">(</span><span class="n">filename</span><span class="p">);</span>
+</code></pre></div><p>Where <code>filename</code> is <code>license.rtf</code>.</p>
+<h2 id="systemcollector">SystemCollector</h2>
+<p>99.9% of this code comes from <a href="https://twitter.com/ryHanson">Ryan Hanson&rsquo;s</a> <a href="https://github.com/atredispartners/CVE-2018-0952-SystemCollector/blob/master/SystemCollector/Program.cs">CVE-2018-0952-SystemCollector PoC</a>, so I won&rsquo;t explain it here.  For a detailed description, see his <a href="https://www.atredis.com/blog/cve-2018-0952-privilege-escalation-vulnerability-in-windows-standard-collector-service">blog post</a>.  I will just conver my modifications.</p>
+<p>The first line I added is:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="kt">var</span> <span class="n">dll</span> <span class="p">=</span> <span class="n">DecompressDLL</span><span class="p">(</span><span class="n">Convert</span><span class="p">.</span><span class="n">FromBase64String</span><span class="p">(</span><span class="s">&#34;blah&#34;</span><span class="p">));</span>
+</code></pre></div><p>Which is the same GZip (de)compression method I used in <a href="https://github.com/rasta-mouse/TikiTorch/blob/master/TikiLoader/Loader.cs#L73-L94">TikiTorch</a>.  This allows you to embedd your malicious DLL as a compressed, base64 encoded string, which is expanded and written to disk later.</p>
+<p>I changed the <code>scratch</code> directory to <code>$@&quot;C:\Users\{Environment.UserName}\AppData\Local\Temp&quot;</code>.</p>
+<p>First, we backup the original target file.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="c1">// backup
+</span><span class="c1"></span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$@&#34; [&gt;] Backing up {filename} to {scratch}&#34;</span><span class="p">);</span>
+<span class="n">File</span><span class="p">.</span><span class="n">Copy</span><span class="p">(</span><span class="s">$@&#34;C:\Windows\System32\{filename}&#34;</span><span class="p">,</span> <span class="s">$@&#34;{scratch}\{filename}&#34;</span><span class="p">);</span>
+</code></pre></div><p>We then overwrite the file with our DLL.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="c1">// overwrite
+</span><span class="c1"></span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$@&#34; [&gt;] Overwriting C:\Windows\System32\{filename} with malicious DLL&#34;</span><span class="p">);</span>
+<span class="n">File</span><span class="p">.</span><span class="n">WriteAllBytes</span><span class="p">(</span><span class="s">$@&#34;C:\Windows\System32\{filename}&#34;</span><span class="p">,</span> <span class="n">dll</span><span class="p">);</span>
+</code></pre></div><p>The final change was to replace <code>Console.ReadLine();</code> with <code>Thread.Sleep(3000);</code>.  I found that if the application closes too quickly, the Collector Service does not load the DLL.</p>
+<p>The DLL is loaded by <code>DiagnosticsHub.StandardCollector.Service.exe</code> which, in my testing, closes after about 5 minutes and subsequently kills the Beacon.</p>
+<figure>
+    <img src="/images/collector-service/procexp.png"/> 
+</figure>
+
+<h2 id="demo">Demo</h2>
+<p>In this demo, we have a foothold as a standard user.  Let&rsquo;s priv esc with a Cobalt Strike SMB DLL.</p>
+<!-- raw HTML omitted -->
+<p>Solution available on <a href="https://github.com/rasta-mouse/CollectorService">GitHub</a>.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/weaponizing-cve-2019-0841/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/tikispawn-msbuild/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

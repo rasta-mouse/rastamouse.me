@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Red Team Infrastructure - AWS Encrypted EBS</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#securing-infrastructure">Securing Infrastructure</a>
+      <ul>
+        <li><a href="#launch-new-base-instance">Launch New Base Instance</a></li>
+        <li><a href="#create-new-image">Create New Image</a></li>
+      </ul>
+    </li>
+    <li><a href="#copy--encrypt-ami">Copy &amp; Encrypt AMI</a>
+      <ul>
+        <li><a href="#new-ami">New AMI</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <p><a href="https://twitter.com/malcomvetter">Tim MalcomVetter</a> caused a bit of stir over his <a href="https://medium.com/@malcomvetter/responsible-red-teams-1c6209fd43cc">Responsible Red Teams</a> post last week, which is not surprising since he was pretty fucking rude about the whole thing.</p>
+<blockquote>
+<p>Responsible red teams don’t throw C2 servers all over virtual private cloud providers. Yes, it’s cool, your neat little red team automation script can deploy Empire and Cobalt Strike servers all over Digital Ocean, Linode, AWS, Azure, Google Cloud, with zero clicks &hellip; but why?</p>
+</blockquote>
+<p>Considering I have a 2-part series on <a href="/tags/terraform/">automated infrastructure deployment</a>, this comment is more-or-less aimed directly at people like myself, <a href="https://github.com/Coalfire-Research/Red-Baron">byt3bl33d3r</a> and <a href="https://www.blackhillsinfosec.com/build-c2-infrastructure-digital-ocean-part-1/">InvokeThreatGuy</a>.</p>
+<blockquote>
+<p>are you just an insensitive jerk</p>
+</blockquote>
+<p><code>¯\_(ツ)_/¯</code></p>
+<p>The ethos behind what Tim was saying however, obviously has merit.</p>
+<blockquote>
+<p>Our goal is to decrease risk, not increase it. [&hellip;] remember that as simulated attackers, we are really still defenders.</p>
+</blockquote>
+<p>I don&rsquo;t think anybody would argue with this, regardless of which side of the public-cloud-c2 fence you come down on.  However, a blanket statement that <em>all</em> public cloud C2 infrastructure is irresponible, even for attacking production systems, just isn&rsquo;t fair in my opinion.</p>
+<p>If you, as an operator, have carried out reasonable steps to secure and protect your C2 infrastructure, can articulate those control measures to the target organisation, <em>and</em> they&rsquo;ve approved its use; then you&rsquo;re good.  They are the risk owners (it&rsquo;s their data) and therefore it&rsquo;s their risk to accept.  If it&rsquo;s within their tolerance/appetite, they&rsquo;ll accept it.  If not, they&rsquo;ll reject it.  But that should be their choice, do not make it for them - that&rsquo;s the difference.</p>
+<h2 id="securing-infrastructure">Securing Infrastructure</h2>
+<p>In parts <a href="/2017/08/automated-red-team-infrastructure-deployment-with-terraform---part-1/">1</a> and <a href="/2017/09/automated-red-team-infrastructure-deployment-with-terraform---part-2/">2</a>, we discussed several security configurations such as limiting network access with cloud firewalls and SSH key management.  In this post, we&rsquo;ll look at how to create encrypted EBS volumes for use with AWS EC2 instances.</p>
+<p>AWS doesn&rsquo;t allow us to encrypt an existing AMI, so we can&rsquo;t just take one of their quick start images and spin it up in an encrypted form.  Intead, we have to hop through a one-time process of creating our own encrypted AMI and use that as a base image for later deployment.</p>
+<h3 id="launch-new-base-instance">Launch New Base Instance</h3>
+<p>So first, create a new instance from an AMI of your choice.</p>
+<p><code>EC2 &gt; Instances &gt; Launch Instance</code></p>
+<p>I&rsquo;m using Ubuntu Server 14.04 LTS (HVM), SSD Volume Type:  <code>ami-3fc8d75b</code></p>
+<figure>
+    <img src="/images/enc-ebs/base-instance.png"/> 
+</figure>
+
+<p>Once the instance has booted, login and make any customisation you want (instal any software you want, make config changes, apply host hardening etc), then power the instance off.
+See <a href="https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki#securing-infrastructure">here</a> for hardening guidance.</p>
+<h3 id="create-new-image">Create New Image</h3>
+<p>From this instance, create a new image:  <code>EC2 &gt; Instances &gt; Actions &gt; Image &gt; Create Image</code></p>
+<figure>
+    <img src="/images/enc-ebs/create-image.png"/> 
+</figure>
+
+<p>This will create a new AMI that is available to you in: <code>EC2 &gt; AMIs</code></p>
+<figure>
+    <img src="/images/enc-ebs/base-ami.png"/> 
+</figure>
+
+<h2 id="copy--encrypt-ami">Copy &amp; Encrypt AMI</h2>
+<p>Now copy the AMI you just created.</p>
+<p><code>EC2 &gt; AMIs &gt; Actions &gt; Copy AMI</code></p>
+<figure>
+    <img src="/images/enc-ebs/copy-ami.png"/> 
+</figure>
+
+<p>Obviously click the <code>Encryption</code> tickbox :)</p>
+<p>There is a default Master Key, but you can specificy your own in the <code>IAM</code> section of the AWS Console.
+I am also copying the AMI to the same region (but you can share across regions too).</p>
+<h3 id="new-ami">New AMI</h3>
+<p>You will now have a new AMI available, in this example <code>ami-d82fcbbf</code>.</p>
+<figure>
+    <img src="/images/enc-ebs/new-ami.png"/> 
+</figure>
+
+<p>Whenever you want to deploy a new EC2 instance, you can do so from this customised, encrypted AMI.  Deployment options are up to you of course - via the normal GUI or use the AMI number in Terraform.</p>
+<figure>
+    <img src="/images/enc-ebs/new-instance.png"/> 
+</figure>
+
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">resource &#34;aws_instance&#34; &#34;http-c2&#34; {
+	ami = &#34;ami-d82fcbbf&#34;
+	instance_type = &#34;t2.medium&#34;
+	key_name = &#34;${aws_key_pair.rasta.key_name}&#34;
+	vpc_security_group_ids = [&#34;${aws_security_group.http-c2.id}&#34;]
+	subnet_id = &#34;${aws_subnet.default.id}&#34;
+	associate_public_ip_address = true
+}
+</code></pre></div><p>You can now terminate the orginal EC2 instance and deregister the unencrypted AMI.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/vhd-backup/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/laps-pt1/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

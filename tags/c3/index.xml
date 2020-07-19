@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>c3 on Rasta Mouse</title>
+    <title>c3 on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/c3/</link>
-    <description>Recent content in c3 on Rasta Mouse</description>
+    <description>Recent content in c3 on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Tue, 03 Sep 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/c3/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>MWR Labs: C3 - First Look</title>
-      <link>https://rastamouse.me/2019/09/mwr-labs-c3-first-look/</link>
+      <link>https://rastamouse.me/blog/c3-first-look/</link>
       <pubDate>Tue, 03 Sep 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://rastamouse.me/2019/09/mwr-labs-c3-first-look/</guid>
+      <guid>https://rastamouse.me/blog/c3-first-look/</guid>
       <description>&lt;p&gt;In this blog post I&amp;rsquo;m going to cover my first impressions of MWR Labs C3 project, through installation and setup to usage in a basic scenario.&lt;/p&gt;</description>
     </item>
     

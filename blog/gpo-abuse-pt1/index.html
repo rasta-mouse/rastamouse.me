@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">GPO Abuse - Part 1</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#enumeration">Enumeration</a>
+      <ul>
+        <li><a href="#create-gpos">Create GPOs</a></li>
+        <li><a href="#gp-link">GP-Link</a></li>
+      </ul>
+    </li>
+    <li><a href="#modify-gpo">Modify GPO</a></li>
+    <li><a href="#mapping-gpos--ous">Mapping GPOs &amp; OUs</a>
+      <ul>
+        <li><a href="#by-computer">By Computer</a></li>
+        <li><a href="#by-gpo">By GPO</a></li>
+        <li><a href="#by-ou">By OU</a></li>
+      </ul>
+    </li>
+    <li><a href="#inheritance">Inheritance</a></li>
+  </ul>
+</nav>
+    <p>Group Policy Objects (GPOs) is a subject I&rsquo;ve wanted to write about for a long time and I&rsquo;m happy to have <em>finally</em> started.</p>
+<p>If you&rsquo;re not too familiar with GPOs, I highly recommend you go and read <a href="https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e">A Red Teamer’s Guide to GPOs and OUs</a> by <a href="https://twitter.com/_wald0">Andy Robbins</a>.  He recaps how GPO enforcement works, how to use BloodHound to find GPO-control based attack paths, and explains a few ways to execute those attacks.</p>
+<p>In terms of weaponisation, <a href="https://twitter.com/harmj0y">Will Schroeder</a> made some ground when he published <a href="http://www.harmj0y.net/blog/redteaming/abusing-gpo-permissions/">Abusing GPO Permissions</a> and implemented <code>New-GPOImmediateTask</code> into <code>PowerView</code>.  However, the function was later <a href="https://www.harmj0y.net/blog/powershell/make-powerview-great-again/">removed</a> with the commment:</p>
+<blockquote>
+<p>inconsistent and better done manually</p>
+</blockquote>
+<p>The aim for this series of blog posts is to demonstrate how to enumerate these abuse opportunities; and exploit them for both privilege escalation and persistence purposes.</p>
+<h2 id="enumeration">Enumeration</h2>
+<p>There are a couple of interesting permissions that we may want to look for.  The ones that spring to mind are:</p>
+<ul>
+<li>Who can create new GPOs in the domain.</li>
+<li>Who can link GPOs to which OUs.</li>
+<li>Who can modify existing GPOs (that may or may not be currently linked).</li>
+</ul>
+<p>The reason I think of them this way, is because they&rsquo;re permissions that are individually delegated. For example:</p>
+<ul>
+<li>Delegating permissions to create GPOs doesn&rsquo;t also grant the permission to link them to an OU.</li>
+<li>A user may be able to modify an existing GPO, but it may be unlinked and they can&rsquo;t link it themselves.</li>
+<li>Or a user may not be able to modify a GPO but can link it to another OU.</li>
+</ul>
+<p>And so the combination of what permissions you have will depend on how you implement this abuse.</p>
+<h3 id="create-gpos">Create GPOs</h3>
+<p>In the Group Policy Management Console (GPMC), delegated permission to create GPOs in the domain looks like this:</p>
+<figure>
+    <img src="/images/gpo-abuse-pt1/gpmc-create-gpos.png"/> 
+</figure>
+
+<p>They can be easy to enumerate PowerView with the following:</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainObjectAcl -SearchBase &#34;CN=Policies,CN=System,DC=testlab,DC=local&#34; -ResolveGUIDs | Where-Object { $_.ObjectAceType -eq &#34;Group-Policy-Container&#34; }
+
+AceQualifier           : AccessAllowed
+ObjectDN               : CN=Policies,CN=System,DC=testlab,DC=local
+ActiveDirectoryRights  : CreateChild                                       &lt;--- CreateChild just means &#34;Create GPO&#34; in this context
+ObjectAceType          : Group-Policy-Container
+ObjectSID              :
+InheritanceFlags       : None
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1106     &lt;--- SID of the user/group
+AccessMask             : 1
+AuditFlags             : None
+IsInherited            : False
+AceFlags               : None
+InheritedObjectAceType : All
+OpaqueLength           : 0
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Convert-SidToName S-1-5-21-407754292-3742881058-3910138598-1106
+LAB\Desktop Admins
+</code></pre></div><h3 id="gp-link">GP-Link</h3>
+<p><code>Get-DomainOU</code> shows us all the <code>Organizational Units</code> in AD.  Here, we only have the default <code>Domain Controllers</code> OU and a custom <code>Workstations</code> OU.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainOU
+
+usncreated             : 6031
+systemflags            : -1946157056
+iscriticalsystemobject : True
+gplink                 : [LDAP://CN={6AC1786C-016F-11D2-945F-00C04fB984F9},CN=Policies,CN=System,DC=testlab,DC=local;0]     &lt;--- GUID(s) of GPO(s) already linked to the OU
+whenchanged            : 06/01/2019 13:14:24
+objectclass            : {top, organizationalUnit}
+showinadvancedviewonly : False
+usnchanged             : 6031
+dscorepropagationdata  : {06/01/2019 13:15:24, 01/01/1601 00:00:01}
+name                   : Domain Controllers
+description            : Default container for domain controllers
+distinguishedname      : OU=Domain Controllers,DC=testlab,DC=local
+ou                     : Domain Controllers
+whencreated            : 06/01/2019 13:14:24
+instancetype           : 4
+objectguid             : d312c411-7c7c-4fb7-b4f9-cbf0637b551f
+objectcategory         : CN=Organizational-Unit,CN=Schema,CN=Configuration,DC=testlab,DC=local
+
+usncreated            : 12790
+name                  : Workstations
+gplink                : [LDAP://cn={7DD7A136-334C-47C1-8890-D9766D449EFA},cn=policies,cn=system,DC=testlab,DC=local;0]     &lt;--- GUID(s) of GPO(s) already linked to the OU
+whenchanged           : 07/01/2019 07:18:51
+objectclass           : {top, organizationalUnit}
+usnchanged            : 13118
+dscorepropagationdata : {07/01/2019 07:18:51, 07/01/2019 07:17:22, 07/01/2019 07:14:37, 06/01/2019 13:52:27...}
+distinguishedname     : OU=Workstations,DC=testlab,DC=local
+ou                    : Workstations
+whencreated           : 06/01/2019 13:28:56
+instancetype          : 4
+objectguid            : 4f733ab3-1809-4a31-b299-e07a3b7b4669
+objectcategory        : CN=Organizational-Unit,CN=Schema,CN=Configuration,DC=testlab,DC=local
+</code></pre></div><p>The Delegation of Control Wizard in Active Directory Users and Computers (ADUC) has a predefined template for &ldquo;Manage Group Policy links&rdquo;.  It&rsquo;s useful for delegating different types of privilege to principals over particular objects.</p>
+<p>In this example, we delegate this to the <code>LAB\Desktop Admins</code> group.</p>
+<figure>
+    <img src="/images/gpo-abuse-pt1/gp-link.png"/> 
+</figure>
+
+<p>This is also easy to enumerate in PowerView by piping <code>Get-DomainOu</code> into <code>Get-DomainObjectAcl</code> and looking for the <code>GP-Link</code> ACE.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object { $_.ObjectAceType -eq &#34;GP-Link&#34; }
+
+AceQualifier           : AccessAllowed
+ObjectDN               : OU=Workstations,DC=testlab,DC=local               &lt;--- The OU Distinguished Name
+ActiveDirectoryRights  : ReadProperty, WriteProperty                       &lt;--- WriteProperty (GP-Link is a property on the OU object that you can see in the Attribute Editor of ADUC)
+ObjectAceType          : GP-Link
+ObjectSID              :
+InheritanceFlags       : ContainerInherit                                  &lt;--- This will be interesting later
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1106     &lt;--- SID of the user/group
+AccessMask             : 48
+AuditFlags             : None
+IsInherited            : False
+AceFlags               : ContainerInherit
+InheritedObjectAceType : All
+OpaqueLength           : 0
+</code></pre></div><h2 id="modify-gpo">Modify GPO</h2>
+<p>We can also pipe <code>Get-DomainGPO</code> into <code>Get-DomainObjectAcl</code> to find which principals can modify them.  Here we look for <code>ActiveDirectoryRights</code> that match <code>WriteProperty</code>, <code>WriteDacl</code> or <code>WriteOwner</code>.  (In most cases we only expect to find <code>WriteProperty</code>, but having <code>WriteDacl</code> or <code>WriteOwner</code> will allow us to grant <code>WriteProperty</code> to ourselves and modify the GPO anyway).</p>
+<p>We put a <code>match</code> in for the <code>SecurityIdentifier</code> so we only list RIDs &gt; 1000 to avoid seeing <code>Domain Admins</code> and <code>Enterprise Admins</code> etc for every GPO.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainGPO | Get-DomainObjectAcl -ResolveGUIDs | Where-Object { $_.ActiveDirectoryRights -match &#34;WriteProperty|WriteDacl|WriteOwner&#34; -and $_.SecurityIdentifier -match &#34;S-1-5-21-407754292-3742881058-3910138598-[\d]{4,10}&#34; }
+
+AceType               : AccessAllowed
+ObjectDN              : CN={7DD7A136-334C-47C1-8890-D9766D449EFA},CN=Policies,CN=System,DC=testlab,DC=local
+ActiveDirectoryRights : CreateChild, DeleteChild, Self, WriteProperty, DeleteTree, Delete, GenericRead, WriteDacl, WriteOwner
+OpaqueLength          : 0
+ObjectSID             :
+InheritanceFlags      : None
+BinaryLength          : 36
+IsInherited           : False
+IsCallback            : False
+PropagationFlags      : None
+SecurityIdentifier    : S-1-5-21-407754292-3742881058-3910138598-1105     &lt;--- SID of the user/group
+AccessMask            : 983295
+AuditFlags            : None
+AceFlags              : None
+AceQualifier          : AccessAllowed
+
+AceType               : AccessAllowed
+ObjectDN              : CN={7DD7A136-334C-47C1-8890-D9766D449EFA},CN=Policies,CN=System,DC=testlab,DC=local
+ActiveDirectoryRights : CreateChild, DeleteChild, ReadProperty, WriteProperty, GenericExecute
+OpaqueLength          : 0
+ObjectSID             :
+InheritanceFlags      : ContainerInherit
+BinaryLength          : 36
+IsInherited           : False
+IsCallback            : False
+PropagationFlags      : None
+SecurityIdentifier    : S-1-5-21-407754292-3742881058-3910138598-1109     &lt;--- SID of the user/group
+AccessMask            : 131127
+AuditFlags            : None
+AceFlags              : ContainerInherit
+AceQualifier          : AccessAllowed
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainGPO | Where-Object { $_.DistinguishedName -eq &#34;CN={7DD7A136-334C-47C1-8890-D9766D449EFA},CN=Policies,CN=System,DC=testlab,DC=local&#34; } | Select-Object DisplayName
+
+displayname
+-----------
+Workstation Policy
+</code></pre></div><p>As seen in the <code>Details</code> tab of GPMC, <code>LAB\bwallace</code> is the <code>owner</code> of this GPO called <code>Workstation Policy</code>.</p>
+<figure>
+    <img src="/images/gpo-abuse-pt1/gpo-owner.png"/> 
+</figure>
+
+<p>Creators of a GPO are automatically granted explicit <code>Edit settings, delete, modify security</code>, which manifests as <code>CreateChild, DeleteChild, Self, WriteProperty, DeleteTree, Delete, GenericRead, WriteDacl, WriteOwner</code>.</p>
+<figure>
+    <img src="/images/gpo-abuse-pt1/gpo-delegation.png"/> 
+</figure>
+
+<p>Also in this example, <code>LAB\tlockhart</code> has been granted explicit <code>Edit settings</code>, which are <code>CreateChild, DeleteChild, ReadProperty, WriteProperty, GenericExecute</code>.</p>
+<h2 id="mapping-gpos--ous">Mapping GPOs &amp; OUs</h2>
+<p>This can be done from a couple of different angles.  You could have an interesting GPO and want to know which OUs and/or computers that single GPO applies; you may want to list every GPO that applies to a particular OU; or you may want to list every GPO that applies to a particular computer.</p>
+<h3 id="by-computer">By Computer</h3>
+<p>Here, we list every GPO that applies to <code>ws-1.testlab.local</code> - displaying only the <code>Display Name</code> and <code>GUID</code> name.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainGPO -ComputerIdentity ws-1 -Properties Name, DisplayName
+
+displayname           name
+-----------           ----
+Demo GPO              {ECB75201-82D7-49F3-A0E0-86788EE7DC36}
+Workstation Policy    {7DD7A136-334C-47C1-8890-D9766D449EFA}
+Default Domain Policy {31B2F340-016D-11D2-945F-00C04FB984F9}
+</code></pre></div><p>GPO&rsquo;s are a bit funny since they have a Display Name, GUID Name and an Object GUID.  The later two in particular are easy to confuse.</p>
+<h3 id="by-gpo">By GPO</h3>
+<p>Here, we list every OU that the <code>Demo GPO</code> applies to.  We use the GUID name in the GPLink search filter.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainOU -GPLink &#34;{ECB75201-82D7-49F3-A0E0-86788EE7DC36}&#34; -Properties DistinguishedName
+
+distinguishedname
+-----------------
+OU=Domain Controllers,DC=testlab,DC=local
+OU=Workstations,DC=testlab,DC=local
+</code></pre></div><p>If you then need to know which computers are in these OUs, you can do so with:</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainComputer -SearchBase &#34;LDAP://OU=Workstations,DC=testlab,DC=local&#34; -Properties DistinguishedName
+
+distinguishedname
+-----------------
+CN=WS-1,OU=Workstations,DC=testlab,DC=local
+CN=WS-2,OU=Workstations,DC=testlab,DC=local
+CN=WS-3,OU=Workstations,DC=testlab,DC=local
+</code></pre></div><h3 id="by-ou">By OU</h3>
+<p>This one is more of a pig.</p>
+<p>If we get the <code>GPLink</code> attribute for the <code>Workstations</code> OU (which tells us every GPO that is linked to it), the results are returned as a single text string which means we can&rsquo;t just pipe it straight into <code>Get-DomainGPO</code> and find their corresponding Display Names.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainOU -Identity &#34;Workstations&#34; -Properties GPLink
+
+gplink
+------
+[LDAP://cn={ECB75201-82D7-49F3-A0E0-86788EE7DC36},cn=policies,cn=system,DC=testlab,DC=local;0][LDAP://cn={7DD7A136-334C-47C1-8890-D9766D449EFA},cn=policies,cn=system,DC=test...
+</code></pre></div><p>Instead, we can do it this way:</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; $GPLink = (Get-DomainOU -Identity &#34;Workstations&#34; -Properties GPLink).gplink
+PS &gt; [Regex]::Matches($GPLink, &#39;(?&lt;={)(.*?)(?=})&#39;) | Select-Object -ExpandProperty Value | ForEach-Object { Get-DomainGPO -Identity &#34;{$_}&#34; -Properties DisplayName }
+
+displayname
+-----------
+Demo GPO
+Workstation Policy
+</code></pre></div><figure>
+    <img src="/images/gpo-abuse-pt1/gpo-by-ou.png"/> 
+</figure>
+
+<p>The astute amongst you may notice in these examples, how some return GPOs included via inheritance (e.g. the Default Domain Policy) and others do not.</p>
+<h2 id="inheritance">Inheritance</h2>
+<p>I find inheritance pretty interesting, especially when it comes to the Delegation of Control Wizard.  By default, it will enable inheritance for <code>This object and all descending objects</code>.</p>
+<figure>
+    <img src="/images/gpo-abuse-pt1/inheritance-all-desc.png"/> 
+</figure>
+
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">PS &gt; Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | Where-Object { $_.ObjectAceType -eq &#34;GP-Link&#34; }
+
+AceQualifier           : AccessAllowed
+ObjectDN               : OU=Workstations,DC=testlab,DC=local
+ActiveDirectoryRights  : ReadProperty, WriteProperty
+ObjectAceType          : GP-Link
+ObjectSID              :
+InheritanceFlags       : ContainerInherit     &lt;---
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1106
+AccessMask             : 48
+AuditFlags             : None
+IsInherited            : False                &lt;--- This OU *is not* inheriting from elsewhere
+AceFlags               : ContainerInherit     &lt;---
+InheritedObjectAceType : All
+OpaqueLength           : 0
+</code></pre></div><p>If we now subsequently create a new OU inside this one, <code>LAB\Desktop Admins</code> will inherit the same <code>GP-Link</code> privileges over it.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">AceQualifier           : AccessAllowed
+ObjectDN               : OU=DAs,OU=Workstations,DC=testlab,DC=local     &lt;--- DA OU is a child of Workstation OU
+ActiveDirectoryRights  : ReadProperty, WriteProperty
+ObjectAceType          : GP-Link
+ObjectSID              :
+InheritanceFlags       : ContainerInherit                &lt;---
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1106
+AccessMask             : 48
+AuditFlags             : None
+IsInherited            : True                            &lt;--- This OU *is* inheriting
+AceFlags               : ContainerInherit, Inherited     &lt;---
+InheritedObjectAceType : All
+OpaqueLength           : 0
+</code></pre></div><p>If we manually modify the inheritance on the <code>Workstations</code> OU to <code>This object only</code>, the new ACL looks like this:</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">AceQualifier           : AccessAllowed
+ObjectDN               : OU=Workstations,DC=testlab,DC=local
+ActiveDirectoryRights  : ReadProperty, WriteProperty
+ObjectAceType          : GP-Link
+ObjectSID              :
+InheritanceFlags       : None    &lt;---
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1106
+AccessMask             : 48
+AuditFlags             : None
+IsInherited            : False    &lt;---
+AceFlags               : None     &lt;---
+InheritedObjectAceType : All
+OpaqueLength           : 0
+</code></pre></div><figure>
+    <img src="/images/gpo-abuse-pt1/inheritance-only.png"/> 
+</figure>
+
+<p>Finally, if you have nested children like this:</p>
+<figure>
+    <img src="/images/gpo-abuse-pt1/3-stack.png"/> 
+</figure>
+
+<p>The <code>DA</code> OU will inherit from both <code>Workstations</code> and <code>Admins</code>.  So we have a delegation on <code>Workstations</code> for <code>LAB\Desktop Admins</code> and a delegation on <code>Admins</code> for <code>LAB\Team 2</code> - the <code>DA</code> OU will inherit both.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">AceQualifier           : AccessAllowed
+ObjectDN               : OU=Workstations,DC=testlab,DC=local
+ActiveDirectoryRights  : ReadProperty, WriteProperty
+ObjectAceType          : GP-Link
+ObjectSID              :
+InheritanceFlags       : ContainerInherit
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1106
+AccessMask             : 48
+AuditFlags             : None
+IsInherited            : False
+AceFlags               : ContainerInherit
+InheritedObjectAceType : All
+OpaqueLength           : 0
+
+AceQualifier           : AccessAllowed
+ObjectDN               : OU=Admins,OU=Workstations,DC=testlab,DC=local
+ActiveDirectoryRights  : ReadProperty, WriteProperty
+ObjectAceType          : GP-Link
+ObjectSID              :
+InheritanceFlags       : ContainerInherit
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1110
+AccessMask             : 48
+AuditFlags             : None
+IsInherited            : False
+AceFlags               : ContainerInherit
+InheritedObjectAceType : All
+OpaqueLength           : 0
+
+AceQualifier           : AccessAllowed
+ObjectDN               : OU=Admins,OU=Workstations,DC=testlab,DC=local
+ActiveDirectoryRights  : ReadProperty, WriteProperty
+ObjectAceType          : GP-Link
+ObjectSID              :
+InheritanceFlags       : ContainerInherit
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1106
+AccessMask             : 48
+AuditFlags             : None
+IsInherited            : True
+AceFlags               : ContainerInherit, Inherited
+InheritedObjectAceType : All
+OpaqueLength           : 0
+
+AceQualifier           : AccessAllowed
+ObjectDN               : OU=DAs,OU=Admins,OU=Workstations,DC=testlab,DC=local
+ActiveDirectoryRights  : ReadProperty, WriteProperty
+ObjectAceType          : GP-Link
+ObjectSID              :
+InheritanceFlags       : ContainerInherit
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1110
+AccessMask             : 48
+AuditFlags             : None
+IsInherited            : True
+AceFlags               : ContainerInherit, Inherited
+InheritedObjectAceType : All
+OpaqueLength           : 0
+
+AceQualifier           : AccessAllowed
+ObjectDN               : OU=DAs,OU=Admins,OU=Workstations,DC=testlab,DC=local
+ActiveDirectoryRights  : ReadProperty, WriteProperty
+ObjectAceType          : GP-Link
+ObjectSID              :
+InheritanceFlags       : ContainerInherit
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-407754292-3742881058-3910138598-1106
+AccessMask             : 48
+AuditFlags             : None
+IsInherited            : True
+AceFlags               : ContainerInherit, Inherited
+InheritedObjectAceType : All
+OpaqueLength           : 0
+</code></pre></div><figure>
+    <img src="/images/gpo-abuse-pt1/da-inheritance.png"/> 
+</figure>
+
+<p>I think that&rsquo;s enough enumeration for now!  In the next part, we&rsquo;ll start with some abuses.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/asb-bypass-pt4/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/gpo-abuse-pt2/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

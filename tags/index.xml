@@ -1,12 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on Rasta Mouse</title>
+    <title>Tags on Cheesy Rumbles</title>
     <link>https://rastamouse.me/tags/</link>
-    <description>Recent content in Tags on Rasta Mouse</description>
+    <description>Recent content in Tags on Cheesy Rumbles</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
+    <lastBuildDate>Sun, 19 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://rastamouse.me/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,9 +15,36 @@
     <item>
       <title>c#</title>
       <link>https://rastamouse.me/tags/c#/</link>
-      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 19 Jul 2020 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/c#/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dinvoke</title>
+      <link>https://rastamouse.me/tags/dinvoke/</link>
+      <pubDate>Sun, 19 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/dinvoke/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>edr</title>
+      <link>https://rastamouse.me/tags/edr/</link>
+      <pubDate>Sun, 19 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/edr/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>injection</title>
+      <link>https://rastamouse.me/tags/injection/</link>
+      <pubDate>Sun, 19 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/injection/</guid>
       <description></description>
     </item>
     
@@ -192,6 +220,15 @@
     </item>
     
     <item>
+      <title>CVE-2019-0841</title>
+      <link>https://rastamouse.me/tags/cve-2019-0841/</link>
+      <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/cve-2019-0841/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Elevation of Privilege</title>
       <link>https://rastamouse.me/tags/elevation-of-privilege/</link>
       <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
@@ -206,15 +243,6 @@
       <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/standard-collector/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>cve-2019-0841</title>
-      <link>https://rastamouse.me/tags/cve-2019-0841/</link>
-      <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://rastamouse.me/tags/cve-2019-0841/</guid>
       <description></description>
     </item>
     
@@ -512,6 +540,15 @@
       <pubDate>Sat, 13 May 2017 00:00:00 +0000</pubDate>
       
       <guid>https://rastamouse.me/tags/silver-tickets/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>index</title>
+      <link>https://rastamouse.me/tags/index/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://rastamouse.me/tags/index/</guid>
       <description></description>
     </item>
     

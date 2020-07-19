@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Covenant Tasks 101</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#hello-world">Hello World</a></li>
+        <li><a href="#parameters">Parameters</a></li>
+        <li><a href="#reference-libraries">Reference Libraries</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <p>Covenant is a .NET Command and Control framework that boasts a number of exciting features for red teamers.  The Covenant implants are called Grunts, which are capable of executing post-exploitation <strong>&ldquo;tasks&rdquo;</strong> on a compromised machine.  Covenant v0.1 released with a number of useful tasks, but the repository has really <a href="https://github.com/cobbr/Covenant/graphs/commit-activity">grown</a> from contributions from the Covenant community.</p>
+<p>Tasks can extend the functionality and versatility of a Grunt, such as providing new lateral movement, persistence or privilege escalation techniques and more.  Contributing a Task to Covenant is an excellent way to support the project.</p>
+<p>This post will provide an introduction for those wishing to create and contribute new Tasks.</p>
+<h3 id="hello-world">Hello World</h3>
+<p>To create a new Task, there are at least two changes needed within Covenant.  The first is the creation of a new <strong>*.task</strong> file within <code>Covenant\Covenant\Data\Tasks\CSharp\</code> (e.g. <code>HelloWorld.task</code>) - this contains the actual source code of the task that the Grunt will execute.  The second is within <code>Covenant\Covenant\Core\DbInitializer.cs</code> - this tells Covenant about the new Task so it will appear in the UI etc.</p>
+<blockquote>
+<p>Tip:  I like to create my Task file with a <strong>*.cs</strong> extension so that IntelliSense works properly.  Just remember to rename it later.</p>
+</blockquote>
+<p>There are a few rules for a Task:</p>
+<ul>
+<li>It must implement a class called <code>Task</code></li>
+<li>It must have a method called <code>Execute</code></li>
+<li>It must return a <code>string</code></li>
+</ul>
+<blockquote>
+<p>It&rsquo;s the responsibility of the Task author (you) to ensure input and return values are appropriately &ldquo;translated&rdquo;.</p>
+</blockquote>
+<p>The reason for this is apparent if we look at the source code of the Grunt.</p>
+<figure>
+    <img src="/images/cov-tasks-101/gruntsource.png"/> 
+</figure>
+
+<p>A bare minimum example could be:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Task</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">Execute</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s">&#34;Hello World&#34;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p><code>DbInitializer.cs</code> is monstrously large, but we&rsquo;re looking for the section that starts with <code>public async static Task InitializeTasks(CovenantContext context)</code>.  Scroll down and you should see <code>var GruntTasks = new List&lt;GruntTask&gt;</code>, which is where the Task definitions start.  At the time of writing, the first <code>GruntTask</code> is the <code>Shell</code> command.  It&rsquo;s generally easier to blast to the very bottom of the GruntTasks list so we can add our new task at the bottom.</p>
+<p>So to wire-in our Task, we can add the following:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">new</span> <span class="n">GruntTask</span>
+<span class="p">{</span>
+    <span class="n">Name</span> <span class="p">=</span> <span class="s">&#34;HelloWorld&#34;</span><span class="p">,</span>
+    <span class="n">AlternateNames</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;{</span> <span class="s">&#34;hello&#34;</span> <span class="p">},</span>
+    <span class="n">Description</span> <span class="p">=</span> <span class="s">&#34;An example Hello World Task.&#34;</span><span class="p">,</span>
+    <span class="n">Code</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadAllText</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="n">Combine</span><span class="p">(</span><span class="n">Common</span><span class="p">.</span><span class="n">CovenantTaskCSharpDirectory</span><span class="p">,</span> <span class="s">&#34;HelloWorld&#34;</span> <span class="p">+</span> <span class="s">&#34;.task&#34;</span><span class="p">)),</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li><code>Name</code> is the name of the Task as it appears in the Covenant UI.</li>
+<li><code>AlternateNames</code> can be thought of as aliases or shortcuts for the full name.  E.g. the <code>ListDirectory</code> Task has an AlternateName of <code>ls</code>.</li>
+<li><code>Description</code> gives the Task a description in the UI.</li>
+<li><code>Code</code> points Covenant do the source *.task file.</li>
+</ul>
+<p>Finally, we need to add some <code>ReferenceAssemblies</code> for the Task - these will differ depending on the functionality of the Task.  Some Tasks use SharpSploit, others use Powerkatz (Mimikatz) and so on (we&rsquo;ll create an example of this below).  For a Task this simple, we only need basic core functionality.</p>
+<p>Find the section just below the GruntTask list that looks like:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="kt">var</span> <span class="n">getcurrentdir</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetGruntTaskByName</span><span class="p">(</span><span class="s">&#34;GetCurrentDirectory&#34;</span><span class="p">);</span>
+
+<span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">AddRangeAsync</span><span class="p">(</span>
+    <span class="k">new</span> <span class="n">GruntTaskReferenceAssembly</span> <span class="p">{</span> <span class="n">GruntTask</span> <span class="p">=</span> <span class="n">upload</span><span class="p">,</span> <span class="n">ReferenceAssembly</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetReferenceAssemblyByName</span><span class="p">(</span><span class="s">&#34;mscorlib.dll&#34;</span><span class="p">,</span> <span class="n">Common</span><span class="p">.</span><span class="n">DotNetVersion</span><span class="p">.</span><span class="n">Net35</span><span class="p">)</span> <span class="p">},</span>
+</code></pre></div><p>First define the new GruntTask:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="kt">var</span> <span class="n">helloworld</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetGruntTaskByName</span><span class="p">(</span><span class="s">&#34;HelloWorld&#34;</span><span class="p">);</span>
+</code></pre></div><p>Then add the new reference assemblies:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">new</span> <span class="n">GruntTaskReferenceAssembly</span> <span class="p">{</span> <span class="n">GruntTask</span> <span class="p">=</span> <span class="n">helloworld</span><span class="p">,</span> <span class="n">ReferenceAssembly</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetReferenceAssemblyByName</span><span class="p">(</span><span class="s">&#34;mscorlib.dll&#34;</span><span class="p">,</span> <span class="n">Common</span><span class="p">.</span><span class="n">DotNetVersion</span><span class="p">.</span><span class="n">Net35</span><span class="p">)</span> <span class="p">},</span>
+<span class="k">new</span> <span class="n">GruntTaskReferenceAssembly</span> <span class="p">{</span> <span class="n">GruntTask</span> <span class="p">=</span> <span class="n">helloworld</span><span class="p">,</span> <span class="n">ReferenceAssembly</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetReferenceAssemblyByName</span><span class="p">(</span><span class="s">&#34;mscorlib.dll&#34;</span><span class="p">,</span> <span class="n">Common</span><span class="p">.</span><span class="n">DotNetVersion</span><span class="p">.</span><span class="n">Net40</span><span class="p">)</span> <span class="p">},</span>
+<span class="k">new</span> <span class="n">GruntTaskReferenceAssembly</span> <span class="p">{</span> <span class="n">GruntTask</span> <span class="p">=</span> <span class="n">helloworld</span><span class="p">,</span> <span class="n">ReferenceAssembly</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetReferenceAssemblyByName</span><span class="p">(</span><span class="s">&#34;System.dll&#34;</span><span class="p">,</span> <span class="n">Common</span><span class="p">.</span><span class="n">DotNetVersion</span><span class="p">.</span><span class="n">Net35</span><span class="p">)</span> <span class="p">},</span>
+<span class="k">new</span> <span class="n">GruntTaskReferenceAssembly</span> <span class="p">{</span> <span class="n">GruntTask</span> <span class="p">=</span> <span class="n">helloworld</span><span class="p">,</span> <span class="n">ReferenceAssembly</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetReferenceAssemblyByName</span><span class="p">(</span><span class="s">&#34;System.dll&#34;</span><span class="p">,</span> <span class="n">Common</span><span class="p">.</span><span class="n">DotNetVersion</span><span class="p">.</span><span class="n">Net40</span><span class="p">)</span> <span class="p">},</span>
+<span class="k">new</span> <span class="n">GruntTaskReferenceAssembly</span> <span class="p">{</span> <span class="n">GruntTask</span> <span class="p">=</span> <span class="n">helloworld</span><span class="p">,</span> <span class="n">ReferenceAssembly</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetReferenceAssemblyByName</span><span class="p">(</span><span class="s">&#34;System.Core.dll&#34;</span><span class="p">,</span> <span class="n">Common</span><span class="p">.</span><span class="n">DotNetVersion</span><span class="p">.</span><span class="n">Net35</span><span class="p">)</span> <span class="p">},</span>
+<span class="k">new</span> <span class="n">GruntTaskReferenceAssembly</span> <span class="p">{</span> <span class="n">GruntTask</span> <span class="p">=</span> <span class="n">helloworld</span><span class="p">,</span> <span class="n">ReferenceAssembly</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetReferenceAssemblyByName</span><span class="p">(</span><span class="s">&#34;System.Core.dll&#34;</span><span class="p">,</span> <span class="n">Common</span><span class="p">.</span><span class="n">DotNetVersion</span><span class="p">.</span><span class="n">Net40</span><span class="p">)</span> <span class="p">},</span>
+</code></pre></div><p>Note how we need each reference for .NET 3.5 and 4.0.</p>
+<p>Now if we start Covenant, our Task should appear in the Tasks menu and be available to the Grunts.</p>
+<blockquote>
+<p>Tip:  When you make changes to <code>DbInitializer</code>, you should remove <code>Covenant\Covenant\Data\covenant.db</code> before starting Covenant again.</p>
+</blockquote>
+<p><figure>
+    <img src="/images/cov-tasks-101/helloworld-task.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/cov-tasks-101/helloworld-grunt.png"/> 
+</figure>
+</p>
+<h3 id="parameters">Parameters</h3>
+<p>Some Tasks require additional input from the user to act as a parameter.  Some may be mandatory and others optional - here we&rsquo;ve modified our task to accept some string inputs, and conditional output depending on if that optional parameter is used.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Task</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">Execute</span><span class="p">(</span><span class="kt">string</span> <span class="n">mandatoryInput</span><span class="p">,</span> <span class="kt">string</span> <span class="n">optionalInput</span> <span class="p">=</span> <span class="s">&#34;&#34;</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">string</span> <span class="n">output</span> <span class="p">=</span> <span class="s">&#34;You said: &#34;</span> <span class="p">+</span> <span class="n">mandatoryInput</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(!</span><span class="kt">string</span><span class="p">.</span><span class="n">IsNullOrEmpty</span><span class="p">(</span><span class="n">optionalInput</span><span class="p">)</span> <span class="p">||</span> <span class="n">optionalInput</span> <span class="p">!=</span> <span class="s">&#34;&#34;</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">output</span> <span class="p">+=</span> <span class="s">&#34; and &#34;</span> <span class="p">+</span> <span class="n">optionalInput</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">output</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>Generally, all inputs will be strings since that&rsquo;s all the user can type.  For example, if you need to provide an <code>int</code>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">Execute</span><span class="p">(</span><span class="kt">string</span> <span class="n">ProcessID</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">pid</span> <span class="p">=</span> <span class="kt">int</span><span class="p">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">ProcessID</span><span class="p">);</span>
+    <span class="kt">var</span> <span class="n">handle</span> <span class="p">=</span> <span class="n">Process</span><span class="p">.</span><span class="n">GetProcessById</span><span class="p">(</span><span class="n">pid</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><p>And if your code produces something other than a string&hellip;</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">Execute</span><span class="p">(</span><span class="kt">string</span> <span class="n">ProcessID</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">pid</span> <span class="p">=</span> <span class="kt">int</span><span class="p">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">ProcessID</span><span class="p">);</span>
+    <span class="kt">var</span> <span class="n">handle</span> <span class="p">=</span> <span class="n">Process</span><span class="p">.</span><span class="n">GetProcessById</span><span class="p">(</span><span class="n">pid</span><span class="p">);</span>
+    <span class="kt">var</span> <span class="n">sessionId</span> <span class="p">=</span> <span class="n">handle</span><span class="p">.</span><span class="n">SessionId</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">sessionId</span><span class="p">.</span><span class="n">ToString</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div><p>To make Covenant aware that this Task can accept inputs, we need to add a new <code>GruntTaskOption</code> list to the <code>GruntTask</code> definition.:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">new</span> <span class="n">GruntTask</span>
+<span class="p">{</span>
+    <span class="n">Name</span> <span class="p">=</span> <span class="s">&#34;HelloWorld&#34;</span><span class="p">,</span>
+    <span class="n">AlternateNames</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;{</span> <span class="s">&#34;hello&#34;</span> <span class="p">},</span>
+    <span class="n">Description</span> <span class="p">=</span> <span class="s">&#34;An example Hello World Task.&#34;</span><span class="p">,</span>
+    <span class="n">Code</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadAllText</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="n">Combine</span><span class="p">(</span><span class="n">Common</span><span class="p">.</span><span class="n">CovenantTaskCSharpDirectory</span><span class="p">,</span> <span class="s">&#34;HelloWorld&#34;</span> <span class="p">+</span> <span class="s">&#34;.task&#34;</span><span class="p">)),</span>
+    <span class="n">Options</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">GruntTaskOption</span><span class="p">&gt;</span>
+    <span class="p">{</span>
+        <span class="k">new</span> <span class="n">GruntTaskOption</span>
+        <span class="p">{</span>
+            <span class="n">Id</span> <span class="p">=</span> <span class="m">123</span><span class="p">,</span>
+            <span class="n">Name</span> <span class="p">=</span> <span class="s">&#34;InputOne&#34;</span><span class="p">,</span>
+            <span class="n">Description</span> <span class="p">=</span> <span class="s">&#34;First Input&#34;</span><span class="p">,</span>
+            <span class="n">SuggestedValues</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;{</span> <span class="s">&#34;Hello World&#34;</span> <span class="p">},</span>
+            <span class="n">Optional</span> <span class="p">=</span> <span class="k">false</span><span class="p">,</span>
+            <span class="n">DefaultValue</span> <span class="p">=</span> <span class="s">&#34;&#34;</span><span class="p">,</span>
+            <span class="n">DisplayInCommand</span> <span class="p">=</span> <span class="k">true</span>
+        <span class="p">},</span>
+        <span class="k">new</span> <span class="n">GruntTaskOption</span>
+        <span class="p">{</span>
+            <span class="n">Id</span> <span class="p">=</span> <span class="m">124</span><span class="p">,</span>
+            <span class="n">Name</span> <span class="p">=</span> <span class="s">&#34;InputTwo&#34;</span><span class="p">,</span>
+            <span class="n">Description</span> <span class="p">=</span> <span class="s">&#34;Second Input&#34;</span><span class="p">,</span>
+            <span class="n">SuggestedValues</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;(),</span>
+            <span class="n">Optional</span> <span class="p">=</span> <span class="k">true</span><span class="p">,</span>
+            <span class="n">DefaultValue</span> <span class="p">=</span> <span class="s">&#34;&#34;</span><span class="p">,</span>
+            <span class="n">DisplayInCommand</span> <span class="p">=</span> <span class="k">false</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li><code>Id</code> each Task option needs its own unique number.</li>
+<li><code>Name</code> is the name of the Task Option as it appears in the UI.</li>
+<li><code>Description</code> gives the Task Option a description in the UI.</li>
+<li><code>SuggestedValues</code> provides possible inputs for the option.  E.g. the Rubeus Task has suggested values of <code>triage</code>, <code>dump</code>, <code>kerberoast</code> and so on.</li>
+<li><code>Optional</code> obviously defines whether it can be left blank or not.</li>
+<li><code>DefaultValue</code> initialises the input with this value. It&rsquo;s particularly useful for optional parameters, to ensure it has content (albeit empty).</li>
+<li><code>DisplayInCommand</code> tells Covenant whether or not to display the input on the Interact UI.</li>
+</ul>
+<p>Executing this task via the Task UI, specifying both inputs produce the expected results.</p>
+<p><figure>
+    <img src="/images/cov-tasks-101/helloworld-tasking.png"/> 
+</figure>
+
+<figure>
+    <img src="/images/cov-tasks-101/helloworld-interact.png"/> 
+</figure>
+</p>
+<p>Notice how <code>InputTwo</code> does not appear in the Interact UI, because we set <code>DisplayInCommand</code> to <code>false</code>.  This is good for tasks that take long strings such as PowerShell Launchers, so as to not clutter the interface.</p>
+<h3 id="reference-libraries">Reference Libraries</h3>
+<p>As mentioned above, some Tasks may need to leverage the functionality from an external project.  Covenant already has a few built-in including <a href="https://github.com/cobbr/SharpSploit">SharpSploit</a>, <a href="https://github.com/GhostPack/Rubeus">Rubeus</a>, <a href="https://github.com/GhostPack/Seatbelt">Seatbelt</a> and <a href="https://github.com/GhostPack/SharpUp">SharpUp</a>.  Referencing these assemblies is relatively simple.</p>
+<p>First, add the appropriate using statement in your task.  As an example, let&rsquo;s execute the <code>WhoAmI</code> method in SharpSploit.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">using</span> <span class="nn">SharpSploit.Credentials</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Task</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">Execute</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">string</span> <span class="n">result</span> <span class="p">=</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
+
+        <span class="k">using</span> <span class="p">(</span><span class="kt">var</span> <span class="n">token</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Tokens</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="n">result</span> <span class="p">=</span> <span class="n">token</span><span class="p">.</span><span class="n">WhoAmI</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>Then in <code>DbInitializer</code>, add a new <code>GruntTaskReferenceSourceLibrary</code>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="k">new</span> <span class="n">GruntTaskReferenceSourceLibrary</span> <span class="p">{</span> <span class="n">ReferenceSourceLibrary</span> <span class="p">=</span> <span class="n">ss</span><span class="p">,</span> <span class="n">GruntTask</span> <span class="p">=</span> <span class="k">await</span> <span class="n">context</span><span class="p">.</span><span class="n">GetGruntTaskByName</span><span class="p">(</span><span class="s">&#34;HelloWorld&#34;</span><span class="p">)</span> <span class="p">}</span>
+</code></pre></div><figure>
+    <img src="/images/cov-tasks-101/whoami.png"/> 
+</figure>
+
+<p>Adding an additional reference library to the Covenant back-end is more involved and probably doesn&rsquo;t qualify as a &ldquo;101&rdquo;, so I&rsquo;ll stop this post here. For all things Covenant, join the #Covenant channel in the <a href="https://bloodhoundgang.herokuapp.com/">BloodHound Slack</a>.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/c3-first-look/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/gadgettojscript/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

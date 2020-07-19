@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">GadgetToJScript</h1>
+    
+      
+    <nav id="TableOfContents"></nav>
+    <p>Back in April 2017, <a href="https://twitter.com/tiraniddo">James Forshaw</a> (hail) released a tool called <a href="https://github.com/tyranid/DotNetToJScript">DotNetToJScript</a> which was capable of generating JScript, VBA and VBScript that could run an arbitrary .NET assembly (mostly) from memory.  Although not its intended purpose, it was quickly picked up by tool developers, pentesters, red teamers, bad guys etc and used to deliver .NET-based payloads via methods such as <a href="https://en.wikipedia.org/wiki/HTML_Application">HTA</a>.</p>
+<p>Microsoft and other AV vendors started writing signatures for DN2JS, and we all know how that makes James feel (Exhibits <a href="https://twitter.com/tiraniddo/status/1204970332127236097">A</a> and <a href="https://twitter.com/tiraniddo/status/951489836027990019">B</a>).  Microsoft even went as far as to make some under-the-hood changes from Windows 10 / 2K16 to mitigate the use of DN2JS payloads, as evidenced by these notes in Covenant:</p>
+<figure>
+    <img src="/images/gadgettojscript/covenant.png"/> 
+</figure>
+
+<p>These factors seem to have resulted in a decline in prevalence for these payloads, or at least, they&rsquo;re not hyped about so much.</p>
+<p>Enter <a href="https://github.com/med0x2e/GadgetToJScript">GadgetToJScript</a> by <a href="https://twitter.com/med0x2e">Mohamed El Azaar</a>.  This tool generates .NET serialized gadgets that can trigger assembly load/execution when deserialized via BinaryFormatter from JScript, VBScript or VBA.  So it once again, allows for a similar tradecraft as was originally provided by DN2JS <strong>and</strong> it works on Windows 10.</p>
+<hr>
+<p>Before picking up the tool I had a quick Google to find any articles regarding its use, but <a href="https://3xpl01tc0d3r.blogspot.com/2020/02/gadgettojscript-covenant-donut.html">this</a> example by <a href="https://twitter.com/chiragsavla94">Chirag Savla</a> is the only one I could really find.</p>
+<p>Since the <code>ActivitySurrogateSelector</code> portion of G2JS is based on the work in <a href="https://github.com/pwntester/ysoserial.net">ysoserial.net</a>, it&rsquo;s no surprise that they seem to work in similar ways.  The ysoserial.net usage example says <code>ActivitySurrogateSelector (This gadget ignores the command parameter and executes the constructor of ExploitClass class.)</code>.  The <code>ExploitClass</code> is <a href="https://github.com/pwntester/ysoserial.net/blob/master/ysoserial/ExploitClass.cs">here</a> and is actually compiled into the binary.</p>
+<p>G2JS also requires that we execute from the constructor of a class; the out-of-the-box payload is hardcoded into the G2JS binary (as a string no less) and any required Reference Assemblies are hardcoded.</p>
+<figure>
+    <img src="/images/gadgettojscript/test-assembly-loader.png"/> 
+</figure>
+
+<p>To me, this isn&rsquo;t a very friendly approach, as I don&rsquo;t want to modify and recompile G2JS for each payload I want to generate.  Chirag <a href="https://gist.github.com/3xpl01tc0d3r/ecf5e1ac09935c674a9c6939c694da13#file-testassemblyloader-cs-L25">solved</a> this issue by modifying the <code>TestAssemblyLoader</code> class to read the payload in from a text file (from the current working directory), but still has this limitation of <a href="https://gist.github.com/3xpl01tc0d3r/ecf5e1ac09935c674a9c6939c694da13#file-testassemblyloader-cs-L18-L22">hardcoding</a> any reference assemblies required by the compiler.</p>
+<p>To make the tool more usable for my needs, I have a <a href="https://github.com/rasta-mouse/GadgetToJScript">forked version</a> of G2JS that can accept an input file and reference assemblies on the command line.  Let&rsquo;s see how it works.</p>
+<hr>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">&gt; GadgetToJScript.exe -h
+Usage:
+  -i, --input=VALUE          Input file, example:
+                               C:\Users\userX\Desktop\payload.cs
+  -r, --references=VALUE     Reference Assemblies, example: System.dll,Syste-
+                               m.IO.Compression.dll
+  -w, --scriptType=VALUE     js, vbs, vba or hta
+  -e, --encodeType=VALUE     VBA gadgets encoding: b64 or hex (default set to
+                               b64)
+  -o, --output=VALUE         Generated payload output file, example:
+                               C:\Users\userX\Desktop\output (Without extension)
+  -f, --regfree              Registration-free activation of .NET based COM
+                               components
+  -h, -?, --help             Show Help
+</code></pre></div><p>The two new options are seen here.  <code>-i</code> for the input file and <code>-r</code> to provide any required references as a comma-separated list (<code>-r</code> was previously assigned to <code>-regfree</code>, which I&rsquo;ve changed to <code>-f</code>).</p>
+<blockquote>
+<p><code>System.dll</code> is actually hardcoded, so there&rsquo;s no need to specify it on the cmdline even though it&rsquo;s in the usage example.</p>
+</blockquote>
+<p>This test payload was written in a completely separate .NET Class Library project.  We can see that it&rsquo;s using <code>System.Windows.Forms</code> to display a MessageBox.</p>
+<figure>
+    <img src="/images/gadgettojscript/test-payload.png"/> 
+</figure>
+
+<p>If we try to build this, it will fail because the G2JS compiler has no reference to the <code>Forms</code> namespace.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">&gt; GadgetToJScript.exe -i ..\..\..\TestPayload\TestClass.cs -w js -o D:\Tools\this-will-fail
+
+Unhandled Exception: System.InvalidOperationException: Error (CS0234): The type or namespace name &#39;Forms&#39; does not exist in the namespace &#39;System.Windows&#39; (are you missing an assembly reference?): 1
+
+   at GadgetToJScript.AssemblyLoader.Compile(String InputFile, String ReferenceAssemblies) in D:\Tools\GadgetToJScript\GadgetToJScript\AssemblyLoader.cs:line 44
+   at GadgetToJScript.Program.Main(String[] args) in D:\Tools\GadgetToJScript\GadgetToJScript\Program.cs:line 133
+</code></pre></div><p>To &ldquo;fix&rdquo; this, all we need to do is specify <code>System.Windows.Forms.dll</code> as a reference.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">&gt; GadgetToJScript.exe -i ..\..\..\TestPayload\TestClass.cs -r System.Windows.Forms.dll -w js -o D:\Tools\msgbox
+</code></pre></div><figure>
+    <img src="/images/gadgettojscript/msgbox.png"/> 
+</figure>
+
+<p>I won&rsquo;t bother going into more complex payloads, as Chirag already did a good job with that.  Hopefully these modifications will make it a little easier and more practical for people to pick up and use GadgetToJScript.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/covenant-tasks-101/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/sharpc2/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

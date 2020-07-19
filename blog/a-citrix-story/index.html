@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">A Citrix Story</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#persistence">Persistence</a></li>
+    <li><a href="#priv-esc">Priv Esc</a></li>
+    <li><a href="#lateral-movement">Lateral Movement</a></li>
+    <li><a href="#the-desktop-shuffle">The Desktop Shuffle</a>
+      <ul>
+        <li><a href="#rince-and-repeat">Rince and Repeat</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    <p>I recently had the pleasure of partaking in a Citrix Virtual Desktop infrastructure assessment.</p>
+<h2 id="background">Background</h2>
+<p>The purpose of the system was to provide staff a means of accessing internal resources via a BYOD model.  They would login to a publically available Citrix Access Gateway and receive a virtual desktop instance of Windows 7.</p>
+<p>The scope was limited to the VDI&rsquo;s so I wasn&rsquo;t to attack other elements of the domain, which made lateral movement a pain in particular.  This post is an outline of how, after initial local privilege escalation, I was able to leverage Kerberos Silver Tickets as a means of maintaining elevated persistence and lateral movement capability.</p>
+<p>This was a partial white-box review, so I did have some valid credentials to log in with.  So we&rsquo;ll kick this off with a Cobalt Strike foothold.</p>
+<figure>
+    <img src="/images/citrix/1-vdi4_nlove.PNG"/> 
+</figure>
+
+<h2 id="persistence">Persistence</h2>
+<p>I have a session as <code>nlove</code>, and I&rsquo;d like to keep it that way.  One tricky aspect to VDI is that each time a user logs on, they get assigned a fresh desktop from the master image.  This means that once a user logs off a virtual desktop, any changes they may&rsquo;ve made are lost.  Provisions must be made for users&rsquo; files etc, but like regular domain roaming profiles, there are some elements that get left behind.</p>
+<p>In this case, it turns out practically everything that occurs within userland persist across different VDI sessions, including HKCU.  So I setup a really simple level of persistence in <code>HKCU\Software\Microsoft\Windows\CurrentVersion\Run</code>.</p>
+<p>This persistence method also helps us with our lateral movement problem - more on that later.</p>
+<h2 id="priv-esc">Priv Esc</h2>
+<p>This turned out to be relatively simple.</p>
+<figure>
+    <img src="/images/citrix/2-vdi4_localadmins.PNG"/> 
+</figure>
+
+<p>One of the system administrators must&rsquo;ve put <code>bob</code> in at some point for testing or during early development, but it was a pretty big derp as it has no password.  The only difficultly I had was spawning a new session via Beacon.  The built-in parser won&rsquo;t handle a blank password and writing a custom aggressor script to run <code>bspawnas</code> didn&rsquo;t work either.  I tried a few others like <code>runas</code>, but I eventually resigned myself to elevating in the actual virtual desktop.  So I just uploaded a stageless PowerShell SMB payload and ran it manually.</p>
+<p><figure>
+    <img src="/images/citrix/3-vdi4_bob.PNG"/> 
+</figure>
+
+<figure>
+    <img src="/images/citrix/4-vdi4_smbbeacon.PNG"/> 
+</figure>
+
+<figure>
+    <img src="/images/citrix/5-vdi4_bobbeacon.PNG"/> 
+</figure>
+</p>
+<p>If any readers have a solution to this - please let me know!</p>
+<p>Now that we have admin access over the desktop, we can carry out the classic act of dumping all the password hashes.  The accounts we&rsquo;re interested in are <code>CitrixAdmin</code> and <code>VDI-004$</code>.</p>
+<figure>
+    <img src="/images/citrix/6-vdi4_creds.PNG"/> 
+</figure>
+
+<p>The Cobalt Strike credential parser doesn&rsquo;t grab machine hashes by default.  <a href="https://github.com/bluscreenofjeff/AggressorScripts/blob/master/silver-tickets.cna">Silver Ticket Monitor</a> is an aggressor extension built by <a href="https://twitter.com/bluscreenofjeff">Jeff Dimmock</a>, which enables machine hash tracking and provides a new GUI popup for crafting Silver Tickets.</p>
+<h2 id="lateral-movement">Lateral Movement</h2>
+<p>Even though I have the credentials for 2 local admin accounts (the built-in Administrator account is disabled), they can&rsquo;t be used to move laterally across the other VDIs.  Non-RID 500 accounts cannot (by default) authenticate as administrators across a network, even if the credentials are identical across computers.  <a href="https://twitter.com/harmj0y">Will Schroeder</a> <a href="http://www.harmj0y.net/blog/redteaming/pass-the-hash-is-dead-long-live-localaccounttokenfilterpolicy/">blogged</a> about this a while ago.</p>
+<h2 id="the-desktop-shuffle">The Desktop Shuffle</h2>
+<p>This is where things start getting at least a little more interesting.</p>
+<p>Let&rsquo;s say <code>nlove</code> logs off for the day and we lose our Beacons.  Next morning he logs on and gets a fresh virtual desktop.  Because his user profile follows him from desktop to desktop, our registry persistence calls back and we get a new session.  This time on <code>VDI-001</code>.</p>
+<figure>
+    <img src="/images/citrix/7-vdi1_nlove.PNG"/> 
+</figure>
+
+<p>We can elevate using the <code>CitrixAdmin</code> account, because the password is the same across all systems.  Here, we do a <code>spawnas</code> and <code>bypassuac</code>.</p>
+<figure>
+    <img src="/images/citrix/8-vdi1_elevate.PNG"/> 
+</figure>
+
+<p>We can now dump the machine hash for <code>VDI-001</code>.  The next trick, is moving laterally back to <code>VDI-004</code>, which we can do using its machine hash that we obtained previously.  Using Jeff&rsquo;s extension:</p>
+<figure>
+    <img src="/images/citrix/9-silver_ticket.PNG"/> 
+</figure>
+
+<p>The domain SID can be obtained via <code>shell whoami /all</code>; and the actual <code>mimiktaz</code> command to forge the Silver Ticket is <code>mimikatz kerberos::golden /user:CitrixAdmin /domain:wild-west.local /sid:S-1-5-21-4247185703-3639085842-2880657779 /target:VDI-004.wild-west.local /rc4:ea0830b4abd1f2c976bb443f64f8186d /service:cifs /ptt</code></p>
+<p>Once the ticket has been injected into our current session, we can simply do a <code>psexec_psh</code> (or whatever method you prefer) to take <code>VDI-004</code>.</p>
+<figure>
+    <img src="/images/citrix/10-vdi1_4.PNG"/> 
+</figure>
+
+<p>Now we have control over 2 VDIs.</p>
+<p>If we take a look at <code>VDI-004</code> we can see that it&rsquo;s been assigned to another user, <code>rparker</code>.</p>
+<figure>
+    <img src="/images/citrix/11-vdi4_netlogons.PNG"/> 
+</figure>
+
+<p>We can obviously steal his password, inject a new Beacon into one of his processes and setup the same userland persistance as with <code>nlove</code>.</p>
+<p><figure>
+    <img src="/images/citrix/12-vdi4_creds.PNG"/> 
+</figure>
+
+<figure>
+    <img src="/images/citrix/13-vdi1_4.PNG"/> 
+</figure>
+</p>
+<h3 id="rince-and-repeat">Rince and Repeat</h3>
+<p>Let&rsquo;s say another day goes by, <code>nlove</code> and <code>rparker</code> have logged back in and are assigned <code>VDI-005</code> and <code>VDI-003</code> respectively.</p>
+<figure>
+    <img src="/images/citrix/14-vdi3_5.PNG"/> 
+</figure>
+
+<p>We elevate on both desktops.</p>
+<figure>
+    <img src="/images/citrix/15-vdi3_5_elevated.PNG"/> 
+</figure>
+
+<p>Dump the hashes.</p>
+<figure>
+    <img src="/images/citrix/16-vdi1345_creds.PNG"/> 
+</figure>
+
+<p>And Pass the Ticket to take <code>VDI-001</code> and <code>VDI-004</code> again.</p>
+<figure>
+    <img src="/images/citrix/17-moar_vdi.PNG"/> 
+</figure>
+
+<p>We now discover a new user on <code>VDI-004</code> - <code>jhardin</code>.</p>
+<figure>
+    <img src="/images/citrix/18-vdi4_jhardin.PNG"/> 
+</figure>
+
+<p>Follow the same process of persisting as <code>jhardin</code> and spreading to more desktops.</p>
+<figure>
+    <img src="/images/citrix/19-final.PNG"/> 
+</figure>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>There are obviously better and more elegent methods of moving laterally across machines.  Given the limitation of the scope, this seemed to be the best available option.  By default, computer hashes are automatically rotated every 30 days, so it would be a lot of work to maintain access across a large number of desktops.  As long as there is sufficient overlap between the computer and <code>CitrixAdmin</code> account passwords being changed, you could likely persist in this manner for a long time.</p>
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a class="grayed-out" href="javascript:void()"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/playing-with-cuckoo/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>

