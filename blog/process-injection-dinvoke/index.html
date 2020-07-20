@@ -93,7 +93,9 @@
 <p>Platform Invoke (P/Invoke) allows you to access methods within unmanaged libraries from managed code.  In other words for us attackers - load and use native DLLs from .NET assemblies.  Those that have used or written offensive tooling in C# (particularly for process injection) have seen this numerous times.</p>
 <div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="na">[DllImport(&#34;kernel32.dll&#34;)]</span>
 <span class="k">static</span> <span class="k">extern</span> <span class="n">IntPtr</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="kt">int</span> <span class="n">dwDesiredAccess</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bInheritHandle</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dwProcessId</span><span class="p">);</span>
-</code></pre></div><p>First we define a <code>DllImport</code> attribute, providing the DLL that contains the method we want.  Then provide the &ldquo;signature&rdquo; of that method, which defines what parameters it expects to take in and what it should return.  These need to be &ldquo;translated&rdquo; from the native <a href="https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess">documentation</a>, e.g. instead of a <code>HANDLE</code> in C, we use an <code>Intptr</code> in C#.  Thereafter, we can just call this method from with our C#:  <code>IntPtr hProcess = OpenProcess(0x001F0FFF, false, int.Parse(args[1]));</code>  (where <code>0x001F0FFF</code> equates to <code>PROCESS_ALL_ACCESS</code>).</p>
+</code></pre></div><p>First we define a <code>DllImport</code> attribute, providing the DLL that contains the method we want.  Then provide the &ldquo;signature&rdquo; of that method, which defines what parameters it expects to take in and what it should return.  These need to be &ldquo;translated&rdquo; from the native <a href="https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess">documentation</a>, e.g. instead of a <code>HANDLE</code> in C, we use an <code>Intptr</code> in C#.  Thereafter, we can just call this method from with our C#:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c#" data-lang="c#"><span class="n">IntPtr</span> <span class="n">hProcess</span> <span class="p">=</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="m">0</span><span class="n">x001F0FFF</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="kt">int</span><span class="p">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="m">1</span><span class="p">]));</span>
+</code></pre></div><p>(where <code>0x001F0FFF</code> equates to <code>PROCESS_ALL_ACCESS</code>).</p>
 <p>The .NET runtime actually uses P/Invoke by design and namespaces like <code>System.Diagnostics</code> rely on <code>OpenProcess</code> under the hood.  For instance, <code>IntPtr hProcess = Process.GetProcessById(x)</code> also gives us handle to the process, but the API calls have harded parameters such as <code>PROCESS_QUERY_INFORMATION</code>.  So although we have a handle, it may not be of sufficient privilege and other API calls may not be exposed via the framework at all.  This is why manually P/Invoking is necessary to access these APIs directly.</p>
 <p>However, as TheWover explains, there are two disadvantages to using P/Invoke in this way:</p>
 <ol>
@@ -136,9 +138,14 @@
         <span class="k">static</span> <span class="k">extern</span> <span class="n">IntPtr</span> <span class="n">CreateRemoteThread</span><span class="p">(</span><span class="n">IntPtr</span> <span class="n">hProcess</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpThreadAttributes</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">dwStackSize</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpStartAddress</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpParameter</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">dwCreationFlags</span><span class="p">,</span> <span class="n">IntPtr</span> <span class="n">lpThreadId</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><p>If we use <a href="http://www.rohitab.com/apimonitor">API Monitor</a> as our would-be EDR, set hooks on these API calls and execute InjectionTest.exe, we can see how it picks up the details of our calls.</p>
+</code></pre></div><p>If we use <a href="http://www.rohitab.com/apimonitor">API Monitor</a> as our would-be EDR, set hooks on these API calls and execute <code>InjectionTest.exe</code>, we can see how it picks up the details of our calls.</p>
 <figure>
     <img src="/images/dinvoke/WriteProcessMemory.png"/> 
+</figure>
+
+<p>Furthermore, we can see how the assembly is locating those API calls at runtime using <code>GetProcAddress</code>.</p>
+<figure>
+    <img src="/images/dinvoke/GetProcAddress.png"/> 
 </figure>
 
 <p>API Monitor restores execution flow, but an EDR would obviously not be that considerate.  Some EDRs may outright block access to these APIs, or at least will be able to inspect the calls (and even see the shellcode) before making some sort of decision for blocking.  So let&rsquo;s replace P/Invoke for D/Invoke - the process is not as hard as you expect.</p>
@@ -199,6 +206,11 @@
 </code></pre></div><p>As we can see - with the same hooks in place, API Monitor no longer sees our API calls and we still get our Beacon.</p>
 <figure>
     <img src="/images/dinvoke/Beacon.png"/> 
+</figure>
+
+<p>We also don&rsquo;t see the same calls to <code>GetProcAddress</code> to get the addresses of those functions.</p>
+<figure>
+    <img src="/images/dinvoke/FindNotFound.png"/> 
 </figure>
 
 <h1 id="conclusion">Conclusion</h1>
